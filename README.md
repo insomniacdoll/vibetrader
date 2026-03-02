@@ -1,10 +1,10 @@
 # VibeTrader 
 Toward an Open Source AI-Friendly Trading Platform
 
-## For Developer
+## For Developers
 https://deepwiki.com/dcaoyuan/vibetrader
 
-## For User
+## For Users
 
 ### Shortcuts
 
