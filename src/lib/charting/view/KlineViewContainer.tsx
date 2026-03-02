@@ -76,6 +76,7 @@ import { fetchData, Source } from "../../domain/DataFecther";
 type Props = {
     toggleColorTheme?: () => void
     colorTheme?: 'light' | 'dark'
+    chartOnly: boolean
 }
 
 type State = {
@@ -1035,134 +1036,135 @@ class KlineViewContainer extends Component<Props, State> {
             <div style={{ display: "flex", width: '100%' }}>
 
                 {/* Toolbar */}
-                <div style={{ display: "inline-block", paddingTop: '3px' }}>
+                {this.props.chartOnly === false &&
+                    <div style={{ display: "inline-block", paddingTop: '3px' }}>
 
-                    <ActionButtonGroup orientation="vertical" >
+                        <ActionButtonGroup orientation="vertical" >
 
-                        <ToggleButtonGroup
-                            orientation="vertical"
-                            selectionMode="single"
-                            selectedKeys={this.state.drawingIdsToCreate}
-                            onSelectionChange={this.setDrawingIdsToCreate}
-                        >
-                            <TooltipTrigger placement="end">
-                                <ToggleButton id="line">
-                                    <Line />
-                                </ToggleButton>
-                                <Tooltip >
-                                    Draw line
-                                </Tooltip>
-                            </TooltipTrigger>
-
-                            <TooltipTrigger placement="end">
-                                <ToggleButton id="parallel">
-                                    <Properties />
-                                </ToggleButton>
-                                <Tooltip >
-                                    Draw parallel
-                                </Tooltip>
-                            </TooltipTrigger>
-
-                            <TooltipTrigger placement="end">
-                                <ToggleButton id="gann_angles">
-                                    <Collection />
-                                </ToggleButton>
-                                <Tooltip >
-                                    Draw Gann angles
-                                </Tooltip>
-                            </TooltipTrigger>
-
-                            <TooltipTrigger placement="end">
-                                <ToggleButton id="fibonacci_retrace" >
-                                    <DistributeSpaceVertically />
-                                </ToggleButton>
-                                <Tooltip >
-                                    Draw Fibonacci retrace
-                                </Tooltip>
-                            </TooltipTrigger>
-
-                            <TooltipTrigger placement="end">
-                                <ToggleButton id="fibonacci_timezone">
-                                    <DistributeSpaceHorizontally />
-                                </ToggleButton>
-                                <Tooltip >
-                                    Draw Fibonacci time zone
-                                </Tooltip>
-                            </TooltipTrigger>
-
-                            <TooltipTrigger placement="end">
-                                <ToggleButton id="fibonacci_retrace_v">
-                                    <AudioWave />
-                                </ToggleButton>
-                                <Tooltip >
-                                    Draw Fibonacci time retrace
-                                </Tooltip>
-                            </TooltipTrigger>
-
-                            <TooltipTrigger placement="end">
-                                <ToggleButton id="polyline" >
-                                    <DirectSelect />
-                                </ToggleButton>
-                                <Tooltip >
-                                    Draw polyline
-                                </Tooltip>
-                            </TooltipTrigger>
-
-                        </ToggleButtonGroup>
-
-                        <Divider staticColor='auto' />
-
-                        <TooltipTrigger placement="end">
-                            <ActionButton onPress={() => this.setState({
-                                updateDrawing: {
-                                    action: 'hide',
-                                    isHidingDrawing: !this.state.updateDrawing.isHidingDrawing
-                                }
-                            })}
+                            <ToggleButtonGroup
+                                orientation="vertical"
+                                selectionMode="single"
+                                selectedKeys={this.state.drawingIdsToCreate}
+                                onSelectionChange={this.setDrawingIdsToCreate}
                             >
-                                <SelectNo />
-                            </ActionButton>
-                            <Tooltip >
-                                Hide drawings
-                            </Tooltip>
-                        </TooltipTrigger>
+                                <TooltipTrigger placement="end">
+                                    <ToggleButton id="line">
+                                        <Line />
+                                    </ToggleButton>
+                                    <Tooltip >
+                                        Draw line
+                                    </Tooltip>
+                                </TooltipTrigger>
 
-                        <TooltipTrigger placement="end">
-                            <ActionButton onPress={() => this.setState({
-                                updateDrawing: {
-                                    ...(this.state.updateDrawing),
-                                    action: 'delete'
-                                }
-                            })}
-                            >
-                                <SelectNone />
-                            </ActionButton>
-                            <Tooltip>
-                                Delete selected drawing
-                            </Tooltip>
-                        </TooltipTrigger>
+                                <TooltipTrigger placement="end">
+                                    <ToggleButton id="parallel">
+                                        <Properties />
+                                    </ToggleButton>
+                                    <Tooltip >
+                                        Draw parallel
+                                    </Tooltip>
+                                </TooltipTrigger>
 
-                        <Divider staticColor='auto' />
+                                <TooltipTrigger placement="end">
+                                    <ToggleButton id="gann_angles">
+                                        <Collection />
+                                    </ToggleButton>
+                                    <Tooltip >
+                                        Draw Gann angles
+                                    </Tooltip>
+                                </TooltipTrigger>
 
-                        <TooltipTrigger placement="end">
-                            <ActionButton onPress={this.toggleKlineKind} >
-                                <DistributeHorizontalCenter />
-                            </ActionButton>
-                            <Tooltip >
-                                Toggle candle/bar chart
-                            </Tooltip>
-                        </TooltipTrigger>
+                                <TooltipTrigger placement="end">
+                                    <ToggleButton id="fibonacci_retrace" >
+                                        <DistributeSpaceVertically />
+                                    </ToggleButton>
+                                    <Tooltip >
+                                        Draw Fibonacci retrace
+                                    </Tooltip>
+                                </TooltipTrigger>
 
-                        <TooltipTrigger placement="end">
-                            <ActionButton onPress={this.toggleScalar} >
-                                <Percentage />
-                            </ActionButton>
-                            <Tooltip >
-                                Toggle Linear/Lg scale
-                            </Tooltip>
-                        </TooltipTrigger>
+                                <TooltipTrigger placement="end">
+                                    <ToggleButton id="fibonacci_timezone">
+                                        <DistributeSpaceHorizontally />
+                                    </ToggleButton>
+                                    <Tooltip >
+                                        Draw Fibonacci time zone
+                                    </Tooltip>
+                                </TooltipTrigger>
 
-                        {/* <TooltipTrigger placement="end">
+                                <TooltipTrigger placement="end">
+                                    <ToggleButton id="fibonacci_retrace_v">
+                                        <AudioWave />
+                                    </ToggleButton>
+                                    <Tooltip >
+                                        Draw Fibonacci time retrace
+                                    </Tooltip>
+                                </TooltipTrigger>
+
+                                <TooltipTrigger placement="end">
+                                    <ToggleButton id="polyline" >
+                                        <DirectSelect />
+                                    </ToggleButton>
+                                    <Tooltip >
+                                        Draw polyline
+                                    </Tooltip>
+                                </TooltipTrigger>
+
+                            </ToggleButtonGroup>
+
+                            <Divider staticColor='auto' />
+
+                            <TooltipTrigger placement="end">
+                                <ActionButton onPress={() => this.setState({
+                                    updateDrawing: {
+                                        action: 'hide',
+                                        isHidingDrawing: !this.state.updateDrawing.isHidingDrawing
+                                    }
+                                })}
+                                >
+                                    <SelectNo />
+                                </ActionButton>
+                                <Tooltip >
+                                    Hide drawings
+                                </Tooltip>
+                            </TooltipTrigger>
+
+                            <TooltipTrigger placement="end">
+                                <ActionButton onPress={() => this.setState({
+                                    updateDrawing: {
+                                        ...(this.state.updateDrawing),
+                                        action: 'delete'
+                                    }
+                                })}
+                                >
+                                    <SelectNone />
+                                </ActionButton>
+                                <Tooltip>
+                                    Delete selected drawing
+                                </Tooltip>
+                            </TooltipTrigger>
+
+                            <Divider staticColor='auto' />
+
+                            <TooltipTrigger placement="end">
+                                <ActionButton onPress={this.toggleKlineKind} >
+                                    <DistributeHorizontalCenter />
+                                </ActionButton>
+                                <Tooltip >
+                                    Toggle candle/bar chart
+                                </Tooltip>
+                            </TooltipTrigger>
+
+                            <TooltipTrigger placement="end">
+                                <ActionButton onPress={this.toggleScalar} >
+                                    <Percentage />
+                                </ActionButton>
+                                <Tooltip >
+                                    Toggle Linear/Lg scale
+                                </Tooltip>
+                            </TooltipTrigger>
+
+                            {/* <TooltipTrigger placement="end">
                             <ActionButton onPress={this.toggleOnCalendarMode} >
                                 {this.state.xc.isOnCalendarMode ? <StarFilled /> : <Star />}
                             </ActionButton>
@@ -1171,74 +1173,74 @@ class KlineViewContainer extends Component<Props, State> {
                             </Tooltip>
                         </TooltipTrigger> */}
 
-                        <TooltipTrigger placement="end">
-                            <ActionButton onPress={this.backToOriginalChartScale} >
-                                <Maximize />
-                            </ActionButton>
-                            <Tooltip >
-                                Original chart height
-                            </Tooltip>
-                        </TooltipTrigger>
+                            <TooltipTrigger placement="end">
+                                <ActionButton onPress={this.backToOriginalChartScale} >
+                                    <Maximize />
+                                </ActionButton>
+                                <Tooltip >
+                                    Original chart height
+                                </Tooltip>
+                            </TooltipTrigger>
 
-                        <TooltipTrigger placement="end">
-                            <ActionButton onPress={this.toggleCrosshairVisiable} >
-                                <Add />
-                            </ActionButton>
-                            <Tooltip >
-                                Toggle crosshair visible
-                            </Tooltip>
-                        </TooltipTrigger>
+                            <TooltipTrigger placement="end">
+                                <ActionButton onPress={this.toggleCrosshairVisiable} >
+                                    <Add />
+                                </ActionButton>
+                                <Tooltip >
+                                    Toggle crosshair visible
+                                </Tooltip>
+                            </TooltipTrigger>
 
-                        <Divider staticColor='auto' />
+                            <Divider staticColor='auto' />
 
-                        <TooltipTrigger placement="end">
-                            <ActionButton onPress={this.props.toggleColorTheme} >
-                                <BrightnessContrast />
-                            </ActionButton>
-                            <Tooltip>
-                                Toggle color theme
-                            </Tooltip>
-                        </TooltipTrigger>
-
-                        <TooltipTrigger placement="end">
-                            <DialogTrigger>
-                                <ActionButton >
-                                    <HelpCircle />
+                            <TooltipTrigger placement="end">
+                                <ActionButton onPress={this.props.toggleColorTheme} >
+                                    <BrightnessContrast />
                                 </ActionButton>
                                 <Tooltip>
-                                    Help
+                                    Toggle color theme
                                 </Tooltip>
+                            </TooltipTrigger>
 
-                                <Popover>
-                                    <div className="help" >
-                                        <Help />
-                                    </div>
-                                </Popover>
-                            </DialogTrigger>
-                        </TooltipTrigger>
+                            <TooltipTrigger placement="end">
+                                <DialogTrigger>
+                                    <ActionButton >
+                                        <HelpCircle />
+                                    </ActionButton>
+                                    <Tooltip>
+                                        Help
+                                    </Tooltip>
 
-                        <Divider staticColor='auto' />
+                                    <Popover>
+                                        <div className="help" >
+                                            <Help />
+                                        </div>
+                                    </Popover>
+                                </DialogTrigger>
+                            </TooltipTrigger>
 
-                        <TooltipTrigger placement="end">
-                            <DialogTrigger>
-                                <ActionButton onPress={this.handleTakeScreenshot} >
-                                    <Exposure />
-                                </ActionButton>
-                                <Tooltip>
-                                    Take screenshot
-                                </Tooltip>
+                            <Divider staticColor='auto' />
 
-                                <Popover>
-                                    <div className="help" >
-                                        <Screenshot canvas={this.state.screenshot} />
-                                    </div>
-                                </Popover>
-                            </DialogTrigger>
-                        </TooltipTrigger>
+                            <TooltipTrigger placement="end">
+                                <DialogTrigger>
+                                    <ActionButton onPress={this.handleTakeScreenshot} >
+                                        <Exposure />
+                                    </ActionButton>
+                                    <Tooltip>
+                                        Take screenshot
+                                    </Tooltip>
 
-                    </ActionButtonGroup>
+                                    <Popover>
+                                        <div className="help" >
+                                            <Screenshot canvas={this.state.screenshot} />
+                                        </div>
+                                    </Popover>
+                                </DialogTrigger>
+                            </TooltipTrigger>
 
-                </div>
+                        </ActionButtonGroup>
+
+                    </div>}
 
                 {/* View Container, width should be set at '.viewcontainer' in vibetrader.css */}
                 <div className="viewcontainer" style={{ paddingLeft: '6px', height: this.state.containerHeight + 'px' }}
@@ -1258,19 +1260,21 @@ class KlineViewContainer extends Component<Props, State> {
                             <div className="borderLeftUp" style={{ top: this.hTitle - 8 }} />
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%', height: this.hIndtags, paddingTop: "0px" }}>
-                            <TagGroup
-                                aria-label="Or need 'label' that will show" // An aria-label or aria-labelledby prop is required for accessibility.
-                                size="S"
-                                selectionMode="multiple"
-                                selectedKeys={this.state.selectedIndicatorTags}
-                                onSelectionChange={this.setSelectedIndicatorTags}
-                            >
-                                {allIndTags.map((tag, n) =>
-                                    <Tag key={"ind-tag-" + n} id={tag}>{tag.toUpperCase()}</Tag>
-                                )}
-                            </TagGroup>
-                        </div>
+                        {/* Indicator tags */}
+                        {this.props.chartOnly === false &&
+                            <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%', height: this.hIndtags, paddingTop: "0px" }}>
+                                <TagGroup
+                                    aria-label="Or need 'label' that will show" // An aria-label or aria-labelledby prop is required for accessibility.
+                                    size="S"
+                                    selectionMode="multiple"
+                                    selectedKeys={this.state.selectedIndicatorTags}
+                                    onSelectionChange={this.setSelectedIndicatorTags}
+                                >
+                                    {allIndTags.map((tag, n) =>
+                                        <Tag key={"ind-tag-" + n} id={tag}>{tag.toUpperCase()}</Tag>
+                                    )}
+                                </TagGroup>
+                            </div>}
 
                         <div style={{ position: 'relative', width: '100%', height: this.state.svgHeight }}>
 

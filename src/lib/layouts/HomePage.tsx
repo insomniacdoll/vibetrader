@@ -12,6 +12,7 @@ const HomePage = (props: HomePageProps) => {
             <KlineViewContainer
                 toggleColorTheme={props.toggleColorTheme}
                 colorTheme={props.colorTheme}
+                chartOnly={false}
             />
         </div>)
 };
