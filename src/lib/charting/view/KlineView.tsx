@@ -14,6 +14,7 @@ import PlotShape from "../plot/PlotShape";
 import PlotHline from "../plot/PlotHline";
 import PlotFill from "../plot/PlotFill";
 import PlotBgcolor from "../plot/PlotBgcolor";
+import PlotDrawingLine from "../plot/PlotDrawingLine";
 
 
 export class KlineView extends ChartView<ViewProps, ViewState> {
@@ -139,6 +140,18 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
 
                         case 'background':
                             chart = <PlotBgcolor
+                                tvar={tvar}
+                                xc={xc}
+                                yc={yc}
+                                depth={0}
+                                atIndex={atIndex}
+                                options={options}
+                                name={title}
+                            />
+                            break
+
+                        case 'drawing_line':
+                            chart = <PlotDrawingLine
                                 tvar={tvar}
                                 xc={xc}
                                 yc={yc}

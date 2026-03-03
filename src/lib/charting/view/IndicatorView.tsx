@@ -12,6 +12,7 @@ import PlotCrossCircles from "../plot/PlotCrossCircles";
 import PlotFill from "../plot/PlotFill";
 import type { PineData } from "../../domain/PineData";
 import PlotBgcolor from "../plot/PlotBgcolor";
+import PlotDrawingLine from "../plot/PlotDrawingLine";
 
 export class IndicatorView extends ChartView<ViewProps, ViewState> {
     constructor(props: ViewProps) {
@@ -101,6 +102,18 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
 
                 case 'background':
                     chart = <PlotBgcolor
+                        tvar={tvar}
+                        xc={xc}
+                        yc={yc}
+                        depth={0}
+                        atIndex={atIndex}
+                        options={options}
+                        name={title}
+                    />
+                    break
+
+                case 'drawing_line':
+                    chart = <PlotDrawingLine
                         tvar={tvar}
                         xc={xc}
                         yc={yc}
