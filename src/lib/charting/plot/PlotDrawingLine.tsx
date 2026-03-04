@@ -71,11 +71,12 @@ const PlotDrawingLine = (props: Props) => {
                 let xPos2: number;
 
                 switch (xloc) {
-                    case 'bar_time':
+                    case 'bt': // bar_time
                         xPos1 = xc.xb(xc.bt(x1));
                         xPos2 = xc.xb(xc.bt(x2));
                         break
-                    case 'bar_index':
+
+                    case 'bi': // bar_index
                     default:
                         xPos1 = xc.xb(xc.br(x1));
                         xPos2 = xc.xb(xc.br(x2));
@@ -98,7 +99,7 @@ const PlotDrawingLine = (props: Props) => {
                     let startY = yPos1;
                     let endY = yPos2;
 
-                    if (extend === 'both') {
+                    if (extend === 'b') { // both
                         startY = 0;
                         endY = chartHeight;
                     }
@@ -125,7 +126,7 @@ const PlotDrawingLine = (props: Props) => {
                     let endY = yPos2;
 
                     switch (extend) {
-                        case 'right': {
+                        case 'r': { // right
                             startX = leftX;
                             startY = leftY;
                             const tempY = yOnLine(chartWidth, leftX, leftY, k);
@@ -134,7 +135,7 @@ const PlotDrawingLine = (props: Props) => {
                             endY = bounded.y;
                             break;
                         }
-                        case 'left': {
+                        case 'l': { // left
                             const tempY = yOnLine(0, leftX, leftY, k);
                             const bounded = getBoundedPoint(0, tempY, leftX, leftY, k);
                             startX = bounded.x;
@@ -143,7 +144,7 @@ const PlotDrawingLine = (props: Props) => {
                             endY = rightY;
                             break;
                         }
-                        case 'both': {
+                        case 'b': { // both
                             const tempLeftY = yOnLine(0, leftX, leftY, k);
                             const boundedLeft = getBoundedPoint(0, tempLeftY, leftX, leftY, k);
                             startX = boundedLeft.x;
@@ -155,7 +156,7 @@ const PlotDrawingLine = (props: Props) => {
                             endY = boundedRight.y;
                             break;
                         }
-                        case 'none':
+                        case 'n': // none
                         default:
                             startX = xPos1;
                             startY = yPos1;

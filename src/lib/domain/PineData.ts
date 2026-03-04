@@ -15,6 +15,14 @@ export type LineObject = {
     _deleted: boolean;
 }
 
+export type LinefillObject = {
+    id: number;
+    line1: LineObject;
+    line2: LineObject;
+    color: string;
+    _deleted: boolean;
+}
+
 // Data type from Pine
 export type PineData = {
     title?: string,
