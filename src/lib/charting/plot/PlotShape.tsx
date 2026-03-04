@@ -66,29 +66,29 @@ const PlotShape = (props: Props) => {
                 let below: boolean
                 let h = d;
                 switch (location) {
-                    case 'abovebar':
+                    case 'AboveBar':
                         below = false
                         y = yc.yv(high) - 3
                         break;
 
-                    case 'belowbar':
+                    case 'BelowBar':
                         below = true
                         y = yc.yv(low) + 3
                         break
 
-                    case 'top':
+                    case 'Top':
                         below = false
                         y = 0
                         break
 
-                    case 'bottom':
+                    case 'Bottom':
                     default:
                         below = true
                         y = yc.hCanvas
                 }
 
                 switch (shape) {
-                    case 'xcross':
+                    case 'shape_xcross':
                         y = below ? y + h : y
 
                         path.moveto(x - r, y)
@@ -97,7 +97,7 @@ const PlotShape = (props: Props) => {
                         path.lineto(x + r, y)
                         break
 
-                    case 'cross':
+                    case 'shape_cross':
                         y = below ? y + h : y
 
                         path.moveto(x, y)
@@ -106,7 +106,7 @@ const PlotShape = (props: Props) => {
                         path.lineto(x + r + 1, y - r - 1)
                         break
 
-                    case 'circle':
+                    case 'shape_circle':
                         fill = color
                         opacity = 0.7
 
@@ -115,7 +115,7 @@ const PlotShape = (props: Props) => {
                         segs.push(new Circle(x, y - r, r))
                         break
 
-                    case 'triangleup':
+                    case 'shape_triangle_up':
                         fill = color
                         opacity = 0.7
 
@@ -127,7 +127,7 @@ const PlotShape = (props: Props) => {
                         path.lineto(x - r, y)
                         break;
 
-                    case 'triangledown':
+                    case 'shape_triangle_down':
                         fill = color
                         opacity = 0.7
 
@@ -139,7 +139,7 @@ const PlotShape = (props: Props) => {
                         path.lineto(x, y)
                         break;
 
-                    case 'arrowup':
+                    case 'shape_arrow_up':
                         fill = color
                         opacity = 0.7
 
@@ -155,7 +155,7 @@ const PlotShape = (props: Props) => {
                         path.closepath()
                         break
 
-                    case 'arrowdown':
+                    case 'shape_arrow_down':
                         fill = color
                         opacity = 0.7
 
@@ -171,7 +171,8 @@ const PlotShape = (props: Props) => {
                         path.closepath()
                         break
 
-                    case 'labelup': {
+                    case 'shape_label_up': {
+                        console.log("fsdhfsdf")
                         fill = color
                         opacity = 0.5
 
@@ -208,7 +209,7 @@ const PlotShape = (props: Props) => {
                         break
                     }
 
-                    case 'labeldown': {
+                    case 'shape_label_down': {
                         fill = color
                         opacity = 0.5
 
@@ -245,7 +246,7 @@ const PlotShape = (props: Props) => {
                         break
                     }
 
-                    case 'flag':
+                    case 'shape_flag':
                         fill = color
                         opacity = 0.7
 
@@ -258,7 +259,7 @@ const PlotShape = (props: Props) => {
                         path.lineto(x - r + 1, y - r)
                         break;
 
-                    case 'square':
+                    case 'shape_square':
                         fill = color
                         opacity = 0.7
 
@@ -271,7 +272,7 @@ const PlotShape = (props: Props) => {
                         path.closepath()
                         break
 
-                    case 'diamond':
+                    case 'shape_diamond':
                         fill = color
                         opacity = 0.7
 
@@ -284,7 +285,7 @@ const PlotShape = (props: Props) => {
                         path.closepath()
                         break;
 
-                    default: // xcross
+                    default: // shape_xcross
                         y = below ? y + h : y
 
                         path.moveto(x - r, y)

@@ -74,18 +74,18 @@ export type PlotOptions = {
 //     force_overlay?: boolean;
 // }
 
-export type Location = 'abovebar' | 'belowbar' | 'top' | 'bottom' | 'absolute'
+export type Location = 'AboveBar' | 'BelowBar' | 'Top' | 'Bottom' | 'Absolute'
 
 export type Shape =
-    'xcross' |
-    'cross' |
-    'circle' |
-    'triangleup' |
-    'triangledown' |
-    'flag' |
-    'arrowup' |
-    'arrowdown' |
-    'square' |
-    'diamond' |
-    'labelup' |
-    'labeldown'
+    'shape_xcross' |
+    'shape_cross' |
+    'shape_circle' |
+    'shape_triangleup' |
+    'shape_triangledown' |
+    'shape_flag' |
+    'shape_arrowup' |
+    'shape_arrowdown' |
+    'shape_square' |
+    'shape_diamond' |
+    'shape_labelup' |
+    'shape_labeldown'

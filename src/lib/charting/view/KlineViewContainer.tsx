@@ -115,7 +115,7 @@ type State = {
 
 const allIndTags = dev
     // ? ['pivot']
-    ? ['ema', 'bb', 'rsi', 'macd', 'kdj', 'signals', 'diagonal', 'ichimoku', 'dynline', 'pivot']
+    ? ['ema', 'bb', 'rsi', 'macd', 'kdj', 'signals', 'diagonal', 'ichimoku', 'dynline', 'pivot', 'sarstoch']
     : ['sma', 'ema', 'bb', 'rsi', 'macd', 'kdj', 'ichimoku', 'diagonal']
 
 export const HSPACING = 25;
@@ -329,7 +329,7 @@ class KlineViewContainer extends Component<Props, State> {
                                     }
 
                                     const isOverlayOutputShapeAndLocation = (
-                                        (style === 'shape' || style === 'char') && (location === 'abovebar' || location === 'belowbar')
+                                        (style === 'shape' || style === 'char') && (location === 'AboveBar' || location === 'BelowBar')
                                     )
 
                                     const output = { atIndex, title, options }
