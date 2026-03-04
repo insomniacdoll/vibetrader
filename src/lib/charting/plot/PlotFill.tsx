@@ -7,125 +7,111 @@ import type { PineData } from "../../domain/PineData";
 import type { Seg } from "../../svg/Seg";
 
 type Props = {
-    xc: ChartXControl,
-    yc: ChartYControl,
-    tvar: TVar<PineData[]>,
-    name: string,
+    xc: ChartXControl;
+    yc: ChartYControl;
+    tvar: TVar<PineData[]>;
+    name: string;
     options: PlotOptions;
     depth?: number;
-}
+};
 
-const PlotFill = (props: Props) => {
-    const { xc, yc, tvar, name, depth, options } = props;
-
+const PlotFill = ({ xc, yc, tvar, options }: Props) => {
     const fillgaps = options.fillgaps;
-
-    const r = xc.wBar < 2
-        ? 0
-        : Math.floor((xc.wBar - 2) / 2);
 
     function plot() {
         const plot1Index = options.plot1 as number;
         const plot2Index = options.plot2 as number;
 
         const segs: Seg[] = [];
-        const points_a = collectPoints(plot1Index);
-        const points_b = collectPoints(plot2Index);
+        const synchronizedPoints: { xa?: number, ya?: number, xb?: number, yb?: number }[] = [];
 
-        let shallStartNewFill = true
+        // Collect points synchronously to prevent X-axis desynchronization 
+        for (let bar = 1; bar <= xc.nBars; bar++) {
+            const time = xc.tb(bar);
+            let ya: number | undefined;
+            let yb: number | undefined;
 
-        let unClosedPath: Path
-        let lastCloseIndex = 0
+            if (tvar.occurred(time)) {
+                const datas = tvar.getByTime(time);
+                if (datas) {
+                    const v1 = datas[plot1Index]?.value;
+                    const v2 = datas[plot2Index]?.value;
 
-        for (let m = 0; m < points_a.length; m++) {
-            const [xa, ya] = points_a[m]
-            const [xb, yb] = points_b[m]
-
-            if (xa === undefined || xb === undefined) {
-                if (unClosedPath) {
-                    for (let n = m - 1; n > lastCloseIndex; n--) {
-                        const [xb, yb] = points_b[n]
-                        unClosedPath.lineto(xb, yb)
-                    }
-
-                    unClosedPath.closepath()
-                    unClosedPath = undefined
+                    if (typeof v1 === "number" && !isNaN(v1)) ya = yc.yv(v1);
+                    if (typeof v2 === "number" && !isNaN(v2)) yb = yc.yv(v2);
                 }
+            }
 
-                shallStartNewFill = true
+            const x = xc.xb(bar);
+            const isValidPoint = ya !== undefined && !isNaN(ya) && yb !== undefined && !isNaN(yb);
+
+            if (isValidPoint) {
+                synchronizedPoints.push({ xa: x, ya, xb: x, yb });
+            } else if (!fillgaps) {
+                synchronizedPoints.push({}); // Represents a gap
+            }
+        }
+
+        let shallStartNewFill = true;
+        let unClosedPath: Path | undefined;
+        let lastCloseIndex = 0;
+
+        for (let m = 0; m < synchronizedPoints.length; m++) {
+            const { xa, ya } = synchronizedPoints[m];
+
+            if (xa === undefined) {
+                // We hit a gap
+                if (unClosedPath) {
+                    // Trace backward to draw the bottom edge
+                    for (let n = m - 1; n >= lastCloseIndex; n--) {
+                        const { xb, yb } = synchronizedPoints[n];
+                        if (xb !== undefined && yb !== undefined) {
+                            unClosedPath.lineto(xb, yb);
+                        }
+                    }
+                    unClosedPath.closepath();
+                    unClosedPath = undefined;
+                }
+                shallStartNewFill = true;
 
             } else {
                 if (shallStartNewFill) {
-                    unClosedPath = new Path()
-                    segs.push(unClosedPath)
+                    unClosedPath = new Path();
+                    segs.push(unClosedPath);
 
-                    unClosedPath.moveto(xa, ya)
+                    unClosedPath.moveto(xa, ya);
 
-                    lastCloseIndex = m
-                    shallStartNewFill = false
-
+                    lastCloseIndex = m;
+                    shallStartNewFill = false;
                 } else {
-                    unClosedPath.lineto(xa, ya)
+                    unClosedPath.lineto(xa, ya);
                 }
             }
         }
 
-        // reached point_a end, has unClosedPath ?
+        // Clean up remaining unclosed paths
         if (unClosedPath) {
-            for (let n = points_a.length - 1; n > lastCloseIndex; n--) {
-                const [xb, yb] = points_b[n]
-                unClosedPath.lineto(xb, yb)
-                n--
+            for (let n = synchronizedPoints.length - 1; n >= lastCloseIndex; n--) {
+                const { xb, yb } = synchronizedPoints[n];
+                if (xb !== undefined && yb !== undefined) {
+                    unClosedPath.lineto(xb, yb);
+                }
             }
-
-            unClosedPath.closepath()
+            unClosedPath.closepath();
         }
 
-        return { segs }
-    }
-
-    function collectPoints(plotIndex: number) {
-        const points: number[][] = []
-
-        for (let bar = 1; bar <= xc.nBars; bar++) {
-            // use `undefined` to test if value has been set at least one time
-            let value: number
-            const time = xc.tb(bar)
-            if (tvar.occurred(time)) {
-                const datas = tvar.getByTime(time);
-                const data = datas ? datas[plotIndex] : undefined;
-                const v = data ? data.value : NaN;
-
-                // console.log(index, data)
-
-                if (typeof v === "number" && !isNaN(v)) {
-                    value = v;
-                }
-            }
-
-            if (value !== undefined && !isNaN(value)) {
-                const x = xc.xb(bar)
-                const y = yc.yv(value)
-
-                if (y !== undefined && !isNaN(y)) {
-                    points.push([x, y])
-                }
-
-            } else {
-                if (!fillgaps) {
-                    points.push([undefined, undefined])
-                }
-            }
-        }
-
-        return points
+        return { segs };
     }
 
     const { segs } = plot();
 
     return (
-        segs.map((seg, n) => seg.render({ key: 'seg-' + n, style: { stroke: undefined, fill: options.color } }))
-    )
-}
+        <>
+            {segs.map((seg, n) =>
+                seg.render({ key: `seg-${n}`, style: { stroke: undefined, fill: options.color } })
+            )}
+        </>
+    );
+};
 
 export default PlotFill;
