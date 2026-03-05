@@ -54,6 +54,7 @@ const PlotDrawingLine = ({ xc, yc, tvar, name, atIndex, depth, options }: Props)
         if (lineObjects !== undefined) {
             for (let i = 0; i < lineObjects.length; i++) {
                 const { id, color, x1, y1, x2, y2, style, width: lineWidth, xloc, extend } = lineObjects[i]
+                // console.log(x1, x2, y1, y2)
 
                 if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
                     continue;
