@@ -6,7 +6,7 @@ import { KVAR_NAME, type Kline, } from "../../domain/Kline";
 import type { Seg } from "../../svg/Seg";
 import { Circle } from "../../svg/Circle";
 import type { PineData } from "../../domain/PineData";
-import { stringMetrics } from "../../Utils";
+import { stringMetrics } from "../../utils";
 import { Texts } from "../../svg/Texts";
 import type { PlotOptions } from "./Plot";
 

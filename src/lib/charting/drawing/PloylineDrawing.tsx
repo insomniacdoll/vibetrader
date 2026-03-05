@@ -1,4 +1,5 @@
 import { Path } from "../../svg/Path"
+import { distanceToLine } from "../utils";
 import { Drawing, type TPoint } from "./Drawing"
 
 export class PolylineDrawing extends Drawing {
@@ -25,7 +26,7 @@ export class PolylineDrawing extends Drawing {
             const dy = y1 - y0
             const k = dx === 0 ? 1 : dy / dx
 
-            const distance = this.distanceToLine(x, y, x0, y0, k)
+            const distance = distanceToLine(x, y, x0, y0, k)
 
             if (distance <= 4) {
                 this.handles.splice(i + 1, 0, this.newHandle(point))
@@ -52,7 +53,7 @@ export class PolylineDrawing extends Drawing {
             const dy = y1 - y0
             const k = dx === 0 ? 1 : dy / dx
 
-            const distance = this.distanceToLine(x, y, x0, y0, k)
+            const distance = distanceToLine(x, y, x0, y0, k)
 
             if (distance <= 4 &&
                 x >= Math.min(x0, x1) - 4 && x <= Math.max(x0, x1) + 4 &&

@@ -14,7 +14,7 @@ import type { Scalar } from "../scalar/Scalar";
 import { LG_SCALAR } from "../scalar/LgScalar";
 import { LINEAR_SCALAR } from "../scalar/LinearScala";
 import type { PlotOptions } from "../plot/Plot";
-import { stringMetrics } from "../../Utils";
+import { stringMetrics } from "../../utils";
 import type { PineData } from "../../domain/PineData";
 
 export type UpdateEvent = {

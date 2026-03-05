@@ -4,6 +4,7 @@ import type { ChartYControl } from "../view/ChartYControl";
 import type { ChartXControl } from "../view/ChartXControl";
 import type { PlotOptions } from "./Plot";
 import type { LineObject, LinefillObject, PineData } from "../../domain/PineData";
+import { xOnLine, yOnLine } from "../utils";
 
 type Props = {
     xc: ChartXControl,
@@ -20,15 +21,6 @@ const PlotDrawingLineFill = (props: Props) => {
 
     const chartWidth = xc.wChart;
     const chartHeight = yc.hChart;
-
-    // --- Shared Math Helpers ---
-    function yOnLine(x: number, refX: number, refY: number, k: number) {
-        return refY + (x - refX) * k;
-    }
-
-    function xOnLine(y: number, refX: number, refY: number, k: number) {
-        return refX + (y - refY) / k;
-    }
 
     function getBoundedPoint(targetX: number, targetY: number, refX: number, refY: number, k: number) {
         if (k === 0) return { x: targetX, y: targetY };
@@ -115,43 +107,42 @@ const PlotDrawingLineFill = (props: Props) => {
         const data = datas ? datas[atIndex] : undefined;
 
         // Assuming your PineData payload contains arrays for both lines and fills
-        const lineObjects = (data?.value as any)?.lines as LineObject[] | undefined;
-        const lineFillObjects = (data?.value as any)?.lineFills as LinefillObject[] | undefined;
+        const lineFillObject = data?.value as LinefillObject;
+        const lineObject1 = lineFillObject?.line1;
+        const lineObject2 = lineFillObject?.line2;
 
-        if (!lineObjects || !lineFillObjects) return fills;
+
+        if (!lineObject1 || !lineObject2 || !lineFillObject) return fills;
 
         // Create a lookup map for lines by ID for quick access
-        const lineMap = new Map(lineObjects.map(line => [line.id, line]));
+        const lineMap = new Map([lineObject1, lineObject2].map(line => [line.id, line]));
 
-        for (let i = 0; i < lineFillObjects.length; i++) {
-            const { id, line1, line2, color } = lineFillObjects[i];
+        const { id, line1, line2, color } = lineFillObject;
 
-            const line1Path = lineMap.get(line1.id);
-            const line2Path = lineMap.get(line2.id);
+        const line1Path = lineMap.get(line1.id);
+        const line2Path = lineMap.get(line2.id);
 
-            if (!line1 || !line2) continue; // Skip if referenced lines don't exist
+        const coords1 = getLineCoords(line1Path);
+        const coords2 = getLineCoords(line2Path);
 
-            const coords1 = getLineCoords(line1Path);
-            const coords2 = getLineCoords(line2Path);
-
-            let path = fills.get(id);
-            if (!path) {
-                path = new Path();
-                fills.set(id, path);
-            }
-
-            // Draw the polygon: Start1 -> End1 -> End2 -> Start2 -> Close
-            path.moveto(coords1.startX, coords1.startY);
-            path.lineto(coords1.endX, coords1.endY);
-            path.lineto(coords2.endX, coords2.endY);
-            path.lineto(coords2.startX, coords2.startY);
-            // In a standard SVG Path class, there might be a close() or Z() method. 
-            // If not, just lineTo back to the start:
-            path.lineto(coords1.startX, coords1.startY);
-
-            path.fill = color;
-            path.stroke = 'none'; // Fills usually don't have borders themselves
+        let path = fills.get(id);
+        if (!path) {
+            path = new Path();
+            fills.set(id, path);
         }
+
+        // Draw the polygon: Start1 -> End1 -> End2 -> Start2 -> Close
+        path.moveto(coords1.startX, coords1.startY);
+        path.lineto(coords1.endX, coords1.endY);
+        path.lineto(coords2.endX, coords2.endY);
+        path.lineto(coords2.startX, coords2.startY);
+        // In a standard SVG Path class, there might be a close() or Z() method. 
+        // If not, just lineTo back to the start:
+        path.lineto(coords1.startX, coords1.startY);
+
+        path.fill = color;
+        path.stroke = 'none'; // Fills usually don't have borders themselves
+
 
         return fills;
     }

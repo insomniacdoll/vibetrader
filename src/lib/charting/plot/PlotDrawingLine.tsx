@@ -4,6 +4,7 @@ import type { ChartYControl } from "../view/ChartYControl";
 import type { ChartXControl } from "../view/ChartXControl";
 import type { PlotOptions } from "./Plot";
 import type { LineObject, PineData } from "../../domain/PineData";
+import { xOnLine, yOnLine } from "../utils";
 
 type Props = {
     xc: ChartXControl,
@@ -20,14 +21,6 @@ const PlotDrawingLine = (props: Props) => {
 
     const chartWidth = xc.wChart;
     const chartHeight = yc.hChart;
-
-    function yOnLine(x: number, refX: number, refY: number, k: number) {
-        return refY + (x - refX) * k
-    }
-
-    function xOnLine(y: number, refX: number, refY: number, k: number) {
-        return refX + (y - refY) / k
-    }
 
     // Mathematically calculates the intersection if the line shoots past the top or bottom of the chart
     function getBoundedPoint(targetX: number, targetY: number, refX: number, refY: number, k: number) {

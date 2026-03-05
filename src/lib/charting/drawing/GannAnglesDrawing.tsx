@@ -1,5 +1,6 @@
 import { Path } from "../../svg/Path";
 import { Texts } from "../../svg/Texts";
+import { distanceToLine, xOnLine, yOnLine } from "../utils";
 import { Drawing } from "./Drawing"
 
 export class GannAnglesDrawing extends Drawing {
@@ -41,13 +42,13 @@ export class GannAnglesDrawing extends Drawing {
 
         // diannol 
         k = x1 - x0 === 0 ? 1 : (y1 - y0) / (x1 - x0)
-        distance = this.distanceToLine(x, y, x0, y0, k)
+        distance = distanceToLine(x, y, x0, y0, k)
         if (distance <= 4) {
             return true
         }
 
         k = x1 - x0 === 0 ? 1 : (y0 - y1) / (x1 - x0)
-        distance = this.distanceToLine(x, y, x0, y1, k)
+        distance = distanceToLine(x, y, x0, y1, k)
         if (distance <= 4) {
             return true
         }
@@ -75,15 +76,15 @@ export class GannAnglesDrawing extends Drawing {
         let yn: number
         let n = 2
         while (n < 4) {
-            xn = this.xOnLine(y1, x0, y0, k * n)
-            yn = this.yOnLine(xn, x0, y0, k * n)
+            xn = xOnLine(y1, x0, y0, k * n)
+            yn = yOnLine(xn, x0, y0, k * n)
 
-            distance = this.distanceToLine(x, y, x0, y0, k * n)
+            distance = distanceToLine(x, y, x0, y0, k * n)
             if (distance <= 4) {
                 return true
             }
 
-            distance = this.distanceToLine(x, y, x0, y0, k / n)
+            distance = distanceToLine(x, y, x0, y0, k / n)
             if (distance <= 4) {
                 return true
             }
@@ -155,14 +156,14 @@ export class GannAnglesDrawing extends Drawing {
         let yn: number
         let n = 2
         while (n < 4) {
-            xn = this.xOnLine(y1, x0, y0, k * n)
-            yn = this.yOnLine(xn, x0, y0, k * n)
+            xn = xOnLine(y1, x0, y0, k * n)
+            yn = yOnLine(xn, x0, y0, k * n)
             path.moveto(x0, y0)
             path.lineto(xn, yn)
 
 
-            yn = this.yOnLine(x1, x0, y0, k / n)
-            xn = this.xOnLine(yn, x0, y0, k / n)
+            yn = yOnLine(x1, x0, y0, k / n)
+            xn = xOnLine(yn, x0, y0, k / n)
             path.moveto(x0, y0)
             path.lineto(x1, yn)
 

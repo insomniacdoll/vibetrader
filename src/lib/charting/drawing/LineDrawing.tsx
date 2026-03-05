@@ -1,4 +1,5 @@
 import { Path } from "../../svg/Path"
+import { distanceToLine } from "../utils";
 import { ChartView } from "../view/ChartView";
 import { Drawing } from "./Drawing"
 
@@ -24,7 +25,7 @@ export class LineDrawing extends Drawing {
         const dy = y1 - y0
         const k = dx === 0 ? 1 : dy / dx
 
-        const distance = this.distanceToLine(x, y, x0, y0, k)
+        const distance = distanceToLine(x, y, x0, y0, k)
 
         return distance <= 4
     }

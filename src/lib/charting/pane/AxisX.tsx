@@ -4,7 +4,7 @@ import { Texts } from "../../svg/Texts";
 import { Component, type JSX, type RefObject, } from "react";
 import type { UpdateEvent } from "../view/ChartView";
 import React from "react";
-import { stringMetrics } from "../../Utils";
+import { stringMetrics } from "../../utils";
 import { HSPACING } from "../view/KlineViewContainer";
 
 type Props = {

@@ -5,6 +5,7 @@ import { Rect } from "../../svg/Rect"
 import type { Seg } from "../../svg/Seg"
 import type { Key } from "react"
 import { Circle } from "../../svg/Circle"
+import { yOnLine } from "../utils"
 
 export type TPoint = {
     time: number,
@@ -237,9 +238,9 @@ export abstract class Drawing {
 
     protected plotLine(baseX: number, baseY: number, k: number, path: Path) {
         const xstart = 0
-        const ystart = this.yOnLine(xstart, baseX, baseY, k)
+        const ystart = yOnLine(xstart, baseX, baseY, k)
         const xend = this.xc.wChart
-        const yend = this.yOnLine(xend, baseX, baseY, k)
+        const yend = yOnLine(xend, baseX, baseY, k)
 
         path.moveto(xstart, ystart)
         path.lineto(xend, yend)
@@ -254,18 +255,6 @@ export abstract class Drawing {
         path.lineto(x, yend)
     }
 
-
-    protected xOnLine(y: number, baseX: number, baseY: number, k: number) {
-        return (baseX + (y - baseY) / k)
-    }
-
-    protected yOnLine(x: number, baseX: number, baseY: number, k: number) {
-        return (baseY + (x - baseX) * k)
-    }
-
-    protected distanceToLine(x: number, y: number, baseX: number, baseY: number, k: number) {
-        return Math.abs(k * x - y + baseY - k * baseX) / Math.sqrt(k * k + 1)
-    }
 }
 
 export class Handle {

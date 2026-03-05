@@ -1,5 +1,5 @@
 import type { TSer } from "../../timeseris/TSer";
-import { getNormPow, normMinTick, normTickUnit } from "../Normalize";
+import { getNormPow, normMinTick, normTickUnit } from "../normalize";
 import { LINEAR_SCALAR } from "../scalar/LinearScala";
 import type { Scalar } from "../scalar/Scalar";
 
@@ -263,38 +263,6 @@ export class ChartYControl {
     get minValue(): number {
         return this.#minValue;
     }
-
-    static yOfLine(x: number, baseX: number, baseY: number, k: number): number {
-        return (baseY + (x - baseX) * k);
-    }
-
-    /**
-     * @param x
-     * @param xCenter center point x of arc
-     * @param yCenter center point y of arc
-     * @return y or Null.Double
-     */
-    static yOfCircle(x: number, xCenter: number, yCenter: number, radius: number, positiveSide: boolean): number {
-        const dx = x - xCenter;
-        const dy = Math.sqrt(radius * radius - dx * dx);
-        return positiveSide ? yCenter + dy : yCenter - dy;
-    }
-
-    // export function yOfCircle(x: number, circle: Arc2D, positiveSide: Boolean): number {
-    //   const xCenter = circle.getCenterX
-    //   const yCenter = circle.getCenterY
-    //   const radius  = circle.getHeight / 2.0
-    //   return yOfCircle(x, xCenter, yCenter, radius, positiveSide)
-    // }
-
-    // export function distanceToCircle(x: number, y: number, circle: Arc2D): number  {
-    //   const xCenter = circle.getCenterX
-    //   const yCenter = circle.getCenterY
-    //   const radius  = circle.getHeight / 2.0
-    //   const dx = x - xCenter
-    //   const dy = y - yCenter
-    //   return (Math.sqrt(dx * dx + dy * dy) - radius)
-    // }
 
     static samePoint(x1: number, y1: number, x2: number, y2: number): boolean {
         return Math.round(x1) === Math.round(x2) && Math.round(y1) === Math.round(y2);
