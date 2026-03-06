@@ -162,7 +162,7 @@ const PlotDrawingLine = ({ xc, yc, tvar, name, atIndex, depth, options }: Props)
                     path.lineto(endX, endY);
                 }
 
-                path.stroke = color;
+                path.stroke = color || "#2962FF"; // #2962FF is the default drawing color
                 path.strokeWidth = lineWidth;
 
                 switch (style) {
