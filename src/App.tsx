@@ -51,10 +51,16 @@ function App() {
                 <Route path="/" element={
                     <HomePage toggleColorScheme={toggleColorTheme} colorScheme={colorScheme} />
                 } />
+
                 <Route path="/vibetrader" element={
                     <HomePage toggleColorScheme={toggleColorTheme} colorScheme={colorScheme} />
                 } />
-                <Route path="/vibetrader/:ticker/:timeframe" element={
+
+                <Route path="/:ticker/:timeframe?" element={
+                    <HomePage toggleColorScheme={toggleColorTheme} colorScheme={colorScheme} />
+                } />
+
+                <Route path="/vibetrader/:ticker/:timeframe?" element={
                     <HomePage toggleColorScheme={toggleColorTheme} colorScheme={colorScheme} />
                 } />
             </Routes>
