@@ -77,6 +77,7 @@ type Props = {
     toggleColorScheme: () => void
     colorScheme: 'light' | 'dark'
     chartOnly: boolean
+    width?: number
     ticker?: string
     timeframe?: string
 }
@@ -180,7 +181,7 @@ class KlineViewContainer extends Component<Props, State> {
             ...geometry,
         }
 
-        console.log("KlinerViewContainer created");
+        console.log("KlinerViewContainer created, width=" + this.props.width);
 
         this.setOverlayIndicatorLabels = this.setOverlayIndicatorLabels.bind(this)
         this.setStackedIndicatorLabels = this.setStackedIndicatorLabels.bind(this)
@@ -1261,7 +1262,7 @@ class KlineViewContainer extends Component<Props, State> {
                     </div>}
 
                 {/* View Container, width should be set at '.viewcontainer' in vibetrader.css */}
-                <div className="viewcontainer" style={{ paddingLeft: '6px', height: this.state.containerHeight + 'px' }}
+                <div className="viewcontainer" style={{ paddingLeft: '6px', width: this.props.width || '100%', height: this.state.containerHeight + 'px' }}
                     key="klineviewcontainer"
                     ref={this.chartviewRef}
                 >

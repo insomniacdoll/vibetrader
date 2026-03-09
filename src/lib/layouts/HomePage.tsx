@@ -1,7 +1,7 @@
 import { style } from '@react-spectrum/s2/style' with {type: 'macro'};
 import KlineViewContainer from '../charting/view/KlineViewContainer';
 import type { ColorScheme } from '../../App';
-import { useParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 import { useEffect } from 'react';
 
 type HomePageProps = {
@@ -11,22 +11,27 @@ type HomePageProps = {
 
 const HomePage = (props: HomePageProps) => {
     const { ticker, timeframe } = useParams();
+    const [searchParams] = useSearchParams();
 
-    // 2. Trigger side effects (like data fetching) when the URL changes
+
     useEffect(() => {
         // Only fetch if both parameters exist (ignores the base "/vibetrader" route)
         if (ticker && timeframe) {
             console.log(`URL changed! Now analyzing ${ticker} on the ${timeframe} chart.`);
 
         }
-    }, [ticker, timeframe]); 
+    }, [ticker, timeframe]);
+
+    const widthParam = searchParams.get('width');
+    const chartWidth = widthParam ? parseInt(widthParam, 10) : 800;
 
     return (
         <div className={style({ display: "flex" })}>
             <KlineViewContainer
                 toggleColorScheme={props.toggleColorScheme}
                 colorScheme={props.colorScheme}
-                chartOnly={false}
+                chartOnly={ticker !== undefined}
+                width={chartWidth}
                 ticker={ticker}
                 timeframe={timeframe}
             />

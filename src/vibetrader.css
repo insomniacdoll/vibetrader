@@ -45,13 +45,6 @@
 }
 
 .viewcontainer {
-    /* grow: 1, shrink: 1, basis: 900px */
-    flex: 1, 1, 900px;
-    /* This forces the element to rely on flex-basis/grow for width */
-    width: 0;
-    /* ...but absolutely never shrink below 900px */
-    min-width: 900px;
-    /* CRITICAL: Prevents internal SVG from stretching the div */
     overflow: hidden;
 
     font-family: "Roboto", "Helvetica", "Arial", sans-serif;
