@@ -16,6 +16,7 @@ import PlotFill from "../plot/PlotFill";
 import PlotBgcolor from "../plot/PlotBgcolor";
 import PlotDrawingLine from "../plot/PlotDrawingLine";
 import PlotDrawingLineFill from "../plot/PlotDrawingLineFill";
+import { negativeColor, positiveColor } from "../../colors";
 
 
 export class KlineView extends ChartView<ViewProps, ViewState> {
@@ -39,6 +40,9 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
     override plot() {
         this.computeGeometry();
 
+        const positive = positiveColor(this.props.colorScheme)
+        const negative = negativeColor(this.props.colorScheme)
+
         const chartLines = [
             <PlotKline
                 kvar={this.props.tvar as TVar<Kline>}
@@ -46,6 +50,8 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
                 yc={this.yc}
                 kind={this.props.xc.klineKind}
                 depth={0}
+                positive={positive}
+                negative={negative}
             />
         ]
 

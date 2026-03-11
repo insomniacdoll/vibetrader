@@ -1,1 +1,1 @@
-scp -r dist/* mmm:~/mysites/chart.mmmmmmm.new/
+scp -r dist/* mmm:~/mysites/chart.mmmmmm.new/

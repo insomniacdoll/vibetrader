@@ -22,6 +22,7 @@ export class Texts implements Seg {
                         y={text.y}
                         fill={text.color || style && style.fill}
                         opacity={style && style.opacity}
+                        fontSize={style && style.fontSize}
                         className={className}
                     >
                         {text.text}

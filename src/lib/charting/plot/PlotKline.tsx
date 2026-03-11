@@ -12,10 +12,12 @@ type Props = {
     kvar: TVar<Kline>,
     kind: KlineKind,
     depth: number;
+    positive: string;
+    negative: string;
 }
 
 const PlotKline = (props: Props) => {
-    const { xc, yc, kvar, kind, depth } = props;
+    const { xc, yc, kvar, kind, depth, positive, negative } = props;
 
     // depth !== 0 is for comparing klines charts
 
@@ -225,9 +227,9 @@ const PlotKline = (props: Props) => {
     const { posPath, negPath } = plot();
 
     return (
-        <g className="klinechart" >
-            {posPath.render({ className: 'positive' })}
-            {negPath.render({ className: 'negative' })}
+        <g className="klinechart">
+            {posPath.render({ style: { stroke: positive, fill: positive } })}
+            {negPath.render({ style: { stroke: negative, fill: negative } })}
         </g>
     )
 }

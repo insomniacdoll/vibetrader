@@ -73,6 +73,8 @@ import Star from '@react-spectrum/s2/icons/Star';
 import Exposure from '@react-spectrum/s2/icons/Exposure';
 import FullScreenExit from '@react-spectrum/s2/icons/FullScreenExit';
 import { fetchData, Source } from "../../domain/DataFecther";
+import type { ColorScheme } from "../../../App";
+import { styleOfAnnot } from "../../colors";
 
 type Props = {
     toggleColorScheme: () => void
@@ -115,6 +117,8 @@ type State = {
 
     screenshot: HTMLCanvasElement
 }
+
+
 
 
 const allIndTags = dev
@@ -541,6 +545,8 @@ class KlineViewContainer extends Component<Props, State> {
             return <></>
         }
 
+        const pathStyle = styleOfAnnot(className, this.props.colorScheme)
+
         const crosshair = new Path;
         // vertical line
         crosshair.moveto(x, this.state.yCursorRange[0]);
@@ -548,7 +554,7 @@ class KlineViewContainer extends Component<Props, State> {
 
         return (
             <g className={className}>
-                {crosshair.render()}
+                {crosshair.render({ style: pathStyle })}
             </g>
         )
     }
@@ -917,11 +923,14 @@ class KlineViewContainer extends Component<Props, State> {
         )
     }
 
-    takeScreenshot(): Promise<HTMLCanvasElement> {
-        // console.log(renderToStaticMarkup(this.renderSvgChart()))
+    async takeScreenshot(): Promise<HTMLCanvasElement> {
+        //console.log(renderToStaticMarkup(this.renderSvgChart()))
         return html2canvas(this.chartviewRef.current, {
             useCORS: true, // in case you have images stored in your application
             backgroundColor: null // Sets the canvas background to transparent
+        }).catch(e => {
+            console.error(e);
+            return document.createElement('canvas')
         })
     }
 
@@ -1075,6 +1084,7 @@ class KlineViewContainer extends Component<Props, State> {
                     name=""
                     xc={this.xc}
                     tvar={this.kvar}
+                    colorScheme={this.props.colorScheme}
                     updateEvent={this.state.updateEvent}
                     updateDrawing={this.state.updateDrawing}
                     overlayIndicators={this.state.overlayIndicators}
@@ -1090,6 +1100,7 @@ class KlineViewContainer extends Component<Props, State> {
                     name="Vol"
                     xc={this.xc}
                     tvar={this.kvar}
+                    colorScheme={this.props.colorScheme}
                     updateEvent={this.state.updateEvent}
                 />
 
@@ -1106,6 +1117,7 @@ class KlineViewContainer extends Component<Props, State> {
                             height={this.hIndicatorView}
                             xc={this.xc}
                             tvar={tvar}
+                            colorScheme={this.props.colorScheme}
                             mainIndicatorOutputs={outputs}
                             updateEvent={this.state.updateEvent}
                             indexOfStackedIndicator={n}

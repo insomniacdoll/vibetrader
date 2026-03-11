@@ -9,10 +9,12 @@ type Props = {
     yc: ChartYControl,
     kvar: TVar<Kline>,
     depth: number;
+    positive: string;
+    negative: string;
 }
 
 const PlotVolmue = (props: Props) => {
-    const { xc, yc, kvar } = props;
+    const { xc, yc, kvar, positive, negative } = props;
 
     function plot() {
         const thin = false;
@@ -71,8 +73,8 @@ const PlotVolmue = (props: Props) => {
 
     return (
         <g className="volumechart">
-            {posPath.render({ className: 'positive' })}
-            {negPath.render({ className: 'negative' })}
+            {posPath.render({ style: { stroke: positive, fill: positive } })}
+            {negPath.render({ style: { stroke: negative, fill: negative } })}
         </g>
     )
 }

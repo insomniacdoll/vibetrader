@@ -2,7 +2,7 @@ import { Path } from "../../svg/Path"
 import type { ChartXControl } from "../view/ChartXControl"
 import type { ChartYControl } from "../view/ChartYControl"
 import { Rect } from "../../svg/Rect"
-import type { Seg } from "../../svg/Seg"
+import type { Seg, Style } from "../../svg/Seg"
 import type { Key } from "react"
 import { Circle } from "../../svg/Circle"
 import { yOnLine } from "../utils"
@@ -206,7 +206,10 @@ export abstract class Drawing {
     renderDrawing(key: Key) {
         return (
             <g key={key} className="drawing">
-                {this.plotDrawing().map((seg, n) => seg.render({ key: "seg-" + n }))}
+                {this.plotDrawing().map((seg, n) => seg.render({
+                    key: "seg-" + n,
+                    style: { stroke: '#393939', fill: "#393939", strokeWidth: '0.7px' }
+                }))}
             </g>
         )
     }
@@ -215,10 +218,17 @@ export abstract class Drawing {
         return (
             <g key={key}>
                 <g className="drawing-highlight">
-                    {this.plotDrawing().map((seg, n) => seg.render({ key: "seg-" + n }))}
+                    {this.plotDrawing().map((seg, n) => seg.render({
+                        key: "seg-" + n,
+                        style: { stroke: '#393939', fill: "#393939", strokeWidth: '1px' }
+
+                    }))}
                 </g>
                 <g className="drawing-handle">
-                    {this.handles.map((handle, n) => handle.render("handle-" + n))}
+                    {this.handles.map((handle, n) => handle.render(
+                        "handle-" + n,
+                        { stroke: '#393939', fill: "none", strokeWidth: '1px' }
+                    ))}
                 </g>
             </g>
         )
@@ -295,10 +305,10 @@ export class Handle {
         return distance <= 8
     }
 
-    render(key: string) {
+    render(key: string, style?: Style) {
         const seg = this.plot();
 
-        return seg.render({ key })
+        return seg.render({ key, style })
     }
 
     equals(o: unknown): boolean {

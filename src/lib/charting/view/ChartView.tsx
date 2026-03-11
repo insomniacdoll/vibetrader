@@ -16,6 +16,8 @@ import { LINEAR_SCALAR } from "../scalar/LinearScala";
 import type { PlotOptions } from "../plot/Plot";
 import { stringMetrics } from "../../utils";
 import type { PineData } from "../../domain/PineData";
+import type { ColorScheme } from "../../../App";
+import { styleOfAnnot } from "../../colors";
 
 export type UpdateEvent = {
     type: 'chart' | 'cursors' | 'drawing'
@@ -53,6 +55,7 @@ export interface ViewProps {
     height: number;
     xc: ChartXControl;
     tvar: TVar<unknown>;
+    colorScheme: ColorScheme;
 
     updateEvent: UpdateEvent;
     updateDrawing?: UpdateDrawing;
@@ -370,7 +373,10 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
         }
     }
 
+
     #plotCursor(x: number, y: number, time: number, value: number, className: string) {
+        const pathStyle = styleOfAnnot(className, this.props.colorScheme);
+
         const wAxisY = ChartView.AXISY_WIDTH
 
         let crosshair: Path
@@ -390,7 +396,7 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
         return (
             <>
                 <g className={className}>
-                    {crosshair && crosshair.render()}
+                    {crosshair && crosshair.render({ style: pathStyle })}
                 </g>
                 {valueLabel}
             </>
@@ -398,6 +404,9 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
     }
 
     plotYValueLabel(y: number, value: number, className: string) {
+        const pathStyle = styleOfAnnot(className, this.props.colorScheme);
+        const textStyle = styleOfAnnot(className, this.props.colorScheme, true);
+
         const valueStr = value.toFixed(3);
 
         const metrics = stringMetrics(valueStr, this.font)
@@ -426,8 +435,8 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
         return (
             // pay attention to the order to avoid text being overlapped
             <g transform={transformYAnnot} className={className}>
-                {axisyPath.render()}
-                {axisyTexts.render()}
+                {axisyPath.render({ style: pathStyle })}
+                {axisyTexts.render({ style: textStyle })}
             </g>
         )
     }

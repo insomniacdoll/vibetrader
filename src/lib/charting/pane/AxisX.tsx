@@ -19,7 +19,7 @@ type Props = {
 }
 
 type State = {
-	chart: JSX.Element,
+	axis: JSX.Element,
 
 	referCursor: JSX.Element,
 	mouseCursor: JSX.Element,
@@ -115,8 +115,8 @@ class AxisX extends Component<Props, State> {
 
 		}
 
-		const chart = this.plot();
-		this.state = { chart, referCursor: <></>, mouseCursor: <></> };
+		const axis = this.plot();
+		this.state = { axis, referCursor: <></>, mouseCursor: <></> };
 
 		console.log("AxisX render");
 	}
@@ -210,11 +210,11 @@ class AxisX extends Component<Props, State> {
 		return (
 			<>
 				<g className="axis">
-					{tickPath.render()}
-					{tickTexts.render()}
+					{tickPath.render({ style: { stroke: '#393939', fill: '#393939', strokeWidth: '0.7px' } })}
+					{tickTexts.render({ style: { fill: '#393939', fontSize: '12px' } })}
 				</g>
 				<g className="grid" >
-					{gridPath.render()}
+					{gridPath.render({ style: { stroke: '#39393959', fill: '#39393959', strokeWidth: '0.5px' } })}
 				</g>
 			</>
 		);
@@ -289,7 +289,7 @@ class AxisX extends Component<Props, State> {
 
 		return (
 			<g transform={transform} ref={this.ref}>
-				{this.state.chart}
+				{this.state.axis}
 				{this.state.referCursor}
 				{this.state.mouseCursor}
 			</g >

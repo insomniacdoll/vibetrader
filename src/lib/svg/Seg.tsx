@@ -6,6 +6,7 @@ export type Style = {
     strokeWidth?: string | number,
     strokeDasharray?: string | number,
     opacity?: number
+    fontSize?: string
 }
 
 export type Options = {

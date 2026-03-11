@@ -14,7 +14,7 @@ type Props = {
 const AxisY = (props: Props) => {
     const { x, y, height, xc, yc } = props;
 
-    const chart = plot();
+    const axis = plot();
 
     function plot() {
         const vTicks = yc.vTicks;
@@ -72,11 +72,11 @@ const AxisY = (props: Props) => {
     return (
         <>
             <g transform={transform} className="axis" >
-                {chart.tickPath.render()}
-                {chart.tickTexts.render()}
+                {axis.tickPath.render({ style: { stroke: '#393939', fill: '#393939', strokeWidth: '0.7px' } })}
+                {axis.tickTexts.render({ style: { fill: '#393939', fontSize: '12px' } })}
             </g>
             <g transform={transform} className="grid" >
-                {chart.gridPath.render()}
+                {axis.gridPath.render({ style: { stroke: '#39393959', fill: '#39393959', strokeWidth: '0.5px' } })}
             </g>
         </>
     );

@@ -1,3 +1,5 @@
+import type { ColorScheme } from "../App";
+
 export namespace Colors {
     const colors = {
         "aliceblue": "#f0f8ff",
@@ -218,3 +220,76 @@ export const chartColors = [
     "#A9A9A9"  // darkgray MOON
 ]
 
+export const positiveColor = (colorScheme: ColorScheme) => {
+    return colorScheme === 'light'
+        ? '#FF0000B4'
+        : '#FF0000'
+}
+
+export const negativeColor = (colorScheme: ColorScheme) => {
+    return colorScheme === 'light'
+        ? '#00AA00B4'
+        : '#00AA00'
+}
+
+export const styleOfAnnot = (className: string, colorScheme: ColorScheme, isText?: boolean) => {
+    if (isText) {
+        switch (className) {
+            case 'annot-mouse':
+                return {
+                    fill: colorScheme === 'light' ? '#ffffff' : '#000000',
+                    fontSize: '12px'
+                }
+
+            case 'annot-refer':
+                return {
+                    fill: colorScheme === 'light' ? '#ffffff' : '#000000',
+                    fontSize: '12px'
+                }
+
+            case 'annot-positive':
+                return {
+                    fill: colorScheme === 'light' ? '#ffffff' : '#000000',
+                    fontSize: '12px'
+                }
+
+            case 'annot-negative':
+                return {
+                    fill: colorScheme === 'light' ? '#ffffff' : '#ffffff',
+                    fontSize: '12px'
+                }
+        }
+
+    } else {
+        switch (className) {
+            case 'annot-mouse':
+                return {
+                    stroke: colorScheme === 'light' ? '#009000' : '#00F000',
+                    fill: colorScheme === 'light' ? '#009000' : '#00F000',
+                    strokeWidth: '0.7px',
+                }
+
+            case 'annot-refer':
+                return {
+                    stroke: colorScheme === 'light' ? '#00A0A0' : '#00F0F0',
+                    fill: colorScheme === 'light' ? '#00A0A0' : '#00F0F0',
+                    strokeWidth: '0.7px'
+                }
+
+            case 'annot-positive':
+                return {
+                    stroke: colorScheme === 'light' ? '#FF0000B4' : '#FF0000',
+                    fill: colorScheme === 'light' ? '#FF0000B4' : '#FF0000',
+                    strokeWidth: '0.7px'
+                }
+
+            case 'annot-negative':
+                return {
+                    stroke: colorScheme === 'light' ? '#00AA00B4' : '#00AA00',
+                    fill: colorScheme === 'light' ? '#00AA00B4' : '#00AA00',
+                    strokeWidth: '0.7px'
+                }
+
+        }
+    }
+}

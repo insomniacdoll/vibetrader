@@ -6,6 +6,7 @@ import { Kline } from "../../domain/Kline";
 import AxisY from "../pane/AxisY";
 import PlotVolmue from "../plot/PlotVolume";
 import { Fragment } from "react/jsx-runtime";
+import { negativeColor, positiveColor } from "../../colors";
 
 export class VolumeView extends ChartView<ViewProps, ViewState> {
 
@@ -24,12 +25,17 @@ export class VolumeView extends ChartView<ViewProps, ViewState> {
     override plot() {
         this.computeGeometry();
 
+        const positive = positiveColor(this.props.colorScheme)
+        const negative = negativeColor(this.props.colorScheme)
+
         const chartLines = [
             <PlotVolmue
                 kvar={this.props.tvar as TVar<Kline>}
                 xc={this.props.xc}
                 yc={this.yc}
                 depth={0}
+                positive={positive}
+                negative={negative}
             />
         ]
 
