@@ -21,6 +21,7 @@ import { tframeToPineTimeframe, type PineData } from "../../domain/PineData";
 import { TSerProvider } from "../../domain/TSerProvider";
 import { Screenshot } from "../pane/Screenshot";
 import { PineTS } from "pinets";
+import { renderToStaticMarkup } from 'react-dom/server';
 
 import {
     ActionButton,
@@ -917,6 +918,7 @@ class KlineViewContainer extends Component<Props, State> {
     }
 
     takeScreenshot(): Promise<HTMLCanvasElement> {
+        // console.log(renderToStaticMarkup(this.renderSvgChart()))
         return html2canvas(this.chartviewRef.current, {
             useCORS: true, // in case you have images stored in your application
             backgroundColor: null // Sets the canvas background to transparent
@@ -1048,6 +1050,85 @@ class KlineViewContainer extends Component<Props, State> {
 
     changeTickerAndTimeframe(ticker: string, tframe: string) {
         return this.handleTickerTimeframeChanged(ticker, tframe, this.tzone)
+    }
+
+    renderSvgChart() {
+        return (
+            <svg viewBox={`0, 0, ${this.state.chartviewWidth} ${this.state.svgHeight}`}
+                width={this.state.chartviewWidth}
+                height={this.state.svgHeight}
+                vectorEffect="non-scaling-stroke"
+                onDoubleClick={this.onDoubleClick}
+                onMouseLeave={this.onMouseLeave}
+                onMouseMove={this.onMouseMove}
+                onMouseDown={this.onMouseDown}
+                onMouseUp={this.onMouseUp}
+                // onWheel={this.onWheel}
+                style={{ zIndex: 1 }}
+            >
+                <KlineView
+                    id={"kline"}
+                    x={0}
+                    y={this.state.yKlineView}
+                    width={this.state.chartviewWidth}
+                    height={this.hKlineView}
+                    name=""
+                    xc={this.xc}
+                    tvar={this.kvar}
+                    updateEvent={this.state.updateEvent}
+                    updateDrawing={this.state.updateDrawing}
+                    overlayIndicators={this.state.overlayIndicators}
+                    callbacksToContainer={this.callbacks}
+                />
+
+                <VolumeView
+                    id={"volume"}
+                    x={0}
+                    y={this.state.yVolumeView}
+                    width={this.state.chartviewWidth}
+                    height={this.hVolumeView}
+                    name="Vol"
+                    xc={this.xc}
+                    tvar={this.kvar}
+                    updateEvent={this.state.updateEvent}
+                />
+
+
+                {
+                    this.state.stackedIndicators.map(({ scriptName, tvar, outputs }, n) =>
+                        <IndicatorView
+                            key={"stacked-indicator-view-" + scriptName}
+                            id={this.#indicatorViewId(n)}
+                            name={"Indicator-" + n}
+                            x={0}
+                            y={this.state.yIndicatorViews + n * (this.hIndicatorView + this.hSpacing)}
+                            width={this.state.chartviewWidth}
+                            height={this.hIndicatorView}
+                            xc={this.xc}
+                            tvar={tvar}
+                            mainIndicatorOutputs={outputs}
+                            updateEvent={this.state.updateEvent}
+                            indexOfStackedIndicator={n}
+                            callbacksToContainer={this.callbacks}
+                        />
+                    )
+                }
+
+                <AxisX
+                    id={"axisx"}
+                    x={0}
+                    y={this.state.yAxisx}
+                    width={this.state.chartviewWidth}
+                    height={this.hAxisx}
+                    xc={this.xc}
+                    updateEvent={this.state.updateEvent}
+                />
+
+                {this.state.referCursor}
+                {this.state.mouseCursor}
+
+            </svg>
+        )
     }
 
     render() {
@@ -1297,80 +1378,7 @@ class KlineViewContainer extends Component<Props, State> {
 
                         <div style={{ position: 'relative', width: '100%', height: this.state.svgHeight }}>
 
-                            <svg viewBox={`0, 0, ${this.state.chartviewWidth} ${this.state.svgHeight}`}
-                                width={this.state.chartviewWidth}
-                                height={this.state.svgHeight}
-                                vectorEffect="non-scaling-stroke"
-                                onDoubleClick={this.onDoubleClick}
-                                onMouseLeave={this.onMouseLeave}
-                                onMouseMove={this.onMouseMove}
-                                onMouseDown={this.onMouseDown}
-                                onMouseUp={this.onMouseUp}
-                                // onWheel={this.onWheel}
-                                style={{ zIndex: 1 }}
-                            >
-                                <KlineView
-                                    id={"kline"}
-                                    x={0}
-                                    y={this.state.yKlineView}
-                                    width={this.state.chartviewWidth}
-                                    height={this.hKlineView}
-                                    name=""
-                                    xc={this.xc}
-                                    tvar={this.kvar}
-                                    updateEvent={this.state.updateEvent}
-                                    updateDrawing={this.state.updateDrawing}
-                                    overlayIndicators={this.state.overlayIndicators}
-                                    callbacksToContainer={this.callbacks}
-                                />
-
-                                <VolumeView
-                                    id={"volume"}
-                                    x={0}
-                                    y={this.state.yVolumeView}
-                                    width={this.state.chartviewWidth}
-                                    height={this.hVolumeView}
-                                    name="Vol"
-                                    xc={this.xc}
-                                    tvar={this.kvar}
-                                    updateEvent={this.state.updateEvent}
-                                />
-
-
-                                {
-                                    this.state.stackedIndicators.map(({ scriptName, tvar, outputs }, n) =>
-                                        <IndicatorView
-                                            key={"stacked-indicator-view-" + scriptName}
-                                            id={this.#indicatorViewId(n)}
-                                            name={"Indicator-" + n}
-                                            x={0}
-                                            y={this.state.yIndicatorViews + n * (this.hIndicatorView + this.hSpacing)}
-                                            width={this.state.chartviewWidth}
-                                            height={this.hIndicatorView}
-                                            xc={this.xc}
-                                            tvar={tvar}
-                                            mainIndicatorOutputs={outputs}
-                                            updateEvent={this.state.updateEvent}
-                                            indexOfStackedIndicator={n}
-                                            callbacksToContainer={this.callbacks}
-                                        />
-                                    )
-                                }
-
-                                <AxisX
-                                    id={"axisx"}
-                                    x={0}
-                                    y={this.state.yAxisx}
-                                    width={this.state.chartviewWidth}
-                                    height={this.hAxisx}
-                                    xc={this.xc}
-                                    updateEvent={this.state.updateEvent}
-                                />
-
-                                {this.state.referCursor}
-                                {this.state.mouseCursor}
-
-                            </svg>
+                            {this.renderSvgChart()}
 
                             {
                                 // labels for overlay indicators
