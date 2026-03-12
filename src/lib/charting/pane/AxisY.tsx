@@ -153,7 +153,6 @@ class AxisY extends Component<Props, State> {
         axisyPath.closepath();
         axisyTexts.text(8, y0 - 2, valueStr);
 
-        const transformYAnnot = `translate(${0}, ${0})`
         return (
             // pay attention to the order to avoid text being overlapped
             <g className={className}>
