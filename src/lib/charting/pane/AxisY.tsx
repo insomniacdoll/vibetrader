@@ -19,7 +19,7 @@ type Props = {
     yc: ChartYControl,
     tvar: TVar<unknown>
     colorScheme: ColorScheme
-    latestValue?: { value: number, isRising: boolean },
+    latestValue?: { value: number, isRising: boolean, axisyUpdated: number },
 }
 
 type State = {
@@ -190,7 +190,8 @@ class AxisY extends Component<Props, State> {
     }
 
     override componentDidUpdate(prevProps: Props, prevState: State) {
-        if (this.props.latestValue?.value !== prevProps.latestValue?.value) {
+        if (this.props.latestValue?.value !== prevProps.latestValue?.value ||
+            this.props.latestValue?.axisyUpdated !== prevProps.latestValue?.axisyUpdated) {
             this.updateChart();
         }
     }

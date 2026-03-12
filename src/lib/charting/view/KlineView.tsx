@@ -43,14 +43,13 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
         const positive = positiveColor(this.props.colorScheme)
         const negative = negativeColor(this.props.colorScheme)
 
-
-        let latestValue: { value: number, isRising: boolean };
+        let latestValue: { value: number, isRising: boolean, axisyUpdated: number };
         const latestTime = this.props.xc.lastOccurredTime();
         if (latestTime !== undefined && latestTime > 0) {
             const kline = this.props.tvar.getByTime(latestTime)
 
             if (kline !== undefined && kline instanceof Kline) {
-                latestValue = { value: kline.close, isRising: kline.close > kline.open };
+                latestValue = { value: kline.close, isRising: kline.close > kline.open, axisyUpdated: new Date().getTime() };
             }
         }
 
