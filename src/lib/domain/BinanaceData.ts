@@ -1,24 +1,11 @@
 
+import { type Kline } from "pinets";
+
 const MAX_LIMIT = 1000; // Binance API max limit per request
 
 const BINANCE_API_URL_DEFAULT = 'https://api.binance.com/api/v3';
 const BINANCE_API_URL_US = 'https://api.binance.us/api/v3';
 const BINANCE_API_URL = BINANCE_API_URL_US
-
-interface Kline {
-    openTime: number;
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-    volume: number;
-    closeTime: number;
-    quoteAssetVolume: number;
-    numberOfTrades: number;
-    takerBuyBaseAssetVolume: number;
-    takerBuyQuoteAssetVolume: number;
-    ignore: number;
-}
 
 const timeframe_to_binance = {
     '1m': '1m', // 1 minute

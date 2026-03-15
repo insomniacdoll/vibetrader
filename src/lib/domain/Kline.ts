@@ -1,17 +1,24 @@
 
 import { TVal } from "../timeseris/TVal";
+import { type Kline as PineTSKline } from "pinets";
 
 export const KVAR_NAME = "kline";
 
-export class Kline extends TVal {
+
+export class Kline extends TVal implements PineTSKline {
+    openTime: number;
     open: number;
     high: number;
     low: number;
     close: number;
     volume: number;
-    openTime: number;
     closeTime: number;
     isClosed: boolean;
+    quoteAssetVolume: number;
+    numberOfTrades: number;
+    takerBuyBaseAssetVolume: number;
+    takerBuyQuoteAssetVolume: number;
+    ignore: number | string;
 
     get value() {
         return this.close;
