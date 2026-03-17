@@ -54,7 +54,7 @@ export class VolumeView extends ChartView<ViewProps, ViewState> {
         return { chartLines, chartAxisy, gridLines }
     }
 
-    override tryToUpdateIndicatorLabels(_mouseTime: number, _referTime?: number) {
+    override UpdateIndicatorLabels(_mouseTime: number, _referTime?: number) {
         // do nothing.
     }
 

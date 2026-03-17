@@ -73,7 +73,7 @@ export interface ViewState {
     chartLines: JSX.Element[];
     chartAxisy?: JSX.Element;
     gridLines?: JSX.Element;
-    overlayChartLines?: JSX.Element[];
+    overlayIndicatorLines?: JSX.Element[];
     drawingLines?: JSX.Element[];
 
     mouseCursor?: JSX.Element
@@ -83,14 +83,10 @@ export interface ViewState {
 
     cursor?: string;
 
-
-
     indicatorLabels?: JSX.Element[];
 }
 
 export type CallbacksToContainer = {
-    // updateOverlayIndicatorLabels: (vs: string[][], refVs?: string[][]) => void
-    // updateStackedIndicatorLabels: (indexOfStackedIndicators: number, vs: string[], refVs?: string[]) => void
     updateDrawingIdsToCreate: (ids?: Selection) => void;
 }
 
@@ -172,9 +168,9 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
     // return `value !== undefined` to show cursor value of time
     abstract valueAtTime(time: number): number
 
-    abstract plot(): Pick<ViewState, "chartLines" | "chartAxisy" | "gridLines" | "overlayChartLines" | "drawingLines">;
+    abstract plot(): Pick<ViewState, "chartLines" | "chartAxisy" | "gridLines" | "overlayIndicatorLines" | "indicatorLabels" | "drawingLines">;
 
-    protected plotOverlayCharts(): JSX.Element[] {
+    protected plotOverlayIndicatorLines(): JSX.Element[] {
         return [];
     }
 
@@ -187,13 +183,13 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
         let state: Partial<ViewState> = {};
 
         if (willUpdateChart) {
-            const { chartLines, chartAxisy, overlayChartLines, drawingLines } = this.plot();
-            state = { ...state, chartLines, chartAxisy, overlayChartLines, drawingLines }
+            const { chartLines, chartAxisy, overlayIndicatorLines, drawingLines } = this.plot();
+            state = { ...state, chartLines, chartAxisy, overlayIndicatorLines, drawingLines }
         }
 
         if (!willUpdateChart && willUpdateOverlayCharts) {
-            const overlayChartLines = this.plotOverlayCharts()
-            state = { ...state, overlayChartLines }
+            const overlayIndicatorLines = this.plotOverlayIndicatorLines()
+            state = { ...state, overlayIndicatorLines }
         }
 
         if (willUpdateCursor) {
@@ -277,11 +273,11 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
             mouseTime = latestTime;
         }
 
-        this.tryToUpdateIndicatorLabels(mouseTime, referTime);
+        this.UpdateIndicatorLabels(mouseTime, referTime);
         this.setState({ ...(state as object), referCursor, mouseCursor })
     }
 
-    abstract tryToUpdateIndicatorLabels(mouseTime: number, referTime?: number): void
+    abstract UpdateIndicatorLabels(mouseTime: number, referTime?: number): void
 
     #plotCursor(x: number, y: number, time: number, value: number, className: string) {
         const pathStyle = styleOfAnnot(className, this.props.colorScheme);

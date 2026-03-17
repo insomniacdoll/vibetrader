@@ -21,12 +21,13 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
     constructor(props: ViewProps) {
         super(props);
 
-        const { chartLines, chartAxisy, gridLines } = this.plot();
+        const { chartLines, chartAxisy, gridLines, indicatorLabels } = this.plot();
 
         this.state = {
             chartLines,
             chartAxisy,
             gridLines,
+            indicatorLabels
         };
     }
 
@@ -37,6 +38,21 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
         const xc = this.props.xc
         const yc = this.yc
         const tvar = this.props.tvar as TVar<PineData[]>
+
+        const latestTime = this.props.xc.lastOccurredTime();
+        let latestIndicatorValues: string[]
+        if (this.props.mainIndicatorOutputs !== undefined) {
+            const tvar = this.props.tvar as TVar<PineData[]>;
+            if (latestTime !== undefined && latestTime > 0) {
+                const datas = tvar.getByTime(latestTime);
+                latestIndicatorValues = datas && datas.map(data => {
+                    const v = data ? data.value : NaN;
+                    return typeof v === 'number'
+                        ? isNaN(v) ? "" : v.toFixed(2)
+                        : '' + v
+                });
+            }
+        }
 
         const chartLines = this.props.mainIndicatorOutputs.map(({ atIndex, title, options }) => {
             let chart: JSX.Element;
@@ -168,10 +184,12 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
 
         const gridLines = this.plotGrids();
 
-        return { chartLines, chartAxisy, gridLines }
+        const indicatorLabels = this.plotIndicatorLabels(latestIndicatorValues);
+
+        return { chartLines, chartAxisy, gridLines, indicatorLabels }
     }
 
-    plotIndicatorLabels(mouseIndicatorValues: string[], referIndicatorValues: string[]) {
+    plotIndicatorLabels(mouseIndicatorValues: string[], referIndicatorValues?: string[]) {
         const chartWidth = this.props.width;
 
         const outputs = this.props.mainIndicatorOutputs;
@@ -209,7 +227,7 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
                 </text>
 
                 {/* Right Aligned - Refer Indicator Values */}
-                {this.props.xc.isReferCursorEnabled && (
+                {this.props.xc.isReferCursorEnabled && referIndicatorValues && (
                     <text
                         x={chartWidth - ChartView.AXISY_WIDTH}
                         y={yPos}
@@ -233,11 +251,10 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
                 )}
             </g >]
         )
-
     }
 
-    override tryToUpdateIndicatorLabels(mouseTime: number, referTime?: number) {
-        if (this.props.indexOfStackedIndicator !== undefined) {
+    override UpdateIndicatorLabels(mouseTime: number, referTime?: number) {
+        if (this.props.mainIndicatorOutputs !== undefined) {
             const tvar = this.props.tvar as TVar<PineData[]>;
             let mouseIndicatorValues: string[]
             if (mouseTime !== undefined && mouseTime > 0 && this.props.xc.baseSer.occurred(mouseTime)) {
@@ -248,7 +265,6 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
                         ? isNaN(v) ? "" : v.toFixed(2)
                         : '' + v
                 });
-
             }
 
             let referIndicatorValues: string[]
@@ -264,8 +280,6 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
 
             const indicatorLabels = this.plotIndicatorLabels(mouseIndicatorValues, referIndicatorValues)
             this.setState({ indicatorLabels })
-
-            // this.props.callbacksToContainer.updateStackedIndicatorLabels(this.props.indexOfStackedIndicator, mouseIndicatorValues, referIndicatorValues);
         }
     }
 
