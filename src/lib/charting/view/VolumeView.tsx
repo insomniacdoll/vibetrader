@@ -54,6 +54,10 @@ export class VolumeView extends ChartView<ViewProps, ViewState> {
         return { chartLines, chartAxisy, gridLines }
     }
 
+    override tryToUpdateIndicatorLabels(_mouseTime: number, _referTime?: number) {
+        // do nothing.
+    }
+
     override computeMaxValueMinValue() {
         let max = Number.NEGATIVE_INFINITY;
         const min = 0// Number.POSITIVE_INFINITY;

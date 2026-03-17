@@ -221,6 +221,113 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
         return overlayChartLines;
     }
 
+    // plotIndicatorLabels() {
+    //     this.props.overlayIndicators.map(({ outputs }, m) =>
+    //         <Fragment key={"indicator-labels-" + m}>
+    //             <div style={{
+    //                 position: 'absolute',
+    //                 top: this.state.yKlineView + m * 13 - H_SPACING + 2,
+    //                 zIndex: 2, // ensure it's above the SVG
+    //                 backgroundColor: 'transparent',
+    //             }}>
+    //                 <div style={{ paddingRight: "0px", paddingTop: '0px' }}>
+    //                     {
+    //                         outputs.map(({ title, options: { color } }, n) =>
+    //                             <Fragment key={"overlay-indicator-label-" + n} >
+    //                                 <span className="label-mouse">{title ? title : ''}&nbsp;</span>
+    //                                 <span style={{ color }}>{
+    //                                     this.state.overlayIndicatorLabels !== undefined &&
+    //                                     this.state.overlayIndicatorLabels[m] !== undefined &&
+    //                                     this.state.overlayIndicatorLabels[m][n]
+    //                                 }
+    //                                 </span>
+    //                                 {n === outputs.length - 1
+    //                                     ? <span></span>
+    //                                     : <span>&nbsp;&middot;&nbsp;</span>
+    //                                 }
+    //                             </Fragment>
+    //                         )
+    //                     }
+    //                 </div>
+    //             </div>
+
+    //             <div style={{
+    //                 position: 'absolute',
+    //                 top: this.state.yKlineView + m * 13 - H_SPACING + 2,
+    //                 right: ChartView.AXISY_WIDTH,
+    //                 zIndex: 2, // ensure it's above the SVG
+    //                 backgroundColor: 'transparent',
+    //             }}>
+    //                 <div style={{ paddingRight: "0px", paddingTop: '0px' }}>
+    //                     {
+    //                         this.xc.isReferCursorEnabled && outputs.map(({ title, options: { color } }, n) =>
+    //                             <Fragment key={"ovarlay-indicator-label-" + n} >
+    //                                 <span className="label-refer">{title ? title : ''}&nbsp;</span>
+    //                                 <span style={{ color }}>{
+    //                                     this.state.referOverlayIndicatorLabels &&
+    //                                     this.state.referOverlayIndicatorLabels[m] &&
+    //                                     this.state.referOverlayIndicatorLabels[m][n]
+    //                                 }
+    //                                 </span>
+    //                                 {n === outputs.length - 1
+    //                                     ? <span></span>
+    //                                     : <span>&nbsp;&middot;&nbsp;</span>
+    //                                 }
+    //                             </Fragment>
+    //                         )
+    //                     }
+    //                 </div>
+    //             </div>
+    //         </Fragment>)
+
+    // }
+
+    override tryToUpdateIndicatorLabels(mouseTime: number, referTime?: number) {
+        if (this.props.overlayIndicators !== undefined) {
+            const allmvs: string[][] = []
+            const allrvs: string[][] = []
+            this.props.overlayIndicators.map((indicator, n) => {
+                const tvar = indicator.tvar;
+
+                let mvs: string[]
+                if (mouseTime !== undefined && mouseTime > 0 && this.props.xc.baseSer.occurred(mouseTime)) {
+                    mvs = indicator.outputs.map(({ atIndex }, n) => {
+                        const datas = tvar.getByTime(mouseTime);
+                        const data = datas ? datas[atIndex] : undefined;
+                        const v = data ? data.value : NaN
+                        return typeof v === 'number'
+                            ? isNaN(v) ? "" : v.toFixed(2)
+                            : '' + v
+                    })
+
+                } else {
+                    mvs = new Array(indicator.outputs.length);
+                }
+
+                allmvs.push(mvs)
+
+                let rvs: string[]
+                if (referTime !== undefined && referTime > 0 && this.props.xc.baseSer.occurred(referTime)) {
+                    rvs = indicator.outputs.map(({ atIndex }, n) => {
+                        const datas = tvar.getByTime(referTime);
+                        const data = datas ? datas[atIndex] : undefined;
+                        const v = data ? data.value : NaN
+                        return typeof v === 'number'
+                            ? isNaN(v) ? "" : v.toFixed(2)
+                            : '' + v
+                    })
+
+                } else {
+                    rvs = new Array(indicator.outputs.length);
+                }
+
+                allrvs.push(rvs)
+            })
+
+            this.props.callbacksToContainer.updateOverlayIndicatorLabels(allmvs, allrvs);
+        }
+    }
+
     override computeMaxValueMinValue() {
         let max = Number.NEGATIVE_INFINITY;
         let min = Number.POSITIVE_INFINITY;

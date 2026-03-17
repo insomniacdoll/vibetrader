@@ -271,86 +271,13 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
             mouseTime = latestTime;
         }
 
-        this.tryToUpdateIndicatorLables(mouseTime, referTime);
+        this.tryToUpdateIndicatorLabels(mouseTime, referTime);
         this.setState({ ...(state as object), referCursor, mouseCursor })
     }
 
-    tryToUpdateIndicatorLables(mouseTime: number, referTime?: number) {
-        // overlay indicators
-        if (this.props.overlayIndicators !== undefined) {
-            const allmvs: string[][] = []
-            const allrvs: string[][] = []
-            this.props.overlayIndicators.map((indicator, n) => {
-                const tvar = indicator.tvar;
+    tryToUpdateIndicatorLabels(mouseTime: number, referTime?: number) {
 
-                let mvs: string[]
-                if (mouseTime !== undefined && mouseTime > 0 && this.props.xc.baseSer.occurred(mouseTime)) {
-                    mvs = indicator.outputs.map(({ atIndex }, n) => {
-                        const datas = tvar.getByTime(mouseTime);
-                        const data = datas ? datas[atIndex] : undefined;
-                        const v = data ? data.value : NaN
-                        return typeof v === 'number'
-                            ? isNaN(v) ? "" : v.toFixed(2)
-                            : '' + v
-                    })
-
-                } else {
-                    mvs = new Array(indicator.outputs.length);
-                }
-
-                allmvs.push(mvs)
-
-                let rvs: string[]
-                if (referTime !== undefined && referTime > 0 && this.props.xc.baseSer.occurred(referTime)) {
-                    rvs = indicator.outputs.map(({ atIndex }, n) => {
-                        const datas = tvar.getByTime(referTime);
-                        const data = datas ? datas[atIndex] : undefined;
-                        const v = data ? data.value : NaN
-                        return typeof v === 'number'
-                            ? isNaN(v) ? "" : v.toFixed(2)
-                            : '' + v
-                    })
-
-                } else {
-                    rvs = new Array(indicator.outputs.length);
-                }
-
-                allrvs.push(rvs)
-            })
-
-            this.props.callbacksToContainer.updateOverlayIndicatorLabels(allmvs, allrvs);
-        }
-
-        // stacked indicators
-        if (this.props.indexOfStackedIndicator !== undefined) {
-            const tvar = this.props.tvar as TVar<PineData[]>;
-            let mvs: string[]
-            if (mouseTime !== undefined && mouseTime > 0 && this.props.xc.baseSer.occurred(mouseTime)) {
-                const datas = tvar.getByTime(mouseTime);
-                mvs = datas && datas.map(data => {
-                    const v = data ? data.value : NaN;
-                    return typeof v === 'number'
-                        ? isNaN(v) ? "" : v.toFixed(2)
-                        : '' + v
-                });
-
-            }
-
-            let rvs: string[]
-            if (referTime !== undefined && referTime > 0 && this.props.xc.baseSer.occurred(referTime)) {
-                const datas = tvar.getByTime(referTime);
-                rvs = datas && datas.map(data => {
-                    const v = data ? data.value : NaN
-                    return typeof v === 'number'
-                        ? isNaN(v) ? "" : v.toFixed(2)
-                        : '' + v
-                });
-            }
-
-            this.props.callbacksToContainer.updateStackedIndicatorLabels(this.props.indexOfStackedIndicator, mvs, rvs);
-        }
     }
-
 
     #plotCursor(x: number, y: number, time: number, value: number, className: string) {
         const pathStyle = styleOfAnnot(className, this.props.colorScheme);

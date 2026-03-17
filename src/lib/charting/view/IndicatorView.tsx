@@ -169,6 +169,36 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
         return { chartLines, chartAxisy, gridLines }
     }
 
+    override tryToUpdateIndicatorLabels(mouseTime: number, referTime?: number) {
+        if (this.props.indexOfStackedIndicator !== undefined) {
+            const tvar = this.props.tvar as TVar<PineData[]>;
+            let mvs: string[]
+            if (mouseTime !== undefined && mouseTime > 0 && this.props.xc.baseSer.occurred(mouseTime)) {
+                const datas = tvar.getByTime(mouseTime);
+                mvs = datas && datas.map(data => {
+                    const v = data ? data.value : NaN;
+                    return typeof v === 'number'
+                        ? isNaN(v) ? "" : v.toFixed(2)
+                        : '' + v
+                });
+
+            }
+
+            let rvs: string[]
+            if (referTime !== undefined && referTime > 0 && this.props.xc.baseSer.occurred(referTime)) {
+                const datas = tvar.getByTime(referTime);
+                rvs = datas && datas.map(data => {
+                    const v = data ? data.value : NaN
+                    return typeof v === 'number'
+                        ? isNaN(v) ? "" : v.toFixed(2)
+                        : '' + v
+                });
+            }
+
+            this.props.callbacksToContainer.updateStackedIndicatorLabels(this.props.indexOfStackedIndicator, mvs, rvs);
+        }
+    }
+
     override computeMaxValueMinValue() {
         let max = Number.NEGATIVE_INFINITY;
         let min = Number.POSITIVE_INFINITY;
