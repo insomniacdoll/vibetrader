@@ -293,3 +293,26 @@ export const styleOfAnnot = (className: string, colorScheme: ColorScheme, isText
         }
     }
 }
+
+export function styleOfLabel(className: string, colorScheme: ColorScheme) {
+    switch (className) {
+        case 'label-title':
+            return {
+                fill: colorScheme === 'light' ? '#FF0000' : '#FF0000',
+                fontSize: '12px'
+            }
+
+        case 'label-mouse':
+            return {
+                fill: colorScheme === 'light' ? '#009000' : '#00F000',
+                fontSize: '12px'
+            }
+
+        case 'label-refer':
+            return {
+                fill: colorScheme === 'light' ? '#00A0A0' : '#00F0F0',
+                fontSize: '12px'
+            }
+
+    }
+}

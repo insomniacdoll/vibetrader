@@ -927,7 +927,7 @@ class KlineViewContainer extends Component<Props, State> {
     }
 
     async takeScreenshot(): Promise<HTMLCanvasElement> {
-        // console.log(renderToStaticMarkup(this.renderSvgChart()))
+        console.log(renderToStaticMarkup(this.renderSvgChart()))
         return html2canvas(this.chartviewRef.current, {
             useCORS: true, // in case you have images stored in your application
             backgroundColor: null // Sets the canvas background to transparent
@@ -1085,6 +1085,7 @@ class KlineViewContainer extends Component<Props, State> {
                     height={H_HEADER}
                     xc={this.xc}
                     tvar={this.kvar}
+                    colorScheme={this.props.colorScheme}
                     ticker={this.ticker}
                     updateEvent={this.state.updateEvent}
                     handleSymbolTimeframeChanged={this.handleTickerTimeframeChanged}

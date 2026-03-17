@@ -43,6 +43,7 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
         const positive = positiveColor(this.props.colorScheme)
         const negative = negativeColor(this.props.colorScheme)
 
+        // Need the non-state latestValue to get it put in AxisY's svg without js code running.
         let latestValue: { value: number, isRising: boolean, axisyUpdated: number };
         const latestTime = this.props.xc.lastOccurredTime();
         if (latestTime !== undefined && latestTime > 0) {

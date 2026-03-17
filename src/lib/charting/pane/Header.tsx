@@ -2,8 +2,10 @@ import { ChartXControl } from "../view/ChartXControl";
 import { Component, type RefObject } from "react";
 import type { UpdateEvent } from "../view/ChartView";
 import type { TVar } from "../../timeseris/TVar";
-import type { Kline } from "../../domain/Kline";
+import { Kline } from "../../domain/Kline";
 import React from "react";
+import { styleOfLabel } from "../../colors";
+import type { ColorScheme } from "../../../App";
 
 type Props = {
     x: number,
@@ -14,14 +16,21 @@ type Props = {
     updateEvent: UpdateEvent,
     tvar: TVar<Kline>,
     ticker: string,
+    colorScheme: ColorScheme,
 
     handleSymbolTimeframeChanged: (ticker: string, timeframe?: string) => void
+}
+
+type Delta = {
+    period?: number,
+    percent?: number,
+    volumeSum?: number
 }
 
 type State = {
     referKline: Kline,
     pointKline: Kline,
-    delta: { period?: number, percent?: number, volumeSum?: number }
+    delta: Delta,
     snapshots: Snapshot[]
     newSnapshot: boolean
 }
@@ -51,10 +60,9 @@ class Header extends Component<Props, State> {
 
         this.ref = React.createRef();
 
-
         this.state = {
-            pointKline: undefined as unknown as Kline,
-            referKline: undefined as unknown as Kline,
+            pointKline: undefined,
+            referKline: undefined,
             delta: undefined,
             snapshots: [],
             newSnapshot: false
@@ -171,7 +179,7 @@ class Header extends Component<Props, State> {
             }
         }
 
-        this.setState({ ...state, referKline: referKline as Kline, pointKline: pointKline as Kline, delta, snapshots, newSnapshot })
+        this.setState({ ...state, referKline, pointKline, delta, snapshots, newSnapshot })
     }
 
     calcDelta() {
@@ -211,17 +219,45 @@ class Header extends Component<Props, State> {
     }
 
     render() {
-        const rKline = this.state.referKline;
-        const mKline = this.state.pointKline;
-        const delta = this.state.delta;
-
-        const transform = `translate(${this.props.x} ${this.props.y})`;
-
         const hText = 13
 
         const leftPadding = 1;
         const yMouseLabel = this.props.height - 8;
         const yReferLabel = yMouseLabel - hText - 6;
+
+        const gap = 8;
+
+        const styleOfTitle = styleOfLabel('label-title', this.props.colorScheme);
+        const styleOfMouse = styleOfLabel('label-mouse', this.props.colorScheme);
+        const styleOfRefer = styleOfLabel('label-refer', this.props.colorScheme);
+
+        // Need the non-state lastestKline for mKline to get it put in svg without js code running.
+        const xc = this.props.xc;
+        let latestKline: Kline;
+        let latestDelta: Delta;
+        const latestTime = xc.lastOccurredTime();
+        if (latestTime !== undefined && latestTime > 0) {
+            const kline = this.props.tvar.getByTime(latestTime)
+
+            if (kline !== undefined && kline instanceof Kline) {
+                latestKline = kline;
+
+                const prevRow = xc.rt(latestTime) - 1
+                const prevOccurredTime = xc.tr(prevRow)
+                if (xc.occurred(prevOccurredTime)) {
+                    const prevKline = this.props.tvar.getByTime(prevOccurredTime);
+                    latestDelta = prevKline.close
+                        ? { percent: 100 * (latestKline.close - prevKline.close) / prevKline.close }
+                        : undefined
+                }
+            }
+        }
+
+        const rKline = this.state.referKline;
+        const mKline = this.state.pointKline || latestKline;
+        const delta = this.state.delta || latestDelta;
+
+        const transform = `translate(${this.props.x} ${this.props.y})`;
 
         return (
             <g transform={transform} ref={this.ref} style={{ fontFamily: 'monospace', fontSize: '12px' }}>
@@ -230,17 +266,17 @@ class Header extends Component<Props, State> {
                 <text x={leftPadding} y={yReferLabel} fill="currentColor">
                     {rKline && rKline.closeTime ? (
                         <>
-                            <tspan className="label-refer">{this.dtFormatL.format(new Date(rKline.closeTime))}</tspan>
-                            <tspan dx="12" className="label-title">O </tspan>
-                            <tspan className="label-refer">{rKline.open?.toPrecision(8)}</tspan>
-                            <tspan dx="12" className="label-title">H </tspan>
-                            <tspan className="label-refer">{rKline.high?.toPrecision(8)}</tspan>
-                            <tspan dx="12" className="label-title">L </tspan>
-                            <tspan className="label-refer">{rKline.low?.toPrecision(8)}</tspan>
-                            <tspan dx="12" className="label-title">C </tspan>
-                            <tspan className="label-refer">{rKline.close?.toPrecision(8)}</tspan>
-                            <tspan dx="12" className="label-title">V </tspan>
-                            <tspan className="label-refer">{rKline.volume}</tspan>
+                            <tspan style={styleOfRefer}>{this.dtFormatL.format(new Date(rKline.closeTime))}</tspan>
+                            <tspan style={styleOfTitle} dx={gap}>O </tspan>
+                            <tspan style={styleOfRefer}>{rKline.open?.toPrecision(8)}</tspan>
+                            <tspan style={styleOfTitle} dx={gap}>H </tspan>
+                            <tspan style={styleOfRefer}>{rKline.high?.toPrecision(8)}</tspan>
+                            <tspan style={styleOfTitle} dx={gap}>L </tspan>
+                            <tspan style={styleOfRefer}>{rKline.low?.toPrecision(8)}</tspan>
+                            <tspan style={styleOfTitle} dx={gap}>C </tspan>
+                            <tspan style={styleOfRefer}>{rKline.close?.toPrecision(8)}</tspan>
+                            <tspan style={styleOfTitle} dx={gap}>V </tspan>
+                            <tspan style={styleOfRefer}>{rKline.volume}</tspan>
                         </>
                     ) : (
                         <tspan visibility="hidden" className="label-refer">{this.dtFormatL.format(new Date())}</tspan>
@@ -251,17 +287,17 @@ class Header extends Component<Props, State> {
                 <text x={leftPadding} y={yMouseLabel} fill="currentColor">
                     {mKline && mKline.closeTime && (
                         <>
-                            <tspan className="label-mouse">{this.dtFormatL.format(new Date(mKline.closeTime))}</tspan>
-                            <tspan dx="12" className="label-title">O </tspan>
-                            <tspan className="label-mouse">{mKline.open?.toPrecision(8)}</tspan>
-                            <tspan dx="12" className="label-title">H </tspan>
-                            <tspan className="label-mouse">{mKline.high?.toPrecision(8)}</tspan>
-                            <tspan dx="12" className="label-title">L </tspan>
-                            <tspan className="label-mouse">{mKline.low?.toPrecision(8)}</tspan>
-                            <tspan dx="12" className="label-title">C </tspan>
-                            <tspan className="label-mouse">{mKline.close?.toPrecision(8)}</tspan>
-                            <tspan dx="12" className="label-title">V </tspan>
-                            <tspan className="label-mouse">{mKline.volume}</tspan>
+                            <tspan style={styleOfMouse}>{this.dtFormatL.format(new Date(mKline.closeTime))}</tspan>
+                            <tspan style={styleOfTitle} dx={gap}>O </tspan>
+                            <tspan style={styleOfMouse}>{mKline.open?.toPrecision(8)}</tspan>
+                            <tspan style={styleOfTitle} dx={gap}>H </tspan>
+                            <tspan style={styleOfMouse}>{mKline.high?.toPrecision(8)}</tspan>
+                            <tspan style={styleOfTitle} dx={gap}>L </tspan>
+                            <tspan style={styleOfMouse}>{mKline.low?.toPrecision(8)}</tspan>
+                            <tspan style={styleOfTitle} dx={gap}>C </tspan>
+                            <tspan style={styleOfMouse}>{mKline.close?.toPrecision(8)}</tspan>
+                            <tspan style={styleOfTitle} dx={gap}>V </tspan>
+                            <tspan style={styleOfMouse}>{mKline.volume}</tspan>
                         </>
                     )}
                 </text>
