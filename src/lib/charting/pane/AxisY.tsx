@@ -23,7 +23,7 @@ type Props = {
 }
 
 type State = {
-    axis: JSX.Element,
+    nothing?: boolean;
 }
 
 
@@ -35,9 +35,6 @@ class AxisY extends Component<Props, State> {
         super(props);
 
         this.ref = React.createRef();
-
-        const axis = this.plot();
-        this.state = { axis }
     }
 
     plot() {
@@ -163,17 +160,14 @@ class AxisY extends Component<Props, State> {
     }
 
 
-    protected updateChart() {
-        const axis = this.plot();
-        this.setState({ axis });
-    }
-
     render() {
+        const axis = this.plot();
+
         const transform = `translate(${this.props.x} ${this.props.y})`;
 
         return (
             <g transform={transform} ref={this.ref}>
-                {this.state.axis}
+                {axis}
             </g >
         );
     }
@@ -187,14 +181,6 @@ class AxisY extends Component<Props, State> {
             this.font = fontSize + ' ' + fontFamily;
         }
     }
-
-    override componentDidUpdate(prevProps: Props, prevState: State) {
-        if (this.props.latestValue?.value !== prevProps.latestValue?.value ||
-            this.props.latestValue?.axisyUpdated !== prevProps.latestValue?.axisyUpdated) {
-            this.updateChart();
-        }
-    }
-
 }
 
 export default AxisY;

@@ -22,7 +22,7 @@ type Props = {
 }
 
 type State = {
-    emptyState?: boolean
+    nothing?: boolean
 }
 
 type Delta = {

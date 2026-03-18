@@ -19,8 +19,6 @@ type Props = {
 }
 
 type State = {
-	axis: JSX.Element,
-
 	referCrosshair: JSX.Element,
 	mouseCrosshair: JSX.Element,
 }
@@ -115,8 +113,7 @@ class AxisX extends Component<Props, State> {
 
 		}
 
-		const axis = this.plot();
-		this.state = { axis, referCrosshair: <></>, mouseCrosshair: <></> };
+		this.state = { referCrosshair: <></>, mouseCrosshair: <></> };
 
 		console.log("AxisX render");
 	}
@@ -220,16 +217,7 @@ class AxisX extends Component<Props, State> {
 		);
 	}
 
-	protected updateChart() {
-		const axis = this.plot();
-		this.updateState({ axis });
-	}
-
 	protected updateCrosshair() {
-		this.updateState({});
-	}
-
-	protected updateState(state: object) {
 		let referCrosshair: JSX.Element
 		let mouseCrosshair: JSX.Element
 		const xc = this.props.xc;
@@ -249,7 +237,7 @@ class AxisX extends Component<Props, State> {
 			mouseCrosshair = this.#plotCrosshair(crosshairX, time, 'annot-mouse')
 		}
 
-		this.setState({ ...state, referCrosshair, mouseCrosshair })
+		this.setState({ referCrosshair, mouseCrosshair })
 	}
 
 	#plotCrosshair(x: number, time: number, className: string) {
@@ -285,11 +273,13 @@ class AxisX extends Component<Props, State> {
 	}
 
 	render() {
+		const axis = this.plot();
+
 		const transform = `translate(${this.props.x} ${this.props.y})`;
 
 		return (
 			<g transform={transform} ref={this.ref}>
-				{this.state.axis}
+				{axis}
 				{this.state.referCrosshair}
 				{this.state.mouseCrosshair}
 			</g >
@@ -315,10 +305,6 @@ class AxisX extends Component<Props, State> {
 	override componentDidUpdate(prevProps: Props, prevState: State) {
 		if (this.props.updateEvent.changed !== prevProps.updateEvent.changed) {
 			switch (this.props.updateEvent.type) {
-				case 'chart':
-					this.updateChart();
-					break;
-
 				case 'crosshair':
 					this.updateCrosshair();
 					break;
@@ -327,9 +313,6 @@ class AxisX extends Component<Props, State> {
 			}
 		}
 
-		if (this.props.y !== prevProps.y) {
-			this.updateChart();
-		}
 	}
 }
 
