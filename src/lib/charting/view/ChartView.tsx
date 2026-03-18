@@ -120,8 +120,6 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
     ref: RefObject<SVGAElement>;
     font: string;
 
-    mouseIndicatorValues?: string[][];
-    referIndicatorValues?: string[][];
 
     // share same xc through all views that are in the same viewcontainer.
     constructor(props: P) {
@@ -278,7 +276,8 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
 
         this.crosshairs = { referCrosshair, mouseCrosshair }
 
-        // this.setState({ referCrosshair: referCrosshair, mouseCrosshair: mouseCrosshair })
+        // may need to update drawing handles when mouse over
+        this.chartElements.drawingLines = this.plotDrawings();
     }
 
     abstract UpdateIndicatorLabels(mouseTime: number, referTime?: number): void

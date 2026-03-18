@@ -339,8 +339,8 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
                 {this.chartElements.indicatorLabels?.map((c, n) => <Fragment key={n}>{c}</Fragment>)}
                 {this.chartElements.chartAxisy}
                 {this.chartElements.gridLines}
-                {this.referCrosshair}
-                {this.mouseCrosshair}
+                {this.crosshairs.referCrosshair}
+                {this.crosshairs.mouseCrosshair}
             </g>
         )
     }
