@@ -1363,7 +1363,6 @@ class KlineViewContainer extends Component<Props, State> {
                             <Title
                                 xc={this.xc}
                                 ticker={this.ticker}
-                                isChartOnly={this.props.chartOnly}
                                 handleSymbolTimeframeChanged={this.handleTickerTimeframeChanged}
                             />
                         </div>

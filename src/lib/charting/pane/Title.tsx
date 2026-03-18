@@ -10,7 +10,6 @@ import { source } from "../../../Env";
 type Props = {
     xc: ChartXControl,
     ticker: string,
-    isChartOnly: boolean,
     handleSymbolTimeframeChanged: (ticker: string, timeframe?: string) => void
 }
 
@@ -116,11 +115,7 @@ export function ChooseTimeframe(props: { ticker: string, timeframe: TFrame, hand
     );
 }
 
-export function Title({ xc, ticker, isChartOnly, handleSymbolTimeframeChanged }: Props) {
-    if (isChartOnly) {
-        return <></>;
-    }
-
+export function Title({ xc, ticker, handleSymbolTimeframeChanged }: Props) {
     const tframe = xc.baseSer.timeframe;
 
     let tframeName = tframe.compactName.toLowerCase();
