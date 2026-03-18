@@ -170,8 +170,6 @@ class KlineViewContainer extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.prevProp = props;
-
         this.chartviewRef = React.createRef();
 
         const geometry = this.#calcGeometry([]);
@@ -454,7 +452,27 @@ class KlineViewContainer extends Component<Props, State> {
         // window.addEventListener('resize', this.updateWidth);
     }
 
+    override componentWillUnmount() {
+        if (this.reloadDataTimeoutId) {
+            clearTimeout(this.reloadDataTimeoutId);
+        }
+
+        if (this.globalKeyboardListener) {
+            document.removeEventListener("keydown", this.onGlobalKeyDown)
+        }
+
+        this.resizeObserver.disconnect();
+
+        // window.removeEventListener('resize', this.updateWidth);
+    }
+
     checkUpdate() {
+        if (this.prevProp === undefined) {
+
+            this.prevProp = this.props;
+            return;
+        }
+
         const prevProps = this.prevProp;
         const props = this.props;
 
@@ -470,26 +488,12 @@ class KlineViewContainer extends Component<Props, State> {
         this.prevProp = props;
     }
 
-    override componentWillUnmount() {
-        if (this.reloadDataTimeoutId) {
-            clearTimeout(this.reloadDataTimeoutId);
-        }
-
-        if (this.globalKeyboardListener) {
-            document.removeEventListener("keydown", this.onGlobalKeyDown)
-        }
-
-        this.resizeObserver.disconnect();
-
-        // window.removeEventListener('resize', this.updateWidth);
-    }
-
-    update(event: UpdateEvent) {
+    private update(event: UpdateEvent) {
         const changed = this.state.updateEvent.changed + 1;
         this.updateState({ updateEvent: { ...event, changed } });
     }
 
-    updateState(newState: Partial<State>, callback?: () => void) {
+    private updateState(newState: Partial<State>, callback?: () => void) {
         const xc = this.xc;
 
         let referCrosshair: JSX.Element
@@ -498,13 +502,13 @@ class KlineViewContainer extends Component<Props, State> {
             const time = xc.tr(xc.referCrosshairRow)
             if (xc.occurred(time)) {
                 const cursorX = xc.xr(xc.referCrosshairRow)
-                referCrosshair = this.#plotCursor(cursorX, 'annot-refer')
+                referCrosshair = this.plotCursor(cursorX, 'annot-refer')
             }
         }
 
         if (xc.isMouseCrosshairEnabled) {
             const cursorX = xc.xr(xc.mouseCrosshairRow)
-            mouseCrosshair = this.#plotCursor(cursorX, 'annot-mouse')
+            mouseCrosshair = this.plotCursor(cursorX, 'annot-mouse')
         }
 
         // need to re-calculate geometry?
@@ -515,11 +519,11 @@ class KlineViewContainer extends Component<Props, State> {
         this.setState({ ...(newState as (Pick<State, keyof State> | State)), ...geometry, referCrosshair, mouseCrosshair }, callback)
     }
 
-    #indicatorViewId(n: number) {
+    private indicatorViewId(n: number) {
         return 'indicator-' + n;
     }
 
-    #calcXYMouses(x: number, y: number) {
+    private calcXYMouses(x: number, y: number) {
         if (y >= this.state.yKlineView && y < this.state.yKlineView + H_KLINE_VIEW) {
             return { who: 'kline', x, y: y - this.state.yKlineView };
 
@@ -534,7 +538,7 @@ class KlineViewContainer extends Component<Props, State> {
                 for (let n = 0; n < this.state.stackedIndicators.length; n++) {
                     const yIndicatorView = this.state.yIndicatorViews + n * (H_INDICATOR_VIEW + H_SPACING);
                     if (y >= yIndicatorView && y < yIndicatorView + H_INDICATOR_VIEW) {
-                        return { who: this.#indicatorViewId(n), x, y: y - yIndicatorView };
+                        return { who: this.indicatorViewId(n), x, y: y - yIndicatorView };
                     }
                 }
             }
@@ -543,7 +547,7 @@ class KlineViewContainer extends Component<Props, State> {
         return undefined;
     }
 
-    #plotCursor(x: number, className: string) {
+    private plotCursor(x: number, className: string) {
         if (this.state.drawingIdsToCreate === 'all' || this.state.drawingIdsToCreate.size > 0 || this.xc.isCrosshairEnabled) {
             return <></>
         }
@@ -562,11 +566,11 @@ class KlineViewContainer extends Component<Props, State> {
         )
     }
 
-    isNotInAxisYArea(x: number) {
+    private isNotInAxisYArea(x: number) {
         return x < this.state.chartviewWidth - ChartView.AXISY_WIDTH
     }
 
-    translate(e: React.MouseEvent) {
+    private translate(e: React.MouseEvent) {
         return [e.nativeEvent.offsetX, e.nativeEvent.offsetY]
     }
 
@@ -711,7 +715,7 @@ class KlineViewContainer extends Component<Props, State> {
             xc.isMouseCrosshairEnabled = false;
         }
 
-        const xyMouse = this.#calcXYMouses(x, y);
+        const xyMouse = this.calcXYMouses(x, y);
 
         this.update({ type: 'crosshair', xyMouse });
     }
@@ -1117,7 +1121,7 @@ class KlineViewContainer extends Component<Props, State> {
                     this.state.stackedIndicators.map(({ scriptName, tvar, outputs }, n) =>
                         <IndicatorView
                             key={"stacked-indicator-view-" + scriptName}
-                            id={this.#indicatorViewId(n)}
+                            id={this.indicatorViewId(n)}
                             name={"Indicator-" + n}
                             x={0}
                             y={this.state.yIndicatorViews + n * (H_INDICATOR_VIEW + H_SPACING)}

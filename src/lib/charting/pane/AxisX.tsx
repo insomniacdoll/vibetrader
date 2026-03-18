@@ -230,20 +230,20 @@ class AxisX extends Component<Props, State> {
 			if (xc.occurred(time)) {
 				const crosshairX = xc.xr(xc.referCrosshairRow)
 
-				referCrosshair = this.#plotCrosshair(crosshairX, time, 'annot-refer')
+				referCrosshair = this.plotCrosshair(crosshairX, time, 'annot-refer')
 			}
 		}
 
 		if (xc.isMouseCrosshairEnabled) {
 			const time = xc.tr(xc.mouseCrosshairRow)
 			const crosshairX = xc.xr(xc.mouseCrosshairRow)
-			mouseCrosshair = this.#plotCrosshair(crosshairX, time, 'annot-mouse')
+			mouseCrosshair = this.plotCrosshair(crosshairX, time, 'annot-mouse')
 		}
 
 		return { referCrosshair, mouseCrosshair };
 	}
 
-	#plotCrosshair(x: number, time: number, className: string) {
+	plotCrosshair(x: number, time: number, className: string) {
 		const h = 13; // annotation height
 
 		const dtStr = this.dfCrosshair.format(new Date(time))
@@ -281,7 +281,6 @@ class AxisX extends Component<Props, State> {
 		const { referCrosshair, mouseCrosshair } = this.updateCrosshair()
 
 		const transform = `translate(${this.props.x} ${this.props.y})`;
-
 		return (
 			<g transform={transform} ref={this.ref}>
 				{axis}

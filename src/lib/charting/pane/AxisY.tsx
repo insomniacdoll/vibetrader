@@ -168,7 +168,6 @@ class AxisY extends Component<Props, State> {
         const axis = this.plot();
 
         const transform = `translate(${this.props.x} ${this.props.y})`;
-
         return (
             <g transform={transform} ref={this.ref}>
                 {axis}

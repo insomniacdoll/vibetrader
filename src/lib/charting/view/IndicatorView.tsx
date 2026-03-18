@@ -21,8 +21,6 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
     constructor(props: ViewProps) {
         super(props);
 
-        this.chartElements = this.plot();
-
         this.state = {}
     }
 

@@ -125,8 +125,6 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
     constructor(props: P) {
         super(props)
 
-        this.prevProps = props;
-
         this.yc = new ChartYControl(props.xc.baseSer, props.height);
 
         this.ref = React.createRef();
@@ -412,6 +410,13 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
     }
 
     checkUpdate() {
+        if (this.prevProps === undefined) {
+            this.chartElements = this.plot();
+
+            this.prevProps = this.props;
+            return
+        }
+
         const prevProps = this.prevProps;
         const props = this.props;
 

@@ -27,26 +27,7 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
 
         this.yc.valueScalar = LINEAR_SCALAR;
 
-        const { chartLines, chartAxisy, gridLines, overlayIndicatorLines, indicatorLabels, drawingLines } = this.plot();
-        this.chartElements = {
-            chartLines,
-            chartAxisy,
-            gridLines,
-            overlayIndicatorLines,
-            indicatorLabels,
-            drawingLines
-        }
-
         this.state = {}
-
-        // this.state = {
-        //     chartLines,
-        //     chartAxisy,
-        //     gridLines,
-        //     overlayIndicatorLines,
-        //     indicatorLabels,
-        //     drawingLines
-        // };
     }
 
     override plot() {
