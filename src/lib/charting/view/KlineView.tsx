@@ -403,7 +403,7 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
         return [max, min]
     }
 
-    swithScalarType() {
+    switchScalarType() {
         switch (this.yc.valueScalar.kind) {
             case LINEAR_SCALAR.kind:
                 this.yc.valueScalar = LG_SCALAR;
