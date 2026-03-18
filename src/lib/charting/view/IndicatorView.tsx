@@ -330,6 +330,8 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
     }
 
     render() {
+        this.checkUpdate(this.prevProps);
+
         const transform = `translate(${this.props.x} ${this.props.y})`;
         return (
             <g transform={transform}>
@@ -337,8 +339,8 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
                 {this.chartElements.indicatorLabels?.map((c, n) => <Fragment key={n}>{c}</Fragment>)}
                 {this.chartElements.chartAxisy}
                 {this.chartElements.gridLines}
-                {this.state.referCrosshair}
-                {this.state.mouseCrosshair}
+                {this.referCrosshair}
+                {this.mouseCrosshair}
             </g>
         )
     }

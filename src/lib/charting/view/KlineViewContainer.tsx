@@ -452,7 +452,7 @@ class KlineViewContainer extends Component<Props, State> {
     }
 
     // Around line 335
-    override componentDidUpdate(prevProps: Props) {
+    override checkUpdate(prevProps: Props) {
         if (prevProps.ticker !== this.props.ticker || prevProps.timeframe !== this.props.timeframe) {
             const newTicker = this.props.ticker || this.ticker;
             const newTimeframe = this.props.timeframe || this.tframe.shortName;

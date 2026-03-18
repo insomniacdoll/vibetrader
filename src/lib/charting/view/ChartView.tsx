@@ -87,6 +87,11 @@ export type ChartElements = {
     indicatorLabels?: JSX.Element[];
 }
 
+export type Crosshairs = {
+    mouseCrosshair?: JSX.Element;
+    referCrosshair?: JSX.Element;
+}
+
 export type CallbacksToContainer = {
     updateDrawingIdsToCreate: (ids?: Selection) => void;
 }
@@ -101,8 +106,10 @@ const MOVE_CURSOR = "all-scroll" // 'move' doesn't work?
  *
  */
 export abstract class ChartView<P extends ViewProps, S extends ViewState> extends Component<P, S> {
+    protected prevProps: P;
 
     protected chartElements: ChartElements = {};
+    protected crosshairs: Crosshairs = {};
 
     static readonly AXISY_WIDTH = 55
     static readonly CONTROL_HEIGHT = 12
@@ -119,6 +126,8 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
     // share same xc through all views that are in the same viewcontainer.
     constructor(props: P) {
         super(props)
+
+        this.prevProps = props;
 
         this.yc = new ChartYControl(props.xc.baseSer, props.height);
 
@@ -227,7 +236,7 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
                         value /= yc.normScale
                     }
 
-                    referCrosshair = this.#plotCrosshair(crosshairX, crosshairY, referTime, value, "annot-refer")
+                    referCrosshair = this.plotCrosshair(crosshairX, crosshairY, referTime, value, "annot-refer")
                 }
             }
         }
@@ -257,7 +266,7 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
                     value /= yc.normScale
                 }
 
-                mouseCrosshair = this.#plotCrosshair(crosshairX, crosshairY, mouseTime, value, "annot-mouse")
+                mouseCrosshair = this.plotCrosshair(crosshairX, crosshairY, mouseTime, value, "annot-mouse")
             }
 
         } else {
@@ -266,12 +275,15 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
         }
 
         this.UpdateIndicatorLabels(mouseTime, referTime);
-        this.setState({ referCrosshair: referCrosshair, mouseCrosshair: mouseCrosshair })
+
+        this.crosshairs = { referCrosshair, mouseCrosshair }
+
+        // this.setState({ referCrosshair: referCrosshair, mouseCrosshair: mouseCrosshair })
     }
 
     abstract UpdateIndicatorLabels(mouseTime: number, referTime?: number): void
 
-    #plotCrosshair(x: number, y: number, time: number, value: number, className: string) {
+    plotCrosshair(x: number, y: number, time: number, value: number, className: string) {
         const pathStyle = styleOfAnnot(className, this.props.colorScheme);
 
         const wAxisY = ChartView.AXISY_WIDTH
@@ -404,7 +416,7 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
     // Ensure you have a conditional check to prevent infinite re-renders.
     // If setState is called unconditionally, it will trigger another update,
     // potentially leading to a loop.
-    override componentDidUpdate(prevProps: ViewProps, prevState: ViewState) {
+    checkUpdate(prevProps: ViewProps) {
         let willUpdateChart = false
         let willUpdateCrosshair = false;
         let willUpdateOverlayCharts = false;
@@ -494,6 +506,8 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
         if (willUpdateChart || willUpdateOverlayCharts || willUpdateCrosshair) {
             this.updateChart_Crosshair(willUpdateChart, willUpdateOverlayCharts, willUpdateCrosshair, xMouse, yMouse)
         }
+
+        this.prevProps = this.props;
     }
 
     isOverlayIndicatorsChanged(newInds: Indicator[], oldInds: Indicator[]) {
@@ -838,8 +852,5 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
             const [x, y] = this.translate(e)
         }
     }
-
-
-
 }
 
