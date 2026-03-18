@@ -29,7 +29,6 @@ import {
     DialogTrigger,
     Divider,
     Popover,
-    Image,
     type Selection,
     ToggleButtonGroup,
     ToggleButton,
@@ -120,7 +119,7 @@ type Geometry = {
     yAxisx: number,
     svgHeight: number,
     containerHeight: number,
-    yCursorRange: number[]
+    yCrosshairRange: number[]
 };
 
 const allIndTags = dev
@@ -235,9 +234,9 @@ class KlineViewContainer extends Component<Props, State> {
 
         const svgHeight = yAxisx + H_AXIS_X;
         const containerHeight = svgHeight + H_TITLE + H_INDICATOR_TAGS;
-        const yCursorRange = [0, yAxisx];
+        const yCrosshairRange = [yKlineView - H_SPACING, yAxisx];
 
-        return { yHeader, yKlineView, yVolumeView, yIndicatorViews, yAxisx, svgHeight, containerHeight, yCursorRange };
+        return { yHeader, yKlineView, yVolumeView, yIndicatorViews, yAxisx, svgHeight, containerHeight, yCrosshairRange };
     }
 
     fetchOPredefinedScripts = (scriptNames: string[]) => {
@@ -546,8 +545,9 @@ class KlineViewContainer extends Component<Props, State> {
 
         const crosshair = new Path();
         // vertical line
-        crosshair.moveto(x, this.geom.yCursorRange[0]);
-        crosshair.lineto(x, this.geom.yCursorRange[1])
+        crosshair
+            .moveto(x, this.geom.yCrosshairRange[0])
+            .lineto(x, this.geom.yCrosshairRange[1])
 
         return (
             crosshair.render({ style: pathStyle, className })
@@ -742,7 +742,7 @@ class KlineViewContainer extends Component<Props, State> {
 
             // draw refer cursor only when not in the axis-y area
             if (
-                y >= this.geom.yCursorRange[0] && y <= this.geom.svgHeight &&
+                y >= this.geom.yCrosshairRange[0] && y <= this.geom.svgHeight &&
                 b >= 1 && b <= xc.nBars
             ) {
                 const row = xc.rb(b)
@@ -894,7 +894,7 @@ class KlineViewContainer extends Component<Props, State> {
     }
 
     async takeScreenshot(): Promise<HTMLCanvasElement> {
-        console.log(renderToStaticMarkup(this.renderSvgChart(this.state.isChartOnly)))
+        console.log(renderToStaticMarkup(this.renderSvgChart()))
         return html2canvas(this.chartviewRef.current, {
             useCORS: true, // in case you have images stored in your application
             backgroundColor: null // Sets the canvas background to transparent
@@ -927,7 +927,7 @@ class KlineViewContainer extends Component<Props, State> {
                 { isChartOnly: true },
                 () => {
                     // console.log(renderToStaticMarkup(this.renderSvgChart(this.state.isChartOnly)))
-                    const svg = renderToString(this.renderSvgChart(this.state.isChartOnly))
+                    const svg = renderToString(this.renderSvgChart())
 
                     this.setState({ isChartOnly: false });
 
