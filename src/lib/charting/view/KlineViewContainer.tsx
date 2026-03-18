@@ -558,8 +558,18 @@ class KlineViewContainer extends Component<Props, State> {
         return x < this.state.chartviewWidth - ChartView.AXISY_WIDTH
     }
 
+    // private translate(e: React.MouseEvent) {
+    //     return [e.nativeEvent.offsetX, e.nativeEvent.offsetY]
+    // }
+
     private translate(e: React.MouseEvent) {
-        return [e.nativeEvent.offsetX, e.nativeEvent.offsetY]
+        if (!this.chartviewRef.current) return [0, 0];
+
+        const rect = this.chartviewRef.current.getBoundingClientRect();
+        return [
+            e.clientX - rect.left,
+            e.clientY - rect.top
+        ];
     }
 
     onGlobalKeyDown(e: KeyboardEvent) {
@@ -1080,23 +1090,17 @@ class KlineViewContainer extends Component<Props, State> {
             </g>)
     }
 
-    renderSvgChart(isChartOnly: boolean) {
+    renderSvgChart() {
         return (
             <svg viewBox={`0, 0, ${this.state.chartviewWidth} ${this.geom.svgHeight}`}
                 width={this.state.chartviewWidth}
                 height={this.geom.svgHeight}
                 vectorEffect="non-scaling-stroke"
-                onDoubleClick={this.onDoubleClick}
-                onMouseLeave={this.onMouseLeave}
-                onMouseMove={this.onMouseMove}
-                onMouseDown={this.onMouseDown}
-                onMouseUp={this.onMouseUp}
-                // onWheel={this.onWheel}
                 style={{ zIndex: 1 }}
             >
 
                 {/* Title in svg */}
-                {isChartOnly &&
+                {this.state.isChartOnly &&
                     <g style={{ fontFamily: 'monospace', fontSize: '12px' }}>
                         <text
                             x={1}
@@ -1474,8 +1478,15 @@ class KlineViewContainer extends Component<Props, State> {
                             </div>}
 
                         {/* Main svg chart part */}
-                        <div style={{ position: 'relative', width: '100%', height: this.geom.svgHeight }}>
-                            {this.renderSvgChart(this.state.isChartOnly)}
+                        <div style={{ position: 'relative', width: '100%', height: this.geom.svgHeight }}
+                            onDoubleClick={this.onDoubleClick}
+                            onMouseLeave={this.onMouseLeave}
+                            onMouseMove={this.onMouseMove}
+                            onMouseDown={this.onMouseDown}
+                            onMouseUp={this.onMouseUp}
+                        // onWheel={this.onWheel}
+                        >
+                            {this.renderSvgChart()}
                         </div>
                     </>)}
 
