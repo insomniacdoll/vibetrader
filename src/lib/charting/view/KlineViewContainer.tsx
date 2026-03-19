@@ -527,7 +527,7 @@ class KlineViewContainer extends Component<Props, State> {
         )
     }
 
-    private isNotInAxisYArea(x: number) {
+    private notWithinAxisYArea(x: number) {
         return x < this.state.chartviewWidth - ChartView.AXISY_WIDTH
     }
 
@@ -612,7 +612,7 @@ class KlineViewContainer extends Component<Props, State> {
     onMouseLeave() {
         const xc = this.xc;
 
-        // clear mouse cursor
+        // clear mouse crosshair
         xc.isMouseCrosshairEnabled = false;
 
         this.update({ type: 'crosshair' });
@@ -652,7 +652,7 @@ class KlineViewContainer extends Component<Props, State> {
                 this.update({ type: 'chart' });
             }
 
-            // NOTE cursor shape will always be processed in ChartView's onDrawingMouseMove
+            // NOTE crosshair shape will always be processed in ChartView's onDrawingMouseMove
 
             return
         }
@@ -666,8 +666,8 @@ class KlineViewContainer extends Component<Props, State> {
 
         const b = xc.bx(x);
 
-        if (this.isNotInAxisYArea(x)) {
-            // show mouse cursor only when x is not in the axis-y area
+        if (this.notWithinAxisYArea(x)) {
+            // show mouse crosshair only when x is not in the axis-y area
             const row = xc.rb(b)
             xc.setMouseCrosshairByRow(row)
             xc.isMouseCrosshairEnabled = true
@@ -693,8 +693,8 @@ class KlineViewContainer extends Component<Props, State> {
         const xc = this.xc;
         const [x, y] = this.xyOfMouseEvent(e)
 
-        // set refer cursor
-        if (this.isNotInAxisYArea(x)) {
+        // set refer crosshair
+        if (this.notWithinAxisYArea(x)) {
             const time = xc.tx(x);
             if (!xc.occurred(time)) {
                 return;
@@ -703,7 +703,7 @@ class KlineViewContainer extends Component<Props, State> {
             // align x to bar center
             const b = xc.bx(x);
 
-            // draw refer cursor only when not in the axis-y area
+            // draw refer crosshair only when not in the axis-y area
             if (
                 y >= this.geom.yCrosshairRange[0] && y <= this.geom.svgHeight &&
                 b >= 1 && b <= xc.nBars
@@ -746,7 +746,7 @@ class KlineViewContainer extends Component<Props, State> {
         } else if (e.ctrlKey) {
             const fastSteps = Math.floor(xc.nBars * 0.168)
             const unitsToScroll = xc.isMovingAccelerated ? delta * fastSteps : delta;
-            // move refer cursor left / right 
+            // move refer crosshair left / right 
             xc.scrollReferCrosshair(unitsToScroll, true)
 
         } else {
