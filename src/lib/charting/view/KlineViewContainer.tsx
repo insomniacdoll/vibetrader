@@ -89,8 +89,8 @@ type Props = {
     colorScheme: 'light' | 'dark'
     chartOnly: boolean
     width?: number
-    ticker?: string
-    timeframe?: string
+    initialTicker?: string
+    initialTimeframe?: string
 }
 
 type State = {
@@ -147,9 +147,6 @@ class KlineViewContainer extends Component<Props, State> {
     tframe: TFrame;
     tzone: string;
 
-    mouseCrosshair?: JSX.Element;
-    referCrosshair?: JSX.Element;
-
     screenshotCanvas?: HTMLCanvasElement;
 
     baseSer: TSer;
@@ -172,8 +169,6 @@ class KlineViewContainer extends Component<Props, State> {
     yDragStart: number;
 
     callbacks: CallbacksToContainer
-
-    systemScheme: string;
 
     reloadDataTimeoutId: number;
     currentLoading = Promise.resolve()
@@ -221,16 +216,16 @@ class KlineViewContainer extends Component<Props, State> {
         this.callbacks = {
             updateDrawingIdsToCreate: this.setDrawingIdsToCreate,
         }
+
+        this.geom = this.calcGeometry(0);
     }
 
-    private calcGeometry() {
-        const stackedIndicators = this.state?.stackedIndicators || [];
-
+    private calcGeometry(nStackedIndicators: number) {
         const yHeader = 0;
         const yKlineView = yHeader + H_HEADER + H_INDICATOR_TAGS + H_SPACING;
         const yVolumeView = yKlineView + H_KLINE_VIEW + H_SPACING;
         const yIndicatorViews = yVolumeView + H_VOLUME_VIEW + H_SPACING;
-        const yAxisx = yIndicatorViews + stackedIndicators.length * (H_INDICATOR_VIEW + H_SPACING);
+        const yAxisx = yIndicatorViews + nStackedIndicators * (H_INDICATOR_VIEW + H_SPACING);
 
         const svgHeight = yAxisx + H_AXIS_X;
         const containerHeight = svgHeight + H_TITLE + H_INDICATOR_TAGS;
@@ -404,7 +399,10 @@ class KlineViewContainer extends Component<Props, State> {
 
                     this.latestTime = latestTime;
 
-                    return this.updateState(
+                    //  re-calculate geom when number of stackedIndicators changed.
+                    this.geom = this.calcGeometry(stackedIndicators.length);
+
+                    return this.setState(
                         {
                             isLoaded: true,
                             updateEvent: { type: 'chart', changed: this.state.updateEvent.changed + 1 },
@@ -412,6 +410,7 @@ class KlineViewContainer extends Component<Props, State> {
                             stackedIndicators,
                         },
                         () => {
+
                             if (latestTime !== undefined && source === Source.binance) {
                                 this.reloadDataTimeoutId = window.setTimeout(() => { this.currentLoading = this.fetchData_runScripts(latestTime, 1000) }, 5000)
                             }
@@ -438,8 +437,8 @@ class KlineViewContainer extends Component<Props, State> {
         this.fetchOPredefinedScripts(allIndTags).then(scripts => {
             this.predefinedScripts = new Map(scripts.map(p => [p.scriptName, p.script]))
         }).then(() => {
-            this.ticker = this.props.ticker || (source === Source.binance ? 'BTCUSDT' : 'NVDA');
-            this.tframe = this.props.timeframe ? TFrame.ofName(this.props.timeframe) : TFrame.DAILY;
+            this.ticker = this.props.initialTicker || (source === Source.binance ? 'BTCUSDT' : 'NVDA');
+            this.tframe = this.props.initialTimeframe ? TFrame.ofName(this.props.initialTimeframe) : TFrame.DAILY;
 
             this.tzone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             //this. tzone = "America/Vancouver" 
@@ -476,37 +475,11 @@ class KlineViewContainer extends Component<Props, State> {
         // window.removeEventListener('resize', this.updateWidth);
     }
 
-    checkUpdate() {
-        if (this.prevProp === undefined) {
-
-            this.prevProp = this.props;
-            return;
-        }
-
-        const prevProps = this.prevProp;
-        const props = this.props;
-
-        if (prevProps.ticker !== props.ticker || prevProps.timeframe !== props.timeframe) {
-            const newTicker = props.ticker || this.ticker;
-            const newTimeframe = props.timeframe || this.tframe.shortName;
-
-            console.log(`Route updated: Reloading chart for ${newTicker} at ${newTimeframe}`);
-
-            this.handleTickerTimeframeChanged(newTicker, newTimeframe, this.tzone);
-        }
-
-        this.prevProp = props;
-    }
-
     private update(event: UpdateEvent) {
         const changed = this.state.updateEvent.changed + 1;
-        this.updateState({ updateEvent: { ...event, changed } });
+        this.setState({ updateEvent: { ...event, changed } })
     }
 
-    private updateState(newState: Partial<State>, callback?: () => void) {
-
-        this.setState(newState as Pick<State, keyof State>, callback)
-    }
 
     private indicatorViewId(n: number) {
         return 'indicator-' + n;
@@ -1194,8 +1167,7 @@ class KlineViewContainer extends Component<Props, State> {
     }
 
     render() {
-        this.checkUpdate();
-        this.geom = this.calcGeometry();
+
 
         return (
             <div style={{ display: "flex", width: '100%' }}>

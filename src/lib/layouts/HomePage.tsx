@@ -30,8 +30,8 @@ const HomePage = ({ colorScheme, toggleColorScheme }: HomePageProps) => {
                 colorScheme={colorScheme}
                 chartOnly={ticker !== undefined}
                 width={chartWidth}
-                ticker={ticker}
-                timeframe={timeframe}
+                initialTicker={ticker}
+                initialTimeframe={timeframe}
             />
         </div>
     )
