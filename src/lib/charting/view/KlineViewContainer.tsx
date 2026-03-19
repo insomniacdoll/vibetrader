@@ -88,7 +88,7 @@ type Props = {
     toggleColorScheme: () => void
     colorScheme: 'light' | 'dark'
     chartOnly: boolean
-    width?: number
+    width: number
     initialTicker?: string
     initialTimeframe?: string
 }
@@ -141,8 +141,6 @@ const H_INDICATOR_VIEW = 160;
 const H_AXIS_X = 40;
 
 class KlineViewContainer extends Component<Props, State> {
-    prevProp: Props;
-
     ticker: string;
     tframe: TFrame;
     tzone: string;
@@ -179,7 +177,7 @@ class KlineViewContainer extends Component<Props, State> {
         this.chartviewRef = React.createRef();
 
         this.state = {
-            chartviewWidth: 0,
+            chartviewWidth: this.props.width - ChartView.AXISY_WIDTH,
             isLoaded: false,
             updateEvent: { type: 'chart', changed: 0 },
             updateDrawing: { isHidingDrawing: false },
@@ -426,6 +424,12 @@ class KlineViewContainer extends Component<Props, State> {
             for (const entry of entries) {
                 // contentRect is more accurate than offsetWidth for scaling
                 const { width } = entry.contentRect;
+                // 2. Update the domain model so its internal math stays in sync!
+                if (this.xc) {
+                    // Assuming you have or can add a setWidth method to ChartXControl
+                    this.xc.setChartWidth(width - ChartView.AXISY_WIDTH);
+                }
+
                 this.setState({ chartviewWidth: width });
             }
         });

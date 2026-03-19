@@ -186,6 +186,11 @@ export class ChartXControl {
 
     xTicks: Tick[] = [];
 
+    setChartWidth(width: number) {
+        this.wChart = width;
+        this.#updateGeometry();
+    }
+
     #updateGeometry() {
         /**
          * !NOTE
