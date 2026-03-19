@@ -531,18 +531,8 @@ class KlineViewContainer extends Component<Props, State> {
         return x < this.state.chartviewWidth - ChartView.AXISY_WIDTH
     }
 
-    // private translate(e: React.MouseEvent) {
-    //     return [e.nativeEvent.offsetX, e.nativeEvent.offsetY]
-    // }
-
-    private translate(e: React.MouseEvent) {
-        if (!this.chartviewRef.current) return [0, 0];
-
-        const rect = this.chartviewRef.current.getBoundingClientRect();
-        return [
-            e.clientX - rect.left,
-            e.clientY - rect.top
-        ];
+    private xyOfMouseEvent(e: React.MouseEvent) {
+        return [e.nativeEvent.offsetX, e.nativeEvent.offsetY]
     }
 
     onGlobalKeyDown(e: KeyboardEvent) {
@@ -631,14 +621,14 @@ class KlineViewContainer extends Component<Props, State> {
     onMouseDown(e: React.MouseEvent) {
         this.isDragging = true
 
-        const [x, y] = this.translate(e)
+        const [x, y] = this.xyOfMouseEvent(e)
         this.xDragStart = x;
         this.yDragStart = y;
     }
 
     onMouseMove(e: React.MouseEvent) {
         const xc = this.xc;
-        const [x, y] = this.translate(e)
+        const [x, y] = this.xyOfMouseEvent(e)
 
         if (this.isDragging && xc.mouseDownHitDrawingIdx === undefined) {
             // drag chart
@@ -701,7 +691,7 @@ class KlineViewContainer extends Component<Props, State> {
 
     onDoubleClick(e: React.MouseEvent) {
         const xc = this.xc;
-        const [x, y] = this.translate(e)
+        const [x, y] = this.xyOfMouseEvent(e)
 
         // set refer cursor
         if (this.isNotInAxisYArea(x)) {
@@ -1167,8 +1157,6 @@ class KlineViewContainer extends Component<Props, State> {
     }
 
     render() {
-
-
         return (
             <div style={{ display: "flex", width: '100%' }}>
 
