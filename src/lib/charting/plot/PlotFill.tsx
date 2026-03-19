@@ -10,9 +10,7 @@ type Props = {
     xc: ChartXControl;
     yc: ChartYControl;
     tvar: TVar<PineData[]>;
-    name: string;
     options: PlotOptions;
-    depth?: number;
 };
 
 const PlotFill = ({ xc, yc, tvar, options }: Props) => {

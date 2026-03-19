@@ -16,6 +16,7 @@ import PlotDrawingLine from "../plot/PlotDrawingLine";
 import PlotDrawingLineFill from "../plot/PlotDrawingLineFill";
 import { H_SPACING } from "./KlineViewContainer";
 import { styleOfLabel } from "../../colors";
+import { plotLines } from "../plot/plots";
 
 export class IndicatorView extends ChartView<ViewProps, ViewState> {
     constructor(props: ViewProps) {
@@ -47,123 +48,7 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
             }
         }
 
-        const chartLines = this.props.mainIndicatorOutputs.map(({ atIndex, title, options }) => {
-            let chart: JSX.Element;
-            switch (options.style) {
-                case 'style_histogram':
-                case 'style_columns':
-                    chart = <PlotHistogram
-                        tvar={tvar}
-                        xc={xc}
-                        yc={yc}
-                        depth={0}
-                        options={options}
-                        name={title}
-                        atIndex={atIndex}
-                    />
-                    break
-
-                case "style_circles":
-                case "style_cross":
-                    chart = <PlotCrossCircles
-                        tvar={tvar}
-                        name={title}
-                        options={options}
-                        atIndex={atIndex}
-                        xc={xc}
-                        yc={yc}
-                        depth={0}
-                    />
-                    break
-
-                case 'shape':
-                case 'char':
-                    chart = <PlotShape
-                        tvar={tvar}
-                        xc={xc}
-                        yc={yc}
-                        depth={0}
-                        options={options}  // todo, back to PlotCharOption
-                        name={title}
-                        atIndex={atIndex}
-                    />
-                    break
-
-                case "hline":
-                    chart = <PlotHline
-                        tvar={tvar}
-                        xc={xc}
-                        yc={yc}
-                        depth={0}
-                        options={options}
-                        name={title}
-                        atIndex={atIndex}
-                    />
-                    break
-
-                case "fill":
-                    chart = <PlotFill
-                        tvar={tvar}
-                        xc={xc}
-                        yc={yc}
-                        depth={0}
-                        options={options}
-                        name={title}
-                    />
-                    break
-
-                case 'background':
-                    chart = <PlotBgcolor
-                        tvar={tvar}
-                        xc={xc}
-                        yc={yc}
-                        depth={0}
-                        atIndex={atIndex}
-                        options={options}
-                        name={title}
-                    />
-                    break
-
-                case 'drawing_line':
-                    chart = <PlotDrawingLine
-                        tvar={tvar}
-                        xc={xc}
-                        yc={yc}
-                        depth={0}
-                        atIndex={atIndex}
-                        options={options}
-                        name={title}
-                    />
-                    break
-
-                case 'linefill':
-                    chart = <PlotDrawingLineFill
-                        tvar={tvar}
-                        xc={xc}
-                        yc={yc}
-                        depth={0}
-                        atIndex={atIndex}
-                        options={options}
-                        name={title}
-                    />
-                    break
-
-                case 'line':
-                case 'dashed':
-                default:
-                    chart = <PlotLine
-                        tvar={tvar}
-                        xc={xc}
-                        yc={yc}
-                        depth={0}
-                        options={options}
-                        name={title}
-                        atIndex={atIndex}
-                    />
-            }
-
-            return chart;
-        })
+        const chartLines = plotLines(this.props.mainIndicatorOutputs, tvar, xc, yc)
 
         const chartAxisy = <AxisY
             x={this.props.width - ChartView.AXISY_WIDTH}

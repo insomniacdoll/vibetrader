@@ -11,10 +11,8 @@ type Props = {
     xc: ChartXControl,
     yc: ChartYControl,
     tvar: TVar<PineData[]>,
-    name: string,
     atIndex: number,
     options: PlotOptions;
-    depth?: number;
 }
 
 const PlotBgcolor = (props: Props) => {

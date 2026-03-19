@@ -220,7 +220,7 @@ class AxisX extends Component<Props, State> {
 		);
 	}
 
-	protected updateCrosshair() {
+	protected crosshair() {
 		let referCrosshair: JSX.Element
 		let mouseCrosshair: JSX.Element
 		const xc = this.props.xc;
@@ -278,7 +278,7 @@ class AxisX extends Component<Props, State> {
 	render() {
 		const axis = this.plot();
 
-		const { referCrosshair, mouseCrosshair } = this.updateCrosshair()
+		const { referCrosshair, mouseCrosshair } = this.crosshair()
 
 		const transform = `translate(${this.props.x} ${this.props.y})`;
 		return (

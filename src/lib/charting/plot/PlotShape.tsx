@@ -14,14 +14,12 @@ type Props = {
     xc: ChartXControl,
     yc: ChartYControl,
     tvar: TVar<PineData[]>,
-    name: string,
     atIndex: number,
     options: PlotOptions
-    depth?: number;
 }
 
 const PlotShape = (props: Props) => {
-    const { xc, yc, tvar, name, atIndex, depth, options: { color, style, shape, location, text } } = props;
+    const { xc, yc, tvar, atIndex, options: { color, style, shape, location, text } } = props;
 
     const font = '12px "Roboto", "Helvetica", "Arial", sans-serif'
 

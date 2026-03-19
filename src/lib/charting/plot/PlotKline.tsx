@@ -3,6 +3,8 @@ import { Kline } from "../../domain/Kline";
 import { Path } from "../../svg/Path";
 import type { ChartYControl } from "../view/ChartYControl";
 import type { ChartXControl } from "../view/ChartXControl";
+import { negativeColor, positiveColor } from "../../colors";
+import type { ColorScheme } from "../../../App";
 
 export type KlineKind = 'candle' | 'bar' | 'line'
 
@@ -11,15 +13,11 @@ type Props = {
     yc: ChartYControl,
     kvar: TVar<Kline>,
     kind: KlineKind,
-    depth: number;
-    positive: string;
-    negative: string;
+    colorScheme: ColorScheme;
 }
 
 const PlotKline = (props: Props) => {
-    const { xc, yc, kvar, kind, depth, positive, negative } = props;
-
-    // depth !== 0 is for comparing klines charts
+    const { xc, yc, kvar, kind, colorScheme } = props;
 
     function plot() {
 
@@ -223,6 +221,9 @@ const PlotKline = (props: Props) => {
             bar++;
         }
     }
+
+    const positive = positiveColor(colorScheme);
+    const negative = negativeColor(colorScheme);
 
     const { posPath, negPath } = plot();
 

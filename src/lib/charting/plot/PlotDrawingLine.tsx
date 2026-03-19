@@ -10,13 +10,11 @@ type Props = {
     xc: ChartXControl,
     yc: ChartYControl,
     tvar: TVar<PineData[]>,
-    name: string,
     atIndex: number,
     options: PlotOptions;
-    depth?: number;
 }
 
-const PlotDrawingLine = ({ xc, yc, tvar, name, atIndex, depth, options }: Props) => {
+const PlotDrawingLine = ({ xc, yc, tvar, atIndex, options }: Props) => {
 
     const chartWidth = xc.wChart;
     const chartHeight = yc.hChart;

@@ -9,14 +9,12 @@ type Props = {
     xc: ChartXControl,
     yc: ChartYControl,
     tvar: TVar<PineData[]>,
-    name: string,
     atIndex: number,
     options: PlotOptions;
-    depth?: number;
 }
 
 const PlotLine = (props: Props) => {
-    const { xc, yc, tvar, name, atIndex, depth, options } = props
+    const { xc, yc, tvar, atIndex, options } = props
 
     const fillgap = options.fillgaps;
 

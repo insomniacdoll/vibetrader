@@ -11,14 +11,12 @@ type Props = {
     xc: ChartXControl,
     yc: ChartYControl,
     tvar: TVar<PineData[]>,
-    name: string,
     atIndex: number,
     options: PlotOptions;
-    depth?: number;
 }
 
 const PlotCrossCircles = (props: Props) => {
-    const { xc, yc, tvar, name, atIndex, depth, options, } = props;
+    const { xc, yc, tvar, atIndex, options, } = props;
 
     const r = Math.max(Math.floor((xc.wBar - 2) / 2), 3);
     const d = r * 2

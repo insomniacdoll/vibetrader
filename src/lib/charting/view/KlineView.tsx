@@ -18,6 +18,7 @@ import PlotDrawingLine from "../plot/PlotDrawingLine";
 import PlotDrawingLineFill from "../plot/PlotDrawingLineFill";
 import { negativeColor, positiveColor, styleOfLabel } from "../../colors";
 import { H_SPACING } from "./KlineViewContainer";
+import { plotLines } from "../plot/plots";
 
 
 export class KlineView extends ChartView<ViewProps, ViewState> {
@@ -78,9 +79,7 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
                 xc={this.props.xc}
                 yc={this.yc}
                 kind={this.props.xc.klineKind}
-                depth={0}
-                positive={positive}
-                negative={negative}
+                colorScheme={this.props.colorScheme}
             />
         ]
 
@@ -106,132 +105,13 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
     protected override plotOverlayIndicatorLines() {
         const overlayIndicatorLines: JSX.Element[] = []
         if (this.props.overlayIndicators) {
-            let depth = 1;
             this.props.overlayIndicators.map((indicator, n) => {
                 const xc = this.props.xc
                 const yc = this.yc
                 const tvar = indicator.tvar;
 
-                for (const { title, atIndex, options } of indicator.outputs) {
-                    let chart: JSX.Element;
-                    switch (options.style) {
-                        case 'style_linebr':
-                        case "style_stepline":
-                            chart = <PlotStepLine
-                                tvar={tvar}
-                                name={title}
-                                options={options}
-                                atIndex={atIndex}
-                                xc={xc}
-                                yc={yc}
-                                depth={depth++}
-                            />
-                            break
-
-                        case "style_circles":
-                        case "style_cross":
-                            chart = <PlotCrossCircles
-                                tvar={tvar}
-                                name={title}
-                                options={options}
-                                atIndex={atIndex}
-                                xc={xc}
-                                yc={yc}
-                                depth={depth++}
-                            />
-                            break
-
-                        case 'shape':
-                        case 'char':
-                            chart = <PlotShape
-                                tvar={tvar}
-                                xc={xc}
-                                yc={yc}
-                                depth={0}
-                                options={options}
-                                name={title}
-                                atIndex={atIndex}
-                            />
-                            break
-
-                        case "hline":
-                            chart = <PlotHline
-                                tvar={tvar}
-                                xc={xc}
-                                yc={yc}
-                                depth={0}
-                                options={options}
-                                name={title}
-                                atIndex={atIndex}
-                            />
-                            break
-
-                        case "fill":
-                            chart = <PlotFill
-                                tvar={tvar}
-                                xc={xc}
-                                yc={yc}
-                                depth={0}
-                                options={options}
-                                name={title}
-                            />
-                            break
-
-                        case 'background':
-                            chart = <PlotBgcolor
-                                tvar={tvar}
-                                xc={xc}
-                                yc={yc}
-                                depth={0}
-                                atIndex={atIndex}
-                                options={options}
-                                name={title}
-                            />
-                            break
-
-                        case 'drawing_line':
-                            chart = <PlotDrawingLine
-                                tvar={tvar}
-                                xc={xc}
-                                yc={yc}
-                                depth={0}
-                                atIndex={atIndex}
-                                options={options}
-                                name={title}
-                            />
-                            break
-
-                        case 'linefill':
-                            chart = <PlotDrawingLineFill
-                                tvar={tvar}
-                                xc={xc}
-                                yc={yc}
-                                depth={0}
-                                atIndex={atIndex}
-                                options={options}
-                                name={title}
-                            />
-                            break
-
-                        case "line":
-                        case "style_line":
-                        default:
-                            chart = <PlotLine
-                                tvar={tvar}
-                                name={title}
-                                options={options}
-                                atIndex={atIndex}
-                                xc={xc}
-                                yc={yc}
-                                depth={depth++}
-                            />
-                    }
-
-                    if (chart !== undefined) {
-                        overlayIndicatorLines.push(chart)
-                    }
-                }
-
+                const plots = plotLines(indicator.outputs, tvar, xc, yc)
+                overlayIndicatorLines.push(...plots);
             })
         }
 

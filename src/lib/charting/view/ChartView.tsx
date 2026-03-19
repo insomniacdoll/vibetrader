@@ -297,13 +297,13 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
         }
 
         if (willUpdateChart || willUpdateOverlayCharts || willUpdateCrosshair) {
-            this.updateChart_Crosshair(willUpdateChart, willUpdateOverlayCharts, willUpdateCrosshair, xMouse, yMouse)
+            this.update(willUpdateChart, willUpdateOverlayCharts, willUpdateCrosshair, xMouse, yMouse)
         }
 
         this.prevProps = this.props;
     }
 
-    protected updateChart_Crosshair(
+    protected update(
         willUpdateChart: boolean,
         willUpdateOverlayCharts: boolean,
         willUpdateCrosshair: boolean,

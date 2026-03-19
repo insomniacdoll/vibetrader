@@ -1,3 +1,5 @@
+import type { ColorScheme } from "../../../App";
+import { negativeColor, positiveColor } from "../../colors";
 import type { Kline } from "../../domain/Kline";
 import { Path } from "../../svg/Path";
 import type { TVar } from "../../timeseris/TVar";
@@ -8,13 +10,11 @@ type Props = {
     xc: ChartXControl,
     yc: ChartYControl,
     kvar: TVar<Kline>,
-    depth: number;
-    positive: string;
-    negative: string;
+    colorScheme: ColorScheme;
 }
 
 const PlotVolmue = (props: Props) => {
-    const { xc, yc, kvar, positive, negative } = props;
+    const { xc, yc, kvar, colorScheme } = props;
 
     function plot() {
         const thin = false;
@@ -68,6 +68,10 @@ const PlotVolmue = (props: Props) => {
 
         return { posPath, negPath }
     }
+
+
+    const positive = positiveColor(colorScheme);
+    const negative = negativeColor(colorScheme);
 
     const { posPath, negPath } = plot();
 
