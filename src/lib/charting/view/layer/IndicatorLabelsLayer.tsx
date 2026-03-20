@@ -32,7 +32,7 @@ export const IndicatorLabelsLayer = memo(function Layer({ xc, outputs, tvar, wid
         const styleOfRefer = styleOfLabel('label-refer', colorScheme);
 
         return (
-            [<g style={{ fontSize: '12px' }}>
+            <g style={{ fontSize: '12px' }}>
                 {/* Left Aligned - Mouse Indicator Values */}
                 <text
                     x={0}
@@ -78,7 +78,7 @@ export const IndicatorLabelsLayer = memo(function Layer({ xc, outputs, tvar, wid
                         )}
                     </text>
                 )}
-            </g >]
+            </g >
         )
     }
 
