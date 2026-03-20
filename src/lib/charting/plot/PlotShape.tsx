@@ -1,24 +1,13 @@
 import { TVar } from "../../timeseris/TVar";
 import { Path } from "../../svg/Path";
-import type { ChartYControl } from "../view/ChartYControl";
-import type { ChartXControl } from "../view/ChartXControl";
 import { KVAR_NAME, type Kline, } from "../../domain/Kline";
 import type { Seg } from "../../svg/Seg";
 import { Circle } from "../../svg/Circle";
-import type { PineData } from "../../domain/PineData";
 import { stringMetrics } from "../../utils";
 import { Texts } from "../../svg/Texts";
-import type { PlotOptions } from "./Plot";
+import type { PlotProps } from "./Plot";
 
-type Props = {
-    xc: ChartXControl,
-    yc: ChartYControl,
-    tvar: TVar<PineData[]>,
-    atIndex: number,
-    options: PlotOptions
-}
-
-const PlotShape = (props: Props) => {
+const PlotShape = (props: PlotProps) => {
     const { xc, yc, tvar, atIndex, options: { color, style, shape, location, text } } = props;
 
     const font = '12px "Roboto", "Helvetica", "Arial", sans-serif'

@@ -1,19 +1,8 @@
-import { TVar } from "../../timeseris/TVar";
 import { Path } from "../../svg/Path";
-import type { ChartYControl } from "../view/ChartYControl";
-import type { ChartXControl } from "../view/ChartXControl";
-import type { PlotOptions } from "./Plot";
-import type { PineData } from "../../domain/PineData";
+import type { PlotProps } from "./Plot";
 import type { Seg } from "../../svg/Seg";
 
-type Props = {
-    xc: ChartXControl;
-    yc: ChartYControl;
-    tvar: TVar<PineData[]>;
-    options: PlotOptions;
-};
-
-const PlotFill = ({ xc, yc, tvar, options }: Props) => {
+const PlotFill = ({ xc, yc, tvar, options }: PlotProps) => {
     const fillgaps = options.fillgaps;
 
     function plot() {

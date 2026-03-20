@@ -1,20 +1,10 @@
-import { TVar } from "../../timeseris/TVar";
 import { Path } from "../../svg/Path";
-import type { ChartYControl } from "../view/ChartYControl";
-import type { ChartXControl } from "../view/ChartXControl";
-import type { PlotOptions } from "./Plot";
-import type { LineObject, PineData } from "../../domain/PineData";
+import type { PlotProps } from "./Plot";
+import type { LineObject } from "../../domain/PineData";
 import { xOnLine, yOnLine } from "../utils";
 
-type Props = {
-    xc: ChartXControl,
-    yc: ChartYControl,
-    tvar: TVar<PineData[]>,
-    atIndex: number,
-    options: PlotOptions;
-}
 
-const PlotDrawingLine = ({ xc, yc, tvar, atIndex, options }: Props) => {
+const PlotDrawingLine = ({ xc, yc, tvar, atIndex, options }: PlotProps) => {
 
     const chartWidth = xc.wChart;
     const chartHeight = yc.hChart;

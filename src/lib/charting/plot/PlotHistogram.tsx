@@ -1,20 +1,8 @@
-import type { PineData } from "../../domain/PineData";
 import { Path } from "../../svg/Path";
-import type { Seg } from "../../svg/Seg";
-import type { TVar } from "../../timeseris/TVar";
-import type { ChartXControl } from "../view/ChartXControl";
-import type { ChartYControl } from "../view/ChartYControl";
-import type { PlotOptions } from "./Plot";
+import type { PlotProps } from "./Plot";
 
-type Props = {
-    xc: ChartXControl,
-    yc: ChartYControl,
-    tvar: TVar<PineData[]>,
-    atIndex: number,
-    options: PlotOptions;
-}
 
-const PlotHistogram = (props: Props) => {
+const PlotHistogram = (props: PlotProps) => {
     const { xc, yc, tvar, atIndex } = props;
 
     function plot() {

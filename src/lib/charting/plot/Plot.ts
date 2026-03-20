@@ -1,4 +1,7 @@
 import type { PineData } from "../../domain/PineData";
+import type { TVar } from "../../timeseris/TVar";
+import type { ChartXControl } from "../view/ChartXControl";
+import type { ChartYControl } from "../view/ChartYControl";
 
 export type Plot = {
     data: PineData[],
@@ -6,6 +9,14 @@ export type Plot = {
     title: string,
     _plotKey: string,
 }
+
+export type PlotProps = {
+    xc: ChartXControl;
+    yc: ChartYControl;
+    tvar: TVar<PineData[]>;
+    options: PlotOptions;
+    atIndex?: number;
+};
 
 // export type PlotCharOptions = {
 //     title?: string;
