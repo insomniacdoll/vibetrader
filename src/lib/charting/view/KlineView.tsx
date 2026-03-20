@@ -1,16 +1,16 @@
-import PlotKline from "../plot/PlotKline"
 import { ChartView, type ViewProps, type ViewState } from "./ChartView";
 import { TVar } from "../../timeseris/TVar";
 import { LINEAR_SCALAR } from "../scalar/LinearScala";
 import { LG_SCALAR } from "../scalar/LgScalar";
 import { Kline } from "../../domain/Kline";
-import AxisY from "../pane/AxisY";
 import { Fragment, type JSX } from "react";
 import { LN_SCALAR } from "../scalar/LnScalar";
-import { negativeColor, positiveColor, styleOfLabel } from "../../colors";
-import { H_SPACING } from "./KlineViewContainer";
-import { plotLines } from "../plot/plots";
-
+import { KlinesLayer } from "./layer/KlineLayer";
+import { AxisYLayer } from "./layer/AxisYLayer";
+import type { Scalar } from "../scalar/Scalar";
+import { OverlayIndicatorsLayer } from "./layer/OverlayIndicatorsLayer";
+import { CrosshairLayer } from "./layer/CrosshairLayer";
+import { OverlayIndicatorLabelsLayer } from "./layer/OverlayIndicatorLabelsLayer";
 
 export class KlineView extends ChartView<ViewProps, ViewState> {
 
@@ -25,209 +25,11 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
     override plot() {
         this.computeGeometry();
 
-        const positive = positiveColor(this.props.colorScheme)
-        const negative = negativeColor(this.props.colorScheme)
-
-        // Need the non-state latestValue to get it put in AxisY's svg without js code running.
-        const latestTime = this.props.xc.lastOccurredTime();
-
-        let latestValue: { value: number, isRising: boolean, axisyUpdated: number };
-        if (latestTime !== undefined && latestTime > 0) {
-            const kline = this.props.tvar.getByTime(latestTime)
-
-            if (kline !== undefined && kline instanceof Kline) {
-                latestValue = { value: kline.close, isRising: kline.close > kline.open, axisyUpdated: new Date().getTime() };
-            }
-        }
-
-        const latestIndicatorValues: string[][] = []
-        if (this.props.overlayIndicators !== undefined) {
-            this.props.overlayIndicators.map((indicator, n) => {
-                const tvar = indicator.tvar;
-
-                let mvs: string[]
-                if (latestTime !== undefined && latestTime > 0) {
-                    mvs = indicator.outputs.map(({ atIndex }, n) => {
-                        const datas = tvar.getByTime(latestTime);
-                        const data = datas ? datas[atIndex] : undefined;
-                        const v = data ? data.value : NaN
-                        return typeof v === 'number'
-                            ? isNaN(v) ? "" : v.toFixed(2)
-                            : '' + v
-                    })
-
-                } else {
-                    mvs = new Array(indicator.outputs.length);
-                }
-
-                latestIndicatorValues.push(mvs)
-            })
-        }
-
-        const chartLines = [
-            <PlotKline
-                kvar={this.props.tvar as TVar<Kline>}
-                xc={this.props.xc}
-                yc={this.yc}
-                kind={this.props.xc.klineKind}
-                colorScheme={this.props.colorScheme}
-            />
-        ]
-
-
-        const chartAxisy = <AxisY
-            x={this.props.width - ChartView.AXISY_WIDTH}
-            y={0}
-            height={this.props.height}
-            xc={this.props.xc}
-            yc={this.yc}
-            tvar={this.props.tvar}
-            colorScheme={this.props.colorScheme}
-            latestValue={latestValue}
-        />
-
-        const overlayIndicatorLines = this.plotOverlayIndicatorLines();
-        const indicatorLabels = this.plotIndicatorLabels(latestIndicatorValues);
         const drawingLines = this.plotDrawings()
 
-        return { chartLines, chartAxisy, overlayIndicatorLines, indicatorLabels, drawingLines }
+        return { drawingLines }
     }
 
-    protected override plotOverlayIndicatorLines() {
-        const overlayIndicatorLines: JSX.Element[] = []
-        if (this.props.overlayIndicators) {
-            this.props.overlayIndicators.map((indicator, n) => {
-                const xc = this.props.xc
-                const yc = this.yc
-                const tvar = indicator.tvar;
-
-                const plots = plotLines(indicator.outputs, tvar, xc, yc)
-                overlayIndicatorLines.push(...plots);
-            })
-        }
-
-        return overlayIndicatorLines;
-    }
-
-    plotIndicatorLabels(mouseIndicatorValues: string[][], referIndicatorValues?: string[][]) {
-        const chartWidth = this.props.width;
-
-        const styleOfMouse = styleOfLabel('label-mouse', this.props.colorScheme);
-        const styleOfRefer = styleOfLabel('label-refer', this.props.colorScheme);
-
-        return this.props.overlayIndicators.map(({ outputs }, m) => {
-            // Calculate Y position. 
-            // Note: SVG <text> y-coordinate is the baseline. 
-            // The "+ 10" is an offset to approximate HTML's top-left positioning.
-            const yPos = m * 13 - H_SPACING + 2 + 10;
-
-            return (
-                <g key={"indicator-labels-" + m} style={{ fontSize: '12px' }}>
-                    {/* Left Aligned - Mouse Indicator Values */}
-                    <text
-                        x={0}
-                        y={yPos}
-                        textAnchor="start"
-                    >
-                        {outputs.map(({ title, options: { color } }, n) =>
-                            <Fragment key={"indicator-label-" + n}>
-                                <tspan style={styleOfMouse}>
-                                    {title ? title + '\u00A0' : ''}
-                                </tspan>
-                                <tspan fill={color}>
-                                    {
-                                        mouseIndicatorValues !== undefined &&
-                                        mouseIndicatorValues[m] !== undefined &&
-                                        mouseIndicatorValues[m][n]
-                                    }
-                                </tspan>
-                                {n === outputs.length - 1
-                                    ? <tspan></tspan>
-                                    : <tspan>{'\u00A0\u00B7\u00A0'}</tspan>
-                                }
-                            </Fragment>
-                        )}
-                    </text>
-
-                    {/* Right Aligned - Refer Indicator Values */}
-                    {this.props.xc.isReferCrosshairEnabled && referIndicatorValues && (
-                        <text
-                            x={chartWidth - ChartView.AXISY_WIDTH}
-                            y={yPos}
-                            textAnchor="end"
-                        >
-                            {outputs.map(({ title, options: { color } }, n) =>
-                                <Fragment key={"indicator-label-" + n}>
-                                    <tspan style={styleOfRefer}>
-                                        {title ? title + '\u00A0' : ''}
-                                    </tspan>
-                                    <tspan fill={color}>
-                                        {
-                                            referIndicatorValues &&
-                                            referIndicatorValues[m] &&
-                                            referIndicatorValues[m][n]
-                                        }
-                                    </tspan>
-                                    {n === outputs.length - 1
-                                        ? <tspan></tspan>
-                                        : <tspan>{'\u00A0\u00B7\u00A0'}</tspan>
-                                    }
-                                </Fragment>
-                            )}
-                        </text>
-                    )}
-                </g>
-            );
-        });
-    }
-
-    override UpdateIndicatorLabels(mouseTime: number, referTime?: number) {
-        if (this.props.overlayIndicators !== undefined) {
-            const mouseIndicatorValues: string[][] = []
-            const referIndicatorValues: string[][] = []
-            this.props.overlayIndicators.map((indicator, n) => {
-                const tvar = indicator.tvar;
-
-                let mvs: string[]
-                if (mouseTime !== undefined && mouseTime > 0 && this.props.xc.baseSer.occurred(mouseTime)) {
-                    mvs = indicator.outputs.map(({ atIndex }, n) => {
-                        const datas = tvar.getByTime(mouseTime);
-                        const data = datas ? datas[atIndex] : undefined;
-                        const v = data ? data.value : NaN
-                        return typeof v === 'number'
-                            ? isNaN(v) ? "" : v.toFixed(2)
-                            : '' + v
-                    })
-
-                } else {
-                    mvs = new Array(indicator.outputs.length);
-                }
-
-                mouseIndicatorValues.push(mvs)
-
-                let rvs: string[]
-                if (referTime !== undefined && referTime > 0 && this.props.xc.baseSer.occurred(referTime)) {
-                    rvs = indicator.outputs.map(({ atIndex }, n) => {
-                        const datas = tvar.getByTime(referTime);
-                        const data = datas ? datas[atIndex] : undefined;
-                        const v = data ? data.value : NaN
-                        return typeof v === 'number'
-                            ? isNaN(v) ? "" : v.toFixed(2)
-                            : '' + v
-                    })
-
-                } else {
-                    rvs = new Array(indicator.outputs.length);
-                }
-
-                referIndicatorValues.push(rvs)
-            })
-
-            const indicatorLabels = this.plotIndicatorLabels(mouseIndicatorValues, referIndicatorValues)
-            this.chartElements.indicatorLabels = indicatorLabels;
-            // this.setState({ indicatorLabels })
-        }
-    }
 
     override computeMaxValueMinValue() {
         let max = Number.NEGATIVE_INFINITY;
@@ -273,7 +75,74 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
     }
 
     render() {
-        this.checkUpdate();
+        // this.checkUpdate();
+
+        const latestTime = this.props.xc.lastOccurredTime();
+
+        let latestValue: { value: number, isPositive: boolean, axisyUpdated: number };
+        if (latestTime !== undefined && latestTime > 0) {
+            const kline = this.props.tvar.getByTime(latestTime);
+
+            if (kline !== undefined && kline instanceof Kline) {
+                latestValue = {
+                    value: kline.close,
+                    isPositive: kline.close > kline.open,
+                    axisyUpdated: new Date().getTime()
+                };
+            }
+        }
+
+        const latestIndicatorValues: string[][] = []
+        if (this.props.overlayIndicators !== undefined) {
+            this.props.overlayIndicators.map((indicator, n) => {
+                const tvar = indicator.tvar;
+
+                let mvs: string[]
+                if (latestTime !== undefined && latestTime > 0) {
+                    mvs = indicator.outputs.map(({ atIndex }, n) => {
+                        const datas = tvar.getByTime(latestTime);
+                        const data = datas ? datas[atIndex] : undefined;
+                        const v = data ? data.value : NaN
+                        return typeof v === 'number'
+                            ? isNaN(v) ? "" : v.toFixed(2)
+                            : '' + v
+                    })
+
+                } else {
+                    mvs = new Array(indicator.outputs.length);
+                }
+
+                latestIndicatorValues.push(mvs)
+            })
+        }
+
+        if (this.props.updateEvent.deltaMouse) {
+            // apply delta to yc chart scale
+            const dy = this.props.updateEvent.deltaMouse.dy
+            if (dy === undefined) {
+                this.yc.yChartScale = 1 // back to 1
+
+            } else {
+                this.yc.yChartScale = this.yc.yChartScale * (1 - dy / this.yc.hChart)
+            }
+
+        } else if (this.props.updateEvent.yScalar) {
+            let scalar: Scalar
+            switch (this.yc.valueScalar.kind) {
+                case "Linear":
+                    scalar = LG_SCALAR
+                    break;
+
+                case "Lg":
+                    scalar = LINEAR_SCALAR
+                    break;
+            }
+
+            this.yc.valueScalar = scalar
+        }
+
+        // update gemoetry
+        this.computeGeometry();
 
         const transform = `translate(${this.props.x} ${this.props.y})`;
         return (
@@ -288,18 +157,61 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
                 {/* Invisible background to capture clicks in empty space */}
                 <rect width={this.props.width} height={this.props.height} fill="transparent" pointerEvents="all" />
 
-                {this.chartElements.chartLines?.map((c, n) => <Fragment key={n}>{c}</Fragment>)}
-                {this.chartElements.chartAxisy}
-                {this.chartElements.overlayIndicatorLines?.map((c, n) => <Fragment key={n}>{c}</Fragment>)}
-                {
-                    this.props.updateDrawing?.isHidingDrawing
-                        ? <></>
-                        : this.chartElements.drawingLines?.map((c, n) => <Fragment key={n}>{c}</Fragment>)
+                <KlinesLayer
+                    kvar={this.props.tvar as TVar<Kline>}
+                    xc={this.props.xc}
+                    yc={this.yc}
+                    kind={this.props.xc.klineKind}
+                    colorScheme={this.props.colorScheme}
+                    updateTicker={this.props.updateEvent.chartTicker}
+                />
+
+                <AxisYLayer
+                    x={this.props.width - ChartView.AXISY_WIDTH}
+                    y={0}
+                    height={this.props.height}
+                    xc={this.props.xc}
+                    yc={this.yc}
+                    tvar={this.props.tvar}
+                    colorScheme={this.props.colorScheme}
+                    latestValue={latestValue}
+                    updateTicker={this.props.updateEvent.chartTicker}
+                />
+
+                <OverlayIndicatorsLayer
+                    xc={this.props.xc}
+                    yc={this.yc}
+                    indicators={this.props.overlayIndicators}
+                    updateTicker={this.props.updateEvent.chartTicker}
+                />
+
+                <CrosshairLayer
+                    xc={this.props.xc}
+                    yc={this.yc}
+                    width={this.props.width}
+                    colorScheme={this.props.colorScheme}
+                    font={this.font}
+                    valueAtTime={(time) => (this.props.tvar.getByTime(time) as Kline).close}
+                    updateTicker={this.props.updateEvent.crosshairTicker}
+                    isCreateDrawing={this.props.updateDrawing && this.props.updateDrawing.createDrawingId !== undefined}
+                />
+
+                <OverlayIndicatorLabelsLayer
+                    xc={this.props.xc}
+                    width={this.props.width}
+                    colorScheme={this.props.colorScheme}
+                    indicators={this.props.overlayIndicators}
+                    latestIndicatorValues={latestIndicatorValues}
+                    updateChart={this.props.updateEvent.chartTicker}
+                    updateCrosshair={this.props.updateEvent.crosshairTicker}
+                />
+
+                {this.props.updateDrawing?.isHidingDrawing
+                    ? <></>
+                    : this.chartElements.drawingLines?.map((c, n) => <Fragment key={n}>{c}</Fragment>)
                 }
-                {this.chartElements.indicatorLabels?.map((c, n) => <Fragment key={n}>{c}</Fragment>)}
                 {this.chartElements.sketching}
-                {this.crosshairs.referCrosshair}
-                {this.crosshairs.mouseCrosshair}
+
             </g >
         )
     }

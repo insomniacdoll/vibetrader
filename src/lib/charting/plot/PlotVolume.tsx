@@ -6,14 +6,15 @@ import type { TVar } from "../../timeseris/TVar";
 import type { ChartXControl } from "../view/ChartXControl";
 import type { ChartYControl } from "../view/ChartYControl";
 
-type Props = {
+export type VolumeProps = {
     xc: ChartXControl,
     yc: ChartYControl,
     kvar: TVar<Kline>,
     colorScheme: ColorScheme;
+    updateTicker?: number;
 }
 
-const PlotVolmue = (props: Props) => {
+const PlotVolmue = (props: VolumeProps) => {
     const { xc, yc, kvar, colorScheme } = props;
 
     function plot() {

@@ -8,7 +8,7 @@ import type { ColorScheme } from "../../../App";
 
 export type KlineKind = 'candle' | 'bar' | 'line'
 
-type Props = {
+export type KlineProps = {
     xc: ChartXControl,
     yc: ChartYControl,
     kvar: TVar<Kline>,
@@ -16,7 +16,7 @@ type Props = {
     colorScheme: ColorScheme;
 }
 
-const PlotKline = (props: Props) => {
+const PlotKline = (props: KlineProps) => {
     const { xc, yc, kvar, kind, colorScheme } = props;
 
     function plot() {

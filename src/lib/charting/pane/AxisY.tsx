@@ -4,14 +4,12 @@ import { Path } from "../../svg/Path";
 import { Texts } from "../../svg/Texts";
 import { styleOfAnnot } from "../../colors";
 import { stringMetrics } from "../../utils";
-import { ChartView, type UpdateEvent } from "../view/ChartView";
-import { Kline } from "../../domain/Kline";
 import type { TVar } from "../../timeseris/TVar";
 import type { ColorScheme } from "../../../App";
-import { Component, type JSX, type RefObject } from "react";
+import { Component, type RefObject } from "react";
 import React from "react";
 
-type Props = {
+export type AxisYProps = {
     x: number,
     y: number,
     height: number,
@@ -19,18 +17,18 @@ type Props = {
     yc: ChartYControl,
     tvar: TVar<unknown>
     colorScheme: ColorScheme
-    latestValue?: { value: number, isRising: boolean, axisyUpdated: number },
+    latestValue?: { value: number, isPositive: boolean, axisyUpdated: number },
 }
 
 type State = {
     nothing?: boolean;
 }
 
-class AxisY extends Component<Props, State> {
+class AxisY extends Component<AxisYProps, State> {
     ref: RefObject<SVGAElement>;
     font: string;
 
-    constructor(props: Props) {
+    constructor(props: AxisYProps) {
         super(props);
 
         this.ref = React.createRef();
@@ -113,7 +111,7 @@ class AxisY extends Component<Props, State> {
 
         if (this.props.latestValue) {
             let value = this.props.latestValue.value
-            const className = this.props.latestValue.isRising ? "annot-positive" : "annot-negative"
+            const className = this.props.latestValue.isPositive ? "annot-positive" : "annot-negative"
 
             const y = yc.yv(value);
             if (yc.shouldNormScale) {

@@ -6,6 +6,9 @@ import { Kline } from "../../domain/Kline";
 import AxisY from "../pane/AxisY";
 import PlotVolmue from "../plot/PlotVolume";
 import { Fragment } from "react/jsx-runtime";
+import { AxisYLayer } from "./layer/AxisYLayer";
+import { VolumeLayer } from "./layer/VolumeLayer";
+import { CrosshairLayer } from "./layer/CrosshairLayer";
 
 export class VolumeView extends ChartView<ViewProps, ViewState> {
 
@@ -16,32 +19,7 @@ export class VolumeView extends ChartView<ViewProps, ViewState> {
     }
 
     override plot() {
-        this.computeGeometry();
-
-        const chartLines = [
-            <PlotVolmue
-                kvar={this.props.tvar as TVar<Kline>}
-                xc={this.props.xc}
-                yc={this.yc}
-                colorScheme={this.props.colorScheme}
-            />
-        ]
-
-        const chartAxisy = <AxisY
-            x={this.props.width - ChartView.AXISY_WIDTH}
-            y={0}
-            height={this.props.height}
-            xc={this.props.xc}
-            yc={this.yc}
-            tvar={this.props.tvar}
-            colorScheme={this.props.colorScheme}
-        />
-
-        return { chartLines, chartAxisy }
-    }
-
-    override UpdateIndicatorLabels(_mouseTime: number, _referTime?: number) {
-        // do nothing.
+        return {}
     }
 
     override computeMaxValueMinValue() {
@@ -88,15 +66,42 @@ export class VolumeView extends ChartView<ViewProps, ViewState> {
     }
 
     render() {
-        this.checkUpdate();
+        // update gemoetry
+        this.computeGeometry();
 
         const transform = `translate(${this.props.x} ${this.props.y})`;
         return (
             <g transform={transform}>
-                {this.chartElements.chartLines?.map((c, n) => <Fragment key={n}>{c}</Fragment>)}
-                {this.chartElements.chartAxisy}
-                {this.crosshairs.referCrosshair}
-                {this.crosshairs.mouseCrosshair}
+                <VolumeLayer
+                    kvar={this.props.tvar as TVar<Kline>}
+                    xc={this.props.xc}
+                    yc={this.yc}
+                    colorScheme={this.props.colorScheme}
+                    updateTicker={this.props.updateEvent.chartTicker}
+                />
+
+                <AxisYLayer
+                    x={this.props.width - ChartView.AXISY_WIDTH}
+                    y={0}
+                    height={this.props.height}
+                    xc={this.props.xc}
+                    yc={this.yc}
+                    tvar={this.props.tvar}
+                    colorScheme={this.props.colorScheme}
+                    updateTicker={this.props.updateEvent.chartTicker}
+                />
+
+                <CrosshairLayer
+                    xc={this.props.xc}
+                    yc={this.yc}
+                    width={this.props.width}
+                    colorScheme={this.props.colorScheme}
+                    font={this.font}
+                    valueAtTime={(time) => (this.props.tvar.getByTime(time) as Kline).volume}
+                    updateTicker={this.props.updateEvent.crosshairTicker}
+                    isCreateDrawing={this.props.updateDrawing && this.props.updateDrawing.createDrawingId !== undefined}
+                />
+
             </g>
         )
     }

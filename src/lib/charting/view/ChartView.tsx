@@ -1,23 +1,16 @@
-import { type TSer } from "../../timeseris/TSer";
 import { TVar } from "../../timeseris/TVar";
 import { ChartXControl } from "./ChartXControl";
 import { ChartYControl } from "./ChartYControl";
-import { Component, Fragment, type JSX, type RefObject } from "react";
-import { Path } from "../../svg/Path";
-import { Texts } from "../../svg/Texts";
-import { Kline, } from "../../domain/Kline";
+import { Component, type JSX, type RefObject } from "react";
+
 import type { Drawing, TPoint } from "../drawing/Drawing";
 import { createDrawing } from "../drawing/Drawings";
 import { type Selection } from "@react-spectrum/s2"
 import React from "react";
-import type { Scalar } from "../scalar/Scalar";
-import { LG_SCALAR } from "../scalar/LgScalar";
-import { LINEAR_SCALAR } from "../scalar/LinearScala";
+
 import type { PlotOptions } from "../plot/Plot";
-import { stringMetrics } from "../../utils";
 import type { PineData } from "../../domain/PineData";
 import type { ColorScheme } from "../../../App";
-import { styleOfAnnot } from "../../colors";
 
 export type UpdateEvent = {
     chartTicker?: number,
@@ -75,16 +68,13 @@ export interface ViewState {
 }
 
 export type ChartElements = {
-    chartLines?: JSX.Element[];
-    chartAxisy?: JSX.Element;
-    overlayIndicatorLines?: JSX.Element[];
+
     drawingLines?: JSX.Element[];
 
     sketching?: JSX.Element
 
     cursor?: string;
 
-    indicatorLabels?: JSX.Element[];
 }
 
 export type Crosshairs = {
@@ -160,9 +150,6 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
         return this.props.width - ChartView.AXISY_WIDTH;
     }
 
-    popupToDesktop() {
-    }
-
     computeMaxValueMinValue() {
         // if no need maxValue/minValue, don't let them all equal 0, just set to 1 and 0 
         return [1, 0];
@@ -171,11 +158,7 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
     // return `value !== undefined` to show cursor value of time
     abstract valueAtTime(time: number): number
 
-    abstract plot(): Pick<ChartElements, "chartLines" | "chartAxisy" | "overlayIndicatorLines" | "indicatorLabels" | "drawingLines">;
-
-    protected plotOverlayIndicatorLines(): JSX.Element[] {
-        return [];
-    }
+    abstract plot(): Pick<ChartElements, "drawingLines">;
 
     checkUpdate() {
         if (this.prevProps === undefined) {
@@ -185,93 +168,10 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
             return
         }
 
-        const isOverlayIndicatorsChanged = (newInds: Indicator[], oldInds: Indicator[]) => {
-            if (newInds === undefined && oldInds === undefined) {
-                return false;
-
-            } else if (newInds === undefined || oldInds === undefined) {
-                return true;
-            }
-
-            if (newInds.length !== oldInds.length) {
-                return true;
-            }
-
-            for (let i = 0; i < newInds.length; i++) {
-                const newInd = newInds[i];
-                const oldInd = oldInds[i];
-
-                if (newInd.scriptName !== oldInd.scriptName) {
-                    return true
-                }
-            }
-
-            return false;
-        }
-
-        const yc = this.yc;
-
         let willUpdateChart = false
-        let willUpdateCrosshair = false;
-        let willUpdateOverlayCharts = false;
-
-        let xMouse: number
-        let yMouse: number
-
-        const xyMouse = this.props.updateEvent.xyMouse;
 
         if (this.props.updateEvent.chartTicker != this.prevProps.updateEvent.chartTicker) {
             willUpdateChart = true;
-            if (this.props.id === "kline") {
-                if (this.props.updateEvent.deltaMouse) {
-                    // apply delta to yc chart scale
-                    const dy = this.props.updateEvent.deltaMouse.dy
-                    if (dy === undefined) {
-                        yc.yChartScale = 1 // back to 1
-
-                    } else {
-                        yc.yChartScale = yc.yChartScale * (1 - dy / yc.hChart)
-                    }
-
-                } else if (this.props.updateEvent.yScalar) {
-                    let scalar: Scalar
-                    switch (yc.valueScalar.kind) {
-                        case "Linear":
-                            scalar = LG_SCALAR
-                            break;
-
-                        case "Lg":
-                            scalar = LINEAR_SCALAR
-                            break;
-                    }
-
-                    yc.valueScalar = scalar
-                }
-            }
-        }
-
-        if (this.props.updateEvent.crosshairTicker != this.prevProps.updateEvent.crosshairTicker) {
-            willUpdateCrosshair = true;
-            if (xyMouse !== undefined) {
-                if (xyMouse.who === this.props.id) {
-                    xMouse = xyMouse.x;
-                    yMouse = xyMouse.y;
-
-                } else {
-                    xMouse = xyMouse.x;
-                    yMouse = undefined;
-                }
-
-            } else {
-                xMouse = undefined;
-                yMouse = undefined;
-            }
-        }
-
-
-        if (isOverlayIndicatorsChanged(this.props.overlayIndicators, this.prevProps.overlayIndicators)) {
-            // console.log(this.props.id, "overlayIndicators changed")
-            willUpdateOverlayCharts = true;
         }
 
         if (this.props.updateDrawing != this.prevProps.updateDrawing) {
@@ -288,8 +188,8 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
             }
         }
 
-        if (willUpdateChart || willUpdateOverlayCharts || willUpdateCrosshair) {
-            this.update(willUpdateChart, willUpdateOverlayCharts, willUpdateCrosshair, xMouse, yMouse)
+        if (willUpdateChart) {
+            this.update(willUpdateChart)
         }
 
         this.prevProps = this.props;
@@ -297,179 +197,12 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
 
     protected update(
         willUpdateChart: boolean,
-        willUpdateOverlayCharts: boolean,
-        willUpdateCrosshair: boolean,
-        xMouse: number,
-        yMouse: number
     ) {
 
         if (willUpdateChart) {
-            const { chartLines, chartAxisy, overlayIndicatorLines, drawingLines } = this.plot();
-            this.chartElements = { ...this.chartElements, chartLines, chartAxisy, overlayIndicatorLines, drawingLines }
+            const { drawingLines } = this.plot();
+            this.chartElements = { ...this.chartElements, drawingLines }
         }
-
-        if (!willUpdateChart && willUpdateOverlayCharts) {
-            this.chartElements.overlayIndicatorLines = this.plotOverlayIndicatorLines();
-        }
-
-        if (willUpdateCrosshair) {
-            this.updateCrosshair(xMouse, yMouse)
-
-        } else {
-            this.updateCrosshair();
-        }
-    }
-
-    protected updateChart() {
-        const { chartLines, chartAxisy, drawingLines } = this.plot();
-        this.chartElements = { ...this.chartElements, chartLines, chartAxisy, drawingLines }
-    }
-
-
-    protected updateCrosshair(xMouse?: number, yMouse?: number) {
-        let referCrosshair: JSX.Element
-        let mouseCrosshair: JSX.Element
-
-        const xc = this.props.xc;
-        const yc = this.yc;
-
-        const latestTime = this.props.xc.lastOccurredTime();
-
-        let referTime: number
-        if (xc.isReferCrosshairEnabled) {
-            referTime = xc.tr(xc.referCrosshairRow)
-            const isOccurredTime = xc.occurred(referTime);
-
-            if (isOccurredTime) {
-                const crosshairX = xc.xr(xc.referCrosshairRow)
-
-                let crosshairY: number
-                let value = this.valueAtTime(referTime);
-                if (value && !isNaN(value)) {
-                    crosshairY = yc.yv(value)
-
-                    if (yc.shouldNormScale) {
-                        value /= yc.normScale
-                    }
-
-                    referCrosshair = this.plotCrosshair(crosshairX, crosshairY, referTime, value, "annot-refer")
-                }
-            }
-        }
-
-        let mouseTime: number
-        if (xc.isMouseCrosshairEnabled) {
-            mouseTime = xc.tr(xc.mouseCrosshairRow)
-            const isOccurredTime = xc.occurred(mouseTime);
-            // try to align x to bar center
-            const crosshairX = isOccurredTime ? xc.xr(xc.mouseCrosshairRow) : xMouse;
-
-            let value: number;
-            let crosshairY: number;
-            if (yMouse === undefined && isOccurredTime) {
-                value = this.valueAtTime(mouseTime);
-                if (value !== undefined && value !== null && !isNaN(value)) {
-                    crosshairY = yc.yv(value);
-                }
-
-            } else {
-                crosshairY = yMouse;
-                value = yc.vy(crosshairY);
-            }
-
-            if (crosshairY !== undefined && !isNaN(crosshairY) && value !== undefined && value !== null && !isNaN(value)) {
-                if (yc.shouldNormScale) {
-                    value /= yc.normScale
-                }
-
-                mouseCrosshair = this.plotCrosshair(crosshairX, crosshairY, mouseTime, value, "annot-mouse")
-            }
-
-        } else {
-            // mouse crosshair invisible, will show latest value
-            mouseTime = latestTime;
-        }
-
-        this.UpdateIndicatorLabels(mouseTime, referTime);
-
-        this.crosshairs = { referCrosshair, mouseCrosshair }
-
-        // may need to update drawing handles when mouse over
-        this.chartElements.drawingLines = this.plotDrawings();
-    }
-
-    abstract UpdateIndicatorLabels(mouseTime: number, referTime?: number): void
-
-    plotCrosshair(x: number, y: number, time: number, value: number, className: string) {
-        const pathStyle = styleOfAnnot(className, this.props.colorScheme);
-
-        const wAxisY = ChartView.AXISY_WIDTH
-
-        let crosshair: Path
-        if (
-            !(this.props.updateDrawing && this.props.updateDrawing.createDrawingId) &&
-            !this.props.xc.isCrosshairEnabled
-        ) {
-            crosshair = new Path();
-
-            // horizontal line
-            crosshair
-                .moveto(0, y)
-                .lineto(this.props.width - wAxisY, y)
-        }
-
-        const valueLabel = this.plotYValueLabel(y, value, className);
-
-        return (
-            <>
-                <g className={className}>
-                    {crosshair && crosshair.render({ style: pathStyle })}
-                </g>
-                {valueLabel}
-            </>
-        )
-    }
-
-    plotYValueLabel(y: number, value: number, className: string) {
-        const pathStyle = styleOfAnnot(className, this.props.colorScheme);
-        const textStyle = styleOfAnnot(className, this.props.colorScheme, true);
-
-        const valueStr = value.toFixed(3);
-
-        const metrics = stringMetrics(valueStr, this.font)
-        const wLabel = metrics.width + 4
-        const hLabel = 13;
-
-        const wAxisY = ChartView.AXISY_WIDTH
-
-        const axisyTexts = new Texts
-        const axisyPath = new Path
-        const y0 = y + 6
-        const x0 = 6
-
-        // draw arrow
-        axisyPath
-            .moveto(6, y - 3)
-            .lineto(0, y)
-            .lineto(6, y + 3);
-
-        axisyPath.moveto(x0, y0)
-            .lineto(x0 + wLabel, y0)
-            .lineto(x0 + wLabel, y0 - hLabel)
-            .lineto(x0, y0 - hLabel)
-            .closepath();
-
-        axisyTexts
-            .text(8, y0 - 2, valueStr);
-
-        const transformYAnnot = `translate(${this.props.width - wAxisY}, ${0})`
-        return (
-            // pay attention to the order to avoid text being overlapped
-            <g transform={transformYAnnot} className={className}>
-                {axisyPath.render({ style: pathStyle })}
-                {axisyTexts.render({ style: textStyle })}
-            </g>
-        )
     }
 
     // translate offset x, y to svg to x, y to this view
@@ -488,12 +221,7 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
 
             this.font = fontSize + ' ' + fontFamily;
         }
-
-        // call to update labels right now
-        this.updateCrosshair(undefined, undefined);
     }
-
-
 
     // --- drawing ---
 
@@ -572,7 +300,6 @@ export abstract class ChartView<P extends ViewProps, S extends ViewState> extend
             ...drawingLines.slice(idxToAddHandles + 1)
         ];
 
-        const chartElements = this.chartElements;
         this.chartElements = { ...this.chartElements, drawingLines, cursor }
     }
 
