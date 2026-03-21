@@ -94,7 +94,7 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
                     xc={this.props.xc}
                     yc={this.yc}
                     outputs={this.props.mainIndicatorOutputs}
-                    updateTicker={this.props.updateEvent.chartTicker}
+                    chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
                 />
 
                 <AxisYLayer
@@ -105,7 +105,7 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
                     yc={this.yc}
                     tvar={this.props.tvar}
                     colorScheme={this.props.colorScheme}
-                    updateTicker={this.props.updateEvent.chartTicker}
+                    chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
                 />
 
                 <CrosshairLayer
@@ -117,7 +117,7 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
                     valueAtTime={() => undefined}
                     xMouse={this.props.updateEvent.xyMouse?.x}
                     yMouse={this.props.updateEvent.xyMouse?.y}
-                    updateTicker={this.props.updateEvent.crosshairTicker}
+                    crosshairUpdateTicker={this.props.updateEvent.crosshairUpdateTicker}
                     isCreateDrawing={this.props.updateDrawing && this.props.updateDrawing.createDrawingId !== undefined}
                 />
 
@@ -128,8 +128,8 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
                     colorScheme={this.props.colorScheme}
                     outputs={this.props.mainIndicatorOutputs}
                     latestIndicatorValues={latestIndicatorValues}
-                    updateChart={this.props.updateEvent.chartTicker}
-                    updateCrosshair={this.props.updateEvent.crosshairTicker}
+                    chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
+                    crosshairUpdateTicker={this.props.updateEvent.crosshairUpdateTicker}
                 />
 
             </g>

@@ -73,7 +73,7 @@ export class VolumeView extends ChartView<ViewProps, ViewState> {
                     xc={this.props.xc}
                     yc={this.yc}
                     colorScheme={this.props.colorScheme}
-                    updateTicker={this.props.updateEvent.chartTicker}
+                    chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
                 />
 
                 <AxisYLayer
@@ -84,7 +84,7 @@ export class VolumeView extends ChartView<ViewProps, ViewState> {
                     yc={this.yc}
                     tvar={this.props.tvar}
                     colorScheme={this.props.colorScheme}
-                    updateTicker={this.props.updateEvent.chartTicker}
+                    chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
                 />
 
                 <CrosshairLayer
@@ -94,7 +94,7 @@ export class VolumeView extends ChartView<ViewProps, ViewState> {
                     colorScheme={this.props.colorScheme}
                     font={this.font}
                     valueAtTime={(time) => (this.props.tvar.getByTime(time) as Kline).volume}
-                    updateTicker={this.props.updateEvent.crosshairTicker}
+                    crosshairUpdateTicker={this.props.updateEvent.crosshairUpdateTicker}
                     isCreateDrawing={this.props.updateDrawing && this.props.updateDrawing.createDrawingId !== undefined}
                 />
 

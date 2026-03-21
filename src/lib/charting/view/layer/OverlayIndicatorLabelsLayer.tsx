@@ -11,8 +11,8 @@ type OverlayIndicatorLabelsLayerProps = {
     colorScheme: ColorScheme;
     indicators: Indicator[],
     latestIndicatorValues: string[][]
-    updateChart: number;
-    updateCrosshair: number;
+    chartUpdateTicker: number;
+    crosshairUpdateTicker: number;
 }
 
 export const OverlayIndicatorLabelsLayer = memo(function Layer({ xc, indicators, width, colorScheme, latestIndicatorValues }: OverlayIndicatorLabelsLayerProps) {

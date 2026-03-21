@@ -5,7 +5,7 @@ type KlinesLayerProps = KlineProps & {
     // Since xc and yc are mutable class instances, 
     // PureComponent won't detect their internal changes. 
     // We pass this primitive number to force a re-render when the chart updates.
-    updateTicker: number;
+    chartUpdateTicker: number;
 }
 
 // This render only fires if kind, colorScheme, or the updateTicker changes.

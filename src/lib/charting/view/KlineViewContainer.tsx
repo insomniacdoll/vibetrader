@@ -190,12 +190,10 @@ class KlineViewContainer extends Component<Props, State> {
         this.state = {
             chartviewWidth: this.props.width - ChartView.AXISY_WIDTH,
             isLoaded: false,
-            updateEvent: { chartTicker: 0, crosshairTicker: 0 },
+            updateEvent: { chartUpdateTicker: 0, crosshairUpdateTicker: 0 },
             updateDrawing: { isHidingDrawing: false },
             stackedIndicators: [],
-            // selectedIndicatorTags: new Set(['ema', 'macd', 'rsi']),
-            selectedIndicatorTags: new Set(),
-
+            selectedIndicatorTags: new Set(['ema', 'macd', 'rsi']),
             drawingIdsToCreate: new Set(),
             isGeneratingScreenshot: false,
             isChartOnly: props.chartOnly
@@ -417,7 +415,7 @@ class KlineViewContainer extends Component<Props, State> {
                     return this.setState(
                         {
                             isLoaded: true,
-                            updateEvent: { chartTicker: nextTickerId() },
+                            updateEvent: { chartUpdateTicker: nextTickerId() },
                             overlayIndicators,
                             stackedIndicators,
                         },
@@ -574,7 +572,7 @@ class KlineViewContainer extends Component<Props, State> {
                     xc.moveChartsInDirection(fastSteps, -1)
                 }
 
-                this.update({ chartTicker: nextTickerId() })
+                this.update({ chartUpdateTicker: nextTickerId() })
                 break;
 
             case "ArrowRight":
@@ -585,20 +583,20 @@ class KlineViewContainer extends Component<Props, State> {
                     xc.moveChartsInDirection(fastSteps, 1)
                 }
 
-                this.update({ chartTicker: nextTickerId() })
+                this.update({ chartUpdateTicker: nextTickerId() })
                 break;
 
             case "ArrowUp":
                 if (!e.ctrlKey) {
                     xc.growWBar(1)
-                    this.update({ chartTicker: nextTickerId() })
+                    this.update({ chartUpdateTicker: nextTickerId() })
                 }
                 break;
 
             case "ArrowDown":
                 if (!e.ctrlKey) {
                     xc.growWBar(-1);
-                    this.update({ chartTicker: nextTickerId() })
+                    this.update({ chartUpdateTicker: nextTickerId() })
                 }
                 break;
 
@@ -612,7 +610,7 @@ class KlineViewContainer extends Component<Props, State> {
                 const curr = xc.isReferCrosshairEnabled;
                 xc.isReferCrosshairEnabled = false;
                 if (curr !== xc.isReferCrosshairEnabled) {
-                    this.update({ crosshairTicker: nextTickerId() })
+                    this.update({ crosshairUpdateTicker: nextTickerId() })
                 }
 
                 break;
@@ -634,7 +632,7 @@ class KlineViewContainer extends Component<Props, State> {
         // clear mouse crosshair
         xc.isMouseCrosshairEnabled = false;
 
-        this.update({ crosshairTicker: nextTickerId() });
+        this.update({ crosshairUpdateTicker: nextTickerId() });
     }
 
     onMouseDown(e: React.MouseEvent) {
@@ -665,10 +663,10 @@ class KlineViewContainer extends Component<Props, State> {
 
             if (e.ctrlKey) {
                 // notice chart view to zoom in / out
-                this.update({ chartTicker: nextTickerId(), deltaMouse: { dx, dy } });
+                this.update({ chartUpdateTicker: nextTickerId(), deltaMouse: { dx, dy } });
 
             } else {
-                this.update({ chartTicker: nextTickerId() });
+                this.update({ chartUpdateTicker: nextTickerId() });
             }
 
             // NOTE crosshair shape will always be processed in ChartView's onDrawingMouseMove
@@ -681,7 +679,7 @@ class KlineViewContainer extends Component<Props, State> {
             this.drawingState.selectedDrawing !== undefined ||
             this.drawingState.mouseMoveHitDrawing !== undefined) {  // is under drawing?
             xc.isMouseCrosshairEnabled = false;
-            this.update({ crosshairTicker: nextTickerId() });
+            this.update({ crosshairUpdateTicker: nextTickerId() });
             return
         }
 
@@ -699,7 +697,7 @@ class KlineViewContainer extends Component<Props, State> {
 
         const xyMouse = this.calcXYMouses(x, y);
 
-        this.update({ crosshairTicker: nextTickerId(), xyMouse });
+        this.update({ crosshairUpdateTicker: nextTickerId(), xyMouse });
     }
 
     onMouseUp(e: React.MouseEvent) {
@@ -733,13 +731,13 @@ class KlineViewContainer extends Component<Props, State> {
                 xc.setReferCrosshairByRow(row, true)
                 xc.isReferCrosshairEnabled = true;
 
-                this.update({ crosshairTicker: nextTickerId() });
+                this.update({ crosshairUpdateTicker: nextTickerId() });
             }
 
         } else {
             xc.isReferCrosshairEnabled = false;
 
-            this.update({ crosshairTicker: nextTickerId() });
+            this.update({ crosshairUpdateTicker: nextTickerId() });
         }
     }
 
@@ -777,7 +775,7 @@ class KlineViewContainer extends Component<Props, State> {
             xc.scrollChartsHorizontallyByBar(unitsToScroll)
         }
 
-        this.update({ chartTicker: nextTickerId() });
+        this.update({ chartUpdateTicker: nextTickerId() });
     }
 
     setSelectedIndicatorTags(selectedIndicatorTags: Selection) {
@@ -821,7 +819,7 @@ class KlineViewContainer extends Component<Props, State> {
     }
 
     backToOriginalChartScale() {
-        this.update({ chartTicker: nextTickerId(), deltaMouse: { dx: undefined, dy: undefined } });
+        this.update({ chartUpdateTicker: nextTickerId(), deltaMouse: { dx: undefined, dy: undefined } });
     }
 
     toggleCrosshairVisiable() {
@@ -829,7 +827,7 @@ class KlineViewContainer extends Component<Props, State> {
 
         xc.isCrosshairEnabled = !xc.isCrosshairEnabled
 
-        this.update({ crosshairTicker: nextTickerId() })
+        this.update({ crosshairUpdateTicker: nextTickerId() })
     }
 
     toggleKlineKind() {
@@ -852,16 +850,16 @@ class KlineViewContainer extends Component<Props, State> {
         }
 
         this.xc.klineKind = kind;
-        this.update({ chartTicker: nextTickerId() })
+        this.update({ chartUpdateTicker: nextTickerId() })
     }
 
     toggleScalar() {
-        this.update({ chartTicker: nextTickerId(), yScalar: true })
+        this.update({ chartUpdateTicker: nextTickerId(), yScalar: true })
     }
 
     toggleOnCalendarMode() {
         this.xc.setOnCalendarMode(!this.xc.isOnCalendarMode)
-        this.update({ chartTicker: nextTickerId() })
+        this.update({ chartUpdateTicker: nextTickerId() })
     }
 
     private handleTakeScreenshot() {

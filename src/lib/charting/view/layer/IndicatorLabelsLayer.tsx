@@ -14,8 +14,8 @@ type IndicatorLabelsLayerProps = {
     colorScheme: ColorScheme;
     outputs: Output[];
     latestIndicatorValues: string[];
-    updateChart: number;
-    updateCrosshair: number;
+    chartUpdateTicker: number;
+    crosshairUpdateTicker: number;
 }
 
 export const IndicatorLabelsLayer = memo(function Layer({ xc, outputs, tvar, width, colorScheme, latestIndicatorValues }: IndicatorLabelsLayerProps) {

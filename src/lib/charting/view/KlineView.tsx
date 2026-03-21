@@ -163,7 +163,7 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
                     height={this.props.height}
                     xc={this.props.xc}
                     yc={this.yc}
-                    updateChart={this.props.updateEvent.chartTicker}
+                    chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
                     isHidingDrawing={this.props.updateDrawing.isHidingDrawing}
                     createDrawingId={this.props.updateDrawing.createDrawingId}
                     callback={this.props.callbacksToContainer}
@@ -178,7 +178,7 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
                     yc={this.yc}
                     kind={this.props.xc.klineKind}
                     colorScheme={this.props.colorScheme}
-                    updateTicker={this.props.updateEvent.chartTicker}
+                    chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
                 />
 
                 <AxisYLayer
@@ -190,14 +190,14 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
                     tvar={this.props.tvar}
                     colorScheme={this.props.colorScheme}
                     latestValue={latestValue}
-                    updateTicker={this.props.updateEvent.chartTicker}
+                    chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
                 />
 
                 <OverlayIndicatorsLayer
                     xc={this.props.xc}
                     yc={this.yc}
                     indicators={this.props.overlayIndicators}
-                    updateTicker={this.props.updateEvent.chartTicker}
+                    chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
                 />
 
                 <CrosshairLayer
@@ -207,7 +207,7 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
                     colorScheme={this.props.colorScheme}
                     font={this.font}
                     valueAtTime={(time) => (this.props.tvar.getByTime(time) as Kline).close}
-                    updateTicker={this.props.updateEvent.crosshairTicker}
+                    crosshairUpdateTicker={this.props.updateEvent.crosshairUpdateTicker}
                     isCreateDrawing={this.props.updateDrawing && this.props.updateDrawing.createDrawingId !== undefined}
                 />
 
@@ -217,8 +217,8 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
                     colorScheme={this.props.colorScheme}
                     indicators={this.props.overlayIndicators}
                     latestIndicatorValues={latestIndicatorValues}
-                    updateChart={this.props.updateEvent.chartTicker}
-                    updateCrosshair={this.props.updateEvent.crosshairTicker}
+                    chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
+                    crosshairUpdateTicker={this.props.updateEvent.crosshairUpdateTicker}
                 />
             </g >
         )

@@ -18,7 +18,7 @@ type DrawingLayerProps = {
 
     callback: CallbacksToContainer;
 
-    updateChart: number;
+    chartUpdateTicker: number;
 }
 
 export type DrawingState = {

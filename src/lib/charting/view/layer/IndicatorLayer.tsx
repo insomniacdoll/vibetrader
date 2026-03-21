@@ -11,7 +11,7 @@ type IndicatorLayerProps = {
     yc: ChartYControl;
     tvar: TVar<PineData[]>;
     outputs: Output[],
-    updateTicker: number;
+    chartUpdateTicker: number;
 }
 
 export const IndicatorLayer = memo(function Layer({ outputs, tvar, xc, yc }: IndicatorLayerProps) {

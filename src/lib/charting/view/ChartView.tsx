@@ -11,8 +11,8 @@ import type { ColorScheme } from "../../../App";
 import type { CallbacksToContainer } from "./KlineViewContainer";
 
 export type UpdateEvent = {
-    chartTicker?: number,
-    crosshairTicker?: number,
+    chartUpdateTicker?: number,
+    crosshairUpdateTicker?: number,
 
     xyMouse?: { who: string, x: number, y: number }
     deltaMouse?: { dx: number, dy: number }

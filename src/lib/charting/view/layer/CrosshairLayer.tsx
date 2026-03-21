@@ -20,7 +20,7 @@ type CrosshairLayerProps = {
     xMouse?: number;
     yMouse?: number;
 
-    updateTicker: number;
+    crosshairUpdateTicker: number;
     isCreateDrawing: boolean;
 }
 

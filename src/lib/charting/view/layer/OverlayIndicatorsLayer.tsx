@@ -9,12 +9,12 @@ type OverlayIndicatorsLayerProps = {
     xc: ChartXControl;
     yc: ChartYControl;
     indicators: Indicator[],
-    updateTicker: number;
+    chartUpdateTicker: number;
 }
 
 const arePropsEqual = (prevProps: OverlayIndicatorsLayerProps, nextProps: OverlayIndicatorsLayerProps) =>
     areOverlayIndicatorsEqual(prevProps.indicators, nextProps.indicators) &&
-    prevProps.updateTicker === nextProps.updateTicker
+    prevProps.chartUpdateTicker === nextProps.chartUpdateTicker
 
 
 const areOverlayIndicatorsEqual = (prevInds: Indicator[], nextInds: Indicator[]) => {
