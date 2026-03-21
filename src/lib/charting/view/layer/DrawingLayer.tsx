@@ -31,6 +31,7 @@ export type DrawingState = {
 export interface DrawingLayerRef {
     deleteSelected: () => void;
     unselect: () => void;
+    cancelSketch: () => void; // Added for the parent to call on 'Escape'
 }
 
 const DEFAULT_CURSOR = "default"
@@ -111,11 +112,18 @@ export const DrawingLayer = forwardRef<DrawingLayerRef, DrawingLayerProps>(({
         });
     }
 
+    const cancelCurrentSketch = () => {
+        if (sketching) {
+            setSketching(undefined);
+            setCursor(DEFAULT_CURSOR);
+            callback.resetDrawingIdsToCreate();
+            // Force re-render to clear the sketch lines
+            setSketchTick(t => t + 1);
+        }
+    }
+
     const onMouseDown = (e: React.MouseEvent) => {
         // console.log('mouse down', e.nativeEvent.offsetX, e.nativeEvent.offsetY)
-
-        // If we are currently sketching a variable-handle drawing, 
-        // don't start dragging logic; let onMouseUp handle the point addition.
         if (sketching && sketching.isCompleted === false) {
             return;
         }
@@ -265,8 +273,7 @@ export const DrawingLayer = forwardRef<DrawingLayerRef, DrawingLayerProps>(({
         // console.log('mouse up', e.detail, e.nativeEvent.offsetX, e.nativeEvent.offsetY)
         isDragging.current = false
 
-        // Important: if this is the second click of a double click, ignore it to prevent 
-        // adding an extra unwanted point to the drawing.
+        // Prevent the second click of a double-click from adding an extra point
         if (e.detail === 2) {
             return
         }
@@ -314,17 +321,15 @@ export const DrawingLayer = forwardRef<DrawingLayerRef, DrawingLayerProps>(({
     }
 
     const onMouseDoubleClick = (e: React.MouseEvent) => {
-        // console.log('mouse doule clicked', e.detail, e.nativeEvent.offsetX, e.nativeEvent.offsetY)
+        //console.log('mouse doule clicked', e.detail, e.nativeEvent.offsetX, e.nativeEvent.offsetY)
         if (e.detail === 2) {
-            // const [x, y] = translate(e)
-
-            // Interaction: Double-click to finish variable-handle drawings (like Polylines)
+            // Logic to finish variable-handle drawings (e.g. Polyline) via Double Click
             if (sketching && sketching.isCompleted === false && sketching.nHandles === undefined) {
                 sketching.setIsCompleted(true);
                 sketching.setIsAnchored(false);
                 sketching.setCurrHandleIdx(-1);
 
-                // Remove the "preview" handle that is usually attached to the mouse
+                // Pop the floating preview handle
                 if (sketching.handles.length > 1) {
                     sketching.handles.pop();
                 }
@@ -335,8 +340,6 @@ export const DrawingLayer = forwardRef<DrawingLayerRef, DrawingLayerProps>(({
                 callback.resetDrawingIdsToCreate();
                 setSketching(undefined);
                 setSelectedDrawing(newDrawings.length - 1);
-
-                // Force UI update
                 setSketchTick(tick => tick + 1);
             }
         }
@@ -345,7 +348,8 @@ export const DrawingLayer = forwardRef<DrawingLayerRef, DrawingLayerProps>(({
     // Expose the internal functions to the parent via the ref
     useImperativeHandle(ref, () => ({
         deleteSelected: () => deleteSelectedDrawing(),
-        unselect: () => unselectDrawing()
+        unselect: () => unselectDrawing(),
+        cancelSketch: () => cancelCurrentSketch()
     }));
 
     const drawingLines = drawings.map((drawing, n) => selectedDrawing === n || mouseMoveHitDrawing === n

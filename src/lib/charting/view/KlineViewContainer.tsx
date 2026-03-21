@@ -606,6 +606,7 @@ class KlineViewContainer extends Component<Props, State> {
 
             case "Escape": {
                 this.klineViewRef.current?.unselectDrawing();
+                this.klineViewRef.current?.cancelSketch();
 
                 const curr = xc.isReferCrosshairEnabled;
                 xc.isReferCrosshairEnabled = false;

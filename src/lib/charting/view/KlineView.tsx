@@ -17,6 +17,7 @@ import { DrawingLayer, type DrawingLayerRef } from "./layer/DrawingLayer";
 export interface KlineViewRef {
     deleteDrawing: () => void;
     unselectDrawing: () => void;
+    cancelSketch: () => void;
 }
 
 export class KlineView extends ChartView<ViewProps, ViewState> {
@@ -29,6 +30,10 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
 
     public unselectDrawing = () => {
         return this.drawingLayerRef.current?.unselect();
+    }
+
+    public cancelSketch = () => {
+        return this.drawingLayerRef.current?.cancelSketch();
     }
 
     constructor(props: ViewProps) {
