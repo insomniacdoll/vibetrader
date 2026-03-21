@@ -215,10 +215,10 @@ class KlineViewContainer extends Component<Props, State> {
         this.handleSaveScreenshot = this.handleSaveScreenshot.bind(this)
 
         this.onGlobalKeyDown = this.onGlobalKeyDown.bind(this)
-        this.onPointerUp = this.onPointerUp.bind(this)
-        this.onPointerDown = this.onPointerDown.bind(this)
-        this.onPointerMove = this.onPointerMove.bind(this)
-        this.onPointerLeave = this.onPointerLeave.bind(this)
+        this.onMouseUp = this.onMouseUp.bind(this)
+        this.onMouseDown = this.onMouseDown.bind(this)
+        this.onMouseMove = this.onMouseMove.bind(this)
+        this.onMouseLeave = this.onMouseLeave.bind(this)
         this.onDoubleClick = this.onDoubleClick.bind(this)
         // this.onWheel = this.onWheel.bind(this)
 
@@ -546,7 +546,7 @@ class KlineViewContainer extends Component<Props, State> {
         return x < this.state.chartviewWidth - ChartView.AXISY_WIDTH
     }
 
-    private xyOfPointerEvent(e: React.PointerEvent) {
+    private xyOfMouseEvent(e: React.MouseEvent) {
         return [e.nativeEvent.offsetX, e.nativeEvent.offsetY]
     }
 
@@ -633,7 +633,7 @@ class KlineViewContainer extends Component<Props, State> {
             this.drawingState.mouseMoveHitDrawing !== undefined
     }
 
-    onPointerLeave() {
+    onMouseLeave() {
         const xc = this.xc;
 
         // clear mouse crosshair
@@ -642,17 +642,17 @@ class KlineViewContainer extends Component<Props, State> {
         this.update({ crosshairUpdateTicker: nextTickerId() });
     }
 
-    onPointerDown(e: React.PointerEvent) {
+    onMouseDown(e: React.MouseEvent) {
         this.isDragging = true
 
-        const [x, y] = this.xyOfPointerEvent(e)
+        const [x, y] = this.xyOfMouseEvent(e)
         this.xDragStart = x;
         this.yDragStart = y;
     }
 
-    onPointerMove(e: React.PointerEvent) {
+    onMouseMove(e: React.MouseEvent) {
         const xc = this.xc;
-        const [x, y] = this.xyOfPointerEvent(e)
+        const [x, y] = this.xyOfMouseEvent(e)
 
         if (this.isDragging && this.drawingState.mouseDownHitDrawing === undefined) {
             // drag chart
@@ -704,7 +704,7 @@ class KlineViewContainer extends Component<Props, State> {
         this.update({ crosshairUpdateTicker: nextTickerId(), xyMouse });
     }
 
-    onPointerUp(e: React.PointerEvent) {
+    onMouseUp(e: React.MouseEvent) {
         if (this.isDragging) {
             this.isDragging = false
             this.xDragStart = undefined
@@ -718,7 +718,7 @@ class KlineViewContainer extends Component<Props, State> {
         }
 
         const xc = this.xc;
-        const [x, y] = this.xyOfPointerEvent(e as unknown as React.PointerEvent)
+        const [x, y] = this.xyOfMouseEvent(e)
 
 
         // set refer crosshair
@@ -1460,10 +1460,10 @@ class KlineViewContainer extends Component<Props, State> {
                         {/* Main svg chart part */}
                         <div style={{ position: 'relative', width: '100%', height: this.geom.svgHeight }}
                             onDoubleClick={this.onDoubleClick}
-                            onPointerLeave={this.onPointerLeave}
-                            onPointerMove={this.onPointerMove}
-                            onPointerDown={this.onPointerDown}
-                            onPointerUp={this.onPointerUp}
+                            onMouseLeave={this.onMouseLeave}
+                            onMouseMove={this.onMouseMove}
+                            onMouseDown={this.onMouseDown}
+                            onMouseUp={this.onMouseUp}
                         // onWheel={this.onWheel}
                         >
                             {this.renderSvgChart()}
