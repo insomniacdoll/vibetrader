@@ -32,9 +32,7 @@ export class FibonacciRetraceDrawing extends Drawing {
 
         const interval = y1 - y0
 
-        let i = 0
-        while (i < FN.length) {
-            const n = FN[i];
+        for (const n of FN) {
             const yn = y0 + interval * n
 
             if (yn > this.yc.hCanvas + 10) { // add a little bit more span
@@ -44,7 +42,6 @@ export class FibonacciRetraceDrawing extends Drawing {
             if (Math.abs(y - yn) <= 4 && x >= x0 && x <= x1) {
                 return true;
             }
-            i++
         }
 
         return false;

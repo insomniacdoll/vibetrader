@@ -2,7 +2,7 @@ import { Path } from "../../svg/Path"
 import { Texts } from "../../svg/Texts";
 import { Drawing } from "./Drawing"
 
-const FN = [
+export const FN = [
     0.000,
     0.382,
     0.500,
@@ -21,34 +21,19 @@ export class FibonacciRetraceVerticalDrawing extends Drawing {
         this.nHandles = 2;
     }
 
-    override hits(x: number, y: number): boolean {
-        const b0 = this.bt(this.handles[0])
-        const b1 = this.bt(this.handles[1])
-        const interval = b1 - b0
+    override hits(x: number, _y: number): boolean {
+        const b0 = this.bt(this.handles[0]);
+        const b1 = this.bt(this.handles[1]);
+        const interval = b1 - b0;
 
-        const x0 = this.xt(this.handles[0])
-        const x1 = this.xt(this.handles[1])
+        for (const n of FN) {
+            const bn = Math.round(b0 + interval * n);
+            const xn = this.xc.xb(bn);
+            if (xn > this.xc.wChart) break;
 
-        const y0 = this.yv(this.handles[0])
-        const y1 = this.yv(this.handles[1])
-
-        let i = 0
-        while (i < FN.length) {
-            const n = FN[i];
-            const b = Math.round(b0 + interval * n)
-            const xn = this.xc.xb(b);
-
-            if (xn > this.xc.wChart) {
-                break;
-            }
-
-            if (Math.abs(x - xn) <= 4) {
-                return true;
-            }
-
-            i++
+            // Vertical line hit check
+            if (Math.abs(x - xn) <= 4) return true;
         }
-
         return false;
     }
 

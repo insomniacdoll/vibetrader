@@ -1,7 +1,8 @@
 import { Path } from "../../svg/Path";
 import { Texts } from "../../svg/Texts";
-import { distanceToLine, xOnLine, yOnLine } from "../utils";
+import { distanceToInfiniteLine, distanceToLine, distanceToSegment, xOnLine, yOnLine } from "../utils";
 import { Drawing } from "./Drawing"
+import { FN } from "./FibonacciRetraceVerticalDrawing";
 
 export class GannAnglesDrawing extends Drawing {
 
@@ -9,23 +10,6 @@ export class GannAnglesDrawing extends Drawing {
         this.nHandles = 2;
     }
 
-    override hits(x: number, y: number) {
-        const x0 = this.xt(this.handles[0])
-        const x1 = this.xt(this.handles[1])
-
-        const y0 = this.yv(this.handles[0])
-        const y1 = this.yv(this.handles[1])
-
-        return (
-            this.#inFrame(x, y, x0, x1, y0, y1) && (
-                this.#hitFrame(x, y, x0, x1, y0, y1) ||
-                this.#hitOneDirection(x, y, x0, x1, y0, y1) ||
-                this.#hitOneDirection(x, y, x1, x0, y0, y1) ||
-                this.#hitOneDirection(x, y, x0, x1, y1, y0) ||
-                this.#hitOneDirection(x, y, x1, x0, y1, y0)
-            )
-        )
-    }
 
     #inFrame(x: number, y: number, x0: number, x1: number, y0: number, y1: number) {
         return (
@@ -36,63 +20,39 @@ export class GannAnglesDrawing extends Drawing {
         )
     }
 
-    #hitFrame(x: number, y: number, x0: number, x1: number, y0: number, y1: number) {
-        let k: number
-        let distance: number
+    override hits(x: number, y: number) {
+        const x0 = this.xt(this.handles[0]), x1 = this.xt(this.handles[1]);
+        const y0 = this.yv(this.handles[0]), y1 = this.yv(this.handles[1]);
 
-        // diannol 
-        k = x1 - x0 === 0 ? 1 : (y1 - y0) / (x1 - x0)
-        distance = distanceToLine(x, y, x0, y0, k)
-        if (distance <= 4) {
-            return true
-        }
-
-        k = x1 - x0 === 0 ? 1 : (y0 - y1) / (x1 - x0)
-        distance = distanceToLine(x, y, x0, y1, k)
-        if (distance <= 4) {
-            return true
-        }
-
-        // horizontal lines
-        if (Math.abs(y - y0) <= 4 || Math.abs(y - y1) <= 4) {
-            return true;
-        }
-
-        // vertical lines 
-        if (Math.abs(x - x0) <= 4 || Math.abs(x - x1) <= 4) {
-            return true
-        }
-
-        return false;
+        return (
+            this.#inFrame(x, y, x0, x1, y0, y1) && (
+                this.#hitFrame(x, y, x0, x1, y0, y1) ||
+                this.#hitOneDirection(x, y, x0, x1, y0, y1) ||
+                this.#hitOneDirection(x, y, x1, x0, y0, y1) ||
+                this.#hitOneDirection(x, y, x0, x1, y1, y0) ||
+                this.#hitOneDirection(x, y, x1, x0, y1, y0)
+            )
+        );
     }
 
     #hitOneDirection(x: number, y: number, x0: number, x1: number, y0: number, y1: number) {
+        const dx = x1 - x0, dy = y1 - y0;
+        if (dx === 0 && dy === 0) return false;
 
-        const k = x1 - x0 === 0 ? 1 : (y1 - y0) / (x1 - x0)
-
-        let distance: number
-
-        let xn: number
-        let yn: number
-        let n = 2
-        while (n < 4) {
-            xn = xOnLine(y1, x0, y0, k * n)
-            yn = yOnLine(xn, x0, y0, k * n)
-
-            distance = distanceToLine(x, y, x0, y0, k * n)
-            if (distance <= 4) {
-                return true
-            }
-
-            distance = distanceToLine(x, y, x0, y0, k / n)
-            if (distance <= 4) {
-                return true
-            }
-
-            n++
+        for (const n of FN) {
+            // We define the ray using point (x0, y0) and a vector (dx, dy * n)
+            if (distanceToInfiniteLine(x, y, x0, y0, x0 + dx, y0 + dy * n) <= 4) return true;
         }
-
         return false;
+    }
+
+    #hitFrame(x: number, y: number, x0: number, x1: number, y0: number, y1: number) {
+        return (
+            distanceToSegment(x, y, x0, y0, x1, y0) <= 4 || // top
+            distanceToSegment(x, y, x0, y1, x1, y1) <= 4 || // bottom
+            distanceToSegment(x, y, x0, y0, x0, y1) <= 4 || // left
+            distanceToSegment(x, y, x1, y0, x1, y1) <= 4    // right
+        );
     }
 
     override plotDrawing() {

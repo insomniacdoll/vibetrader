@@ -28,7 +28,7 @@ export abstract class Drawing {
 
     }
 
-    nHandles = 0
+    nHandles? = 0
 
     abstract init(): void
 
@@ -151,8 +151,6 @@ export abstract class Drawing {
                 i++
             }
         }
-
-        return this.renderDrawingWithHandles("drawing-stretching")
     }
 
     // Store handles when mouse pressed, for moveDrawing() 
@@ -189,8 +187,6 @@ export abstract class Drawing {
 
             i++
         }
-
-        return this.renderDrawingWithHandles("drawing-moving")
     }
 
     // used by variable-handle drawing to insert a handle
