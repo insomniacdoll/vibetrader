@@ -52,10 +52,7 @@ const DrawingLayer = forwardRef<DrawingLayerRef, DrawingLayerProps>(({
     const [selectedDrawing, setSelectedDrawingNative] = useState<number | undefined>(undefined);
     const [mouseMoveHitDrawing, setMouseMoveHitDrawingNative] = useState<number | undefined>(undefined);
 
-
-    const mouseDownHitDrawing = useRef<number>(undefined);
-
-    // const creatingDrawing = useRef<Drawing>(undefined)
+    const mouseDownHitDrawing = useRef<number | undefined>(undefined);
     const isDragging = useRef(false);
 
     const setSelectedDrawing = (valueOrUpdater: SetStateAction<number | undefined>) => {
@@ -133,12 +130,12 @@ const DrawingLayer = forwardRef<DrawingLayerRef, DrawingLayerProps>(({
         const [x, y] = translate(e)
 
         // Select drawing ? Search backwards so you select the top-most visual layer
-        const hitDrawingIdx = drawings.findLastIndex(drawing => drawing.hits(x, y))
-        if (hitDrawingIdx >= 0) {
+        const hitIdx = drawings.findLastIndex(drawing => drawing.hits(x, y))
+        if (hitIdx >= 0) {
             // record the mouseDownHitDrawingIdx for dragging decision
-            setMouseDownHitDrawing(hitDrawingIdx);
+            setMouseDownHitDrawing(hitIdx);
 
-            const selectedOne = drawings[hitDrawingIdx]
+            const selectedOne = drawings[hitIdx]
 
             const handleIdx = selectedOne.getHandleIdxAt(x, y)
             if (handleIdx >= 0) {
@@ -148,14 +145,14 @@ const DrawingLayer = forwardRef<DrawingLayerRef, DrawingLayerProps>(({
 
                     selectedOne.setCurrHandleIdx(-1);
 
-                    setSelectedDrawing(hitDrawingIdx);
+                    setSelectedDrawing(hitIdx);
                     setCursor(DEFAULT_CURSOR);
 
                 } else {
                     // ready to drag handle 
                     selectedOne.setCurrHandleIdx(handleIdx);
 
-                    setSelectedDrawing(hitDrawingIdx);
+                    setSelectedDrawing(hitIdx);
                     setCursor(HANDLE_CURSOR);
                 }
 
@@ -166,7 +163,7 @@ const DrawingLayer = forwardRef<DrawingLayerRef, DrawingLayerProps>(({
 
                     selectedOne.setCurrHandleIdx(newHandleIdx);
 
-                    setSelectedDrawing(hitDrawingIdx);
+                    setSelectedDrawing(hitIdx);
 
                     setCursor(HANDLE_CURSOR);
 
@@ -176,7 +173,7 @@ const DrawingLayer = forwardRef<DrawingLayerRef, DrawingLayerProps>(({
 
                     selectedOne.setCurrHandleIdx(-1);
 
-                    setSelectedDrawing(hitDrawingIdx);
+                    setSelectedDrawing(hitIdx);
                     setCursor(GRAB_CURSOR);
                 }
             }
@@ -218,51 +215,45 @@ const DrawingLayer = forwardRef<DrawingLayerRef, DrawingLayerProps>(({
         }
 
         if (isDragging.current) {
-            const activeDragIdx = mouseDownHitDrawing.current;
+            if (mouseDownHitDrawing.current !== undefined) {
+                const activeOne = drawings[mouseDownHitDrawing.current];
 
-            if (activeDragIdx !== undefined) {
-                const selectedOne = drawings[activeDragIdx];
-
-                if (selectedOne.currHandleIdx >= 0) {
-                    selectedOne.stretchCurrentHandle(p(x, y));
+                if (activeOne.currHandleIdx >= 0) {
+                    activeOne.stretchCurrentHandle(p(x, y));
 
                 } else {
-                    selectedOne.dragDrawing(p(x, y));
+                    activeOne.dragDrawing(p(x, y));
                 }
 
                 setDrawings(prev => [...prev]);
-                setCursor(selectedOne.currHandleIdx >= 0 ? HANDLE_CURSOR : GRAB_CURSOR);
+                setCursor(activeOne.currHandleIdx >= 0 ? HANDLE_CURSOR : GRAB_CURSOR);
 
             } else {
                 setCursor(MOVE_CURSOR);
             }
 
         } else {
-            // Process drawing is hit by mouse. Search backwards so you select the top-most visual layer.
-            const hitDrawingIdx = drawings.findLastIndex(drawing => drawing.hits(x, y))
-            if (hitDrawingIdx >= 0) {
+            // Process hover drawing. Search backwards so you select the top-most visual layer.
+            const hoverIdx = drawings.findLastIndex(drawing => drawing.hits(x, y))
+            if (hoverIdx >= 0) {
                 // show with handles 
-                setMouseMoveHitDrawing(hitDrawingIdx)
-                const hitOne = drawings[hitDrawingIdx]
+                setMouseMoveHitDrawing(hoverIdx)
+                const hitOne = drawings[hoverIdx]
 
-                const handleIdx = hitOne.getHandleIdxAt(x, y)
-                const cursor = handleIdx >= 0
+                const hoverHandle = hitOne.getHandleIdxAt(x, y)
+                const cursor = hoverHandle >= 0
                     ? HANDLE_CURSOR
-                    : e.ctrlKey ? HANDLE_CURSOR : GRAB_CURSOR
-                // ctrl + move means going to insert handle for variable-handle drawing, use HANDLE_CURSOR
+                    : e.ctrlKey
+                        ? HANDLE_CURSOR  // ctrl + move means going to insert handle for variable-handle drawing, use HANDLE_CURSOR
+                        : GRAB_CURSOR
+
 
                 setCursor(cursor);
 
             } else {
-                // Is there drawing previously marked hit? it's not the selected one
-                if (mouseMoveHitDrawing !== undefined && mouseMoveHitDrawing >= 0) {
-                    setMouseMoveHitDrawing(undefined);
-
-                    setCursor(DEFAULT_CURSOR);
-
-                } else {
-                    setCursor(DEFAULT_CURSOR);
-                }
+                // reset  MouseMoveHitDrawin
+                setMouseMoveHitDrawing(undefined);
+                setCursor(DEFAULT_CURSOR);
 
             }
         }
