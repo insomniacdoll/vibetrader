@@ -71,7 +71,7 @@ export const Help = () => {
                     <span className='label-refer'>Select it</span>
                 </div>
                 <div>
-                    <span className='label-mouse'>CTRL + Click: </span>
+                    <span className='label-mouse'>Doubel Click: </span>
                     <span className='label-refer'>Complete variable-handle drawing</span>
                 </div>
                 <div>

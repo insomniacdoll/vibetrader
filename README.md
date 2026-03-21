@@ -31,7 +31,7 @@ https://deepwiki.com/dcaoyuan/vibetrader
 #### Drawing
 * Mouse:
   * Click on drawing: Select it
-  * Ctrl + Click: Complete variable-handle drawing
+  * Double Click: Complete variable-handle drawing
   * Ctrl + Click on variable-handle drawing's handle: remove this handle
   * Ctrl + Drag on variable-handle drawing's segment: insert a handle
 
