@@ -18,10 +18,6 @@ export class VolumeView extends ChartView<ViewProps, ViewState> {
         this.state = {}
     }
 
-    override plot() {
-        return {}
-    }
-
     override computeMaxValueMinValue() {
         let max = Number.NEGATIVE_INFINITY;
         const min = 0// Number.POSITIVE_INFINITY;

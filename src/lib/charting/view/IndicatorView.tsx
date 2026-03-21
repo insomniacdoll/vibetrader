@@ -15,10 +15,6 @@ export class IndicatorView extends ChartView<ViewProps, ViewState> {
         this.state = {}
     }
 
-    override plot() {
-        return {}
-    }
-
     override computeMaxValueMinValue() {
         let max = Number.NEGATIVE_INFINITY;
         let min = Number.POSITIVE_INFINITY;

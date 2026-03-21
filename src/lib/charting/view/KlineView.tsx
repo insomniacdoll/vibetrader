@@ -3,7 +3,7 @@ import { TVar } from "../../timeseris/TVar";
 import { LINEAR_SCALAR } from "../scalar/LinearScala";
 import { LG_SCALAR } from "../scalar/LgScalar";
 import { Kline } from "../../domain/Kline";
-import { Fragment, type JSX } from "react";
+import { createRef, Fragment, type JSX } from "react";
 import { LN_SCALAR } from "../scalar/LnScalar";
 import { KlinesLayer } from "./layer/KlineLayer";
 import { AxisYLayer } from "./layer/AxisYLayer";
@@ -11,8 +11,25 @@ import type { Scalar } from "../scalar/Scalar";
 import { OverlayIndicatorsLayer } from "./layer/OverlayIndicatorsLayer";
 import { CrosshairLayer } from "./layer/CrosshairLayer";
 import { OverlayIndicatorLabelsLayer } from "./layer/OverlayIndicatorLabelsLayer";
+import { DrawingLayer, type DrawingLayerRef } from "./layer/DrawingLayer";
+
+// Define the API KlineView will expose to its parent
+export interface KlineViewRef {
+    deleteDrawing: () => void;
+    unselectDrawing: () => void;
+}
 
 export class KlineView extends ChartView<ViewProps, ViewState> {
+
+    private drawingLayerRef = createRef<DrawingLayerRef>();
+
+    public deleteSelectedDrawing = () => {
+        this.drawingLayerRef.current?.deleteSelected();
+    }
+
+    public unselectDrawing = () => {
+        return this.drawingLayerRef.current?.unselect();
+    }
 
     constructor(props: ViewProps) {
         super(props);
@@ -21,15 +38,6 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
 
         this.state = {}
     }
-
-    override plot() {
-        this.computeGeometry();
-
-        const drawingLines = this.plotDrawings()
-
-        return { drawingLines }
-    }
-
 
     override computeMaxValueMinValue() {
         let max = Number.NEGATIVE_INFINITY;
@@ -75,8 +83,6 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
     }
 
     render() {
-        // this.checkUpdate();
-
         const latestTime = this.props.xc.lastOccurredTime();
 
         let latestValue: { value: number, isPositive: boolean, axisyUpdated: number };
@@ -147,15 +153,24 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
         const transform = `translate(${this.props.x} ${this.props.y})`;
         return (
             <g transform={transform}
-                onDoubleClick={this.onDrawingMouseDoubleClick}
-                onMouseDown={this.onDrawingMouseDown}
-                onMouseMove={this.onDrawingMouseMove}
-                onMouseUp={this.onDrawingMouseUp}
-                cursor={this.chartElements.cursor}
                 ref={this.ref}
             >
+                <DrawingLayer
+                    ref={this.drawingLayerRef}
+                    x={this.props.x}
+                    y={this.props.y}
+                    width={this.props.width}
+                    height={this.props.height}
+                    xc={this.props.xc}
+                    yc={this.yc}
+                    updateChart={this.props.updateEvent.chartTicker}
+                    isHidingDrawing={this.props.updateDrawing.isHidingDrawing}
+                    createDrawingId={this.props.updateDrawing.createDrawingId}
+                    callback={this.props.callbacksToContainer}
+                />
+
                 {/* Invisible background to capture clicks in empty space */}
-                <rect width={this.props.width} height={this.props.height} fill="transparent" pointerEvents="all" />
+                {/* <rect width={this.props.width} height={this.props.height} fill="transparent" pointerEvents="all" /> */}
 
                 <KlinesLayer
                     kvar={this.props.tvar as TVar<Kline>}
@@ -205,13 +220,6 @@ export class KlineView extends ChartView<ViewProps, ViewState> {
                     updateChart={this.props.updateEvent.chartTicker}
                     updateCrosshair={this.props.updateEvent.crosshairTicker}
                 />
-
-                {this.props.updateDrawing?.isHidingDrawing
-                    ? <></>
-                    : this.chartElements.drawingLines?.map((c, n) => <Fragment key={n}>{c}</Fragment>)
-                }
-                {this.chartElements.sketching}
-
             </g >
         )
     }

@@ -1,7 +1,6 @@
 import { Path } from "../../svg/Path"
 import type { ChartXControl } from "../view/ChartXControl"
 import type { ChartYControl } from "../view/ChartYControl"
-import { Rect } from "../../svg/Rect"
 import type { Seg, Style } from "../../svg/Seg"
 import type { Key } from "react"
 import { Circle } from "../../svg/Circle"
@@ -49,6 +48,18 @@ export abstract class Drawing {
 
     protected newHandle(point?: TPoint) {
         return new Handle(this.xc, this.yc, point)
+    }
+
+    setCurrHandleIdx(idx: number) {
+        this.currHandleIdx = idx;
+    }
+
+    setIsCompleted(isCompleted: boolean) {
+        this.isCompleted = isCompleted;
+    }
+
+    setIsAnchored(isAnchored: boolean) {
+        this.isAnchored = isAnchored;
     }
 
     /**

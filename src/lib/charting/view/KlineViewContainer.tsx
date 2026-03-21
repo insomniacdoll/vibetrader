@@ -3,7 +3,7 @@ import html2canvas from "html2canvas";
 import { KlineView } from "./KlineView";
 import { VolumeView } from "./VolumeView";
 import { ChartXControl } from "./ChartXControl";
-import { ChartView, type CallbacksToContainer, type Indicator, type Output, type UpdateDrawing, type UpdateEvent } from "./ChartView";
+import { ChartView, type Indicator, type Output, type UpdateDrawing, type UpdateEvent } from "./ChartView";
 import AxisX from "../pane/AxisX";
 import type { TSer } from "../../timeseris/TSer";
 import type { TVar } from "../../timeseris/TVar";
@@ -83,6 +83,7 @@ import type { ColorScheme } from "../../../App";
 import { styleOfAnnot } from "../../colors";
 import Header from "../pane/Header";
 import { formatDateForFileName, nextTickerId } from "../../utils";
+import type { DrawingLayerRef, DrawingState } from "./layer/DrawingLayer";
 
 type Props = {
     toggleColorScheme: () => void
@@ -122,6 +123,11 @@ type Geometry = {
     yCrosshairRange: number[]
 };
 
+export type CallbacksToContainer = {
+    resetDrawingIdsToCreate: () => void;
+    updateDrawingState: (state: DrawingState) => void;
+}
+
 const allIndTags = dev
     //? ['dynpivot']
     ? ['ema', 'bb', 'rsi', 'macd', 'kdj', 'signals', 'diagonal', 'ichimoku', 'dynline', 'pivot', 'sarstoch', 'channel', 'autotrendline']
@@ -157,6 +163,8 @@ class KlineViewContainer extends Component<Props, State> {
     scripts?: { scriptName: string, script: string }[];
 
     chartviewRef: React.RefObject<HTMLDivElement>;
+    klineViewRef: React.RefObject<KlineView>;
+
     resizeObserver: ResizeObserver;
 
     geom: Geometry;
@@ -167,6 +175,7 @@ class KlineViewContainer extends Component<Props, State> {
     yDragStart: number;
 
     callbacks: CallbacksToContainer
+    drawingState: DrawingState = {};
 
     reloadDataTimeoutId: number;
     currentLoading = Promise.resolve()
@@ -176,13 +185,17 @@ class KlineViewContainer extends Component<Props, State> {
 
         this.chartviewRef = React.createRef();
 
+        this.klineViewRef = React.createRef();
+
         this.state = {
             chartviewWidth: this.props.width - ChartView.AXISY_WIDTH,
             isLoaded: false,
             updateEvent: { chartTicker: 0, crosshairTicker: 0 },
             updateDrawing: { isHidingDrawing: false },
             stackedIndicators: [],
-            selectedIndicatorTags: new Set(['ema', 'macd', 'rsi']),
+            // selectedIndicatorTags: new Set(['ema', 'macd', 'rsi']),
+            selectedIndicatorTags: new Set(),
+
             drawingIdsToCreate: new Set(),
             isGeneratingScreenshot: false,
             isChartOnly: props.chartOnly
@@ -212,7 +225,8 @@ class KlineViewContainer extends Component<Props, State> {
         // this.onWheel = this.onWheel.bind(this)
 
         this.callbacks = {
-            updateDrawingIdsToCreate: this.setDrawingIdsToCreate,
+            resetDrawingIdsToCreate: () => this.setDrawingIdsToCreate(),
+            updateDrawingState: (state: DrawingState) => this.drawingState = { ...this.drawingState, ...state }
         }
 
         this.geom = this.calcGeometry(0);
@@ -592,19 +606,21 @@ class KlineViewContainer extends Component<Props, State> {
                 xc.isMovingAccelerated = !xc.isMovingAccelerated
                 break;
 
-            case "Escape":
-                if (xc.selectedDrawingIdx !== undefined) {
-                    this.setState({ updateDrawing: { ...(this.state.updateDrawing), action: 'unselect' } })
+            case "Escape": {
+                this.klineViewRef.current?.unselectDrawing();
 
-                } else {
-                    xc.isReferCrosshairEnabled = !xc.isReferCrosshairEnabled;
-
+                const curr = xc.isReferCrosshairEnabled;
+                xc.isReferCrosshairEnabled = false;
+                if (curr !== xc.isReferCrosshairEnabled) {
                     this.update({ crosshairTicker: nextTickerId() })
                 }
+
                 break;
+            }
+
 
             case 'Delete':
-                this.setState({ updateDrawing: { ...(this.state.updateDrawing), action: 'delete' } })
+                this.klineViewRef.current?.deleteSelectedDrawing();
                 break;
 
             default:
@@ -633,7 +649,7 @@ class KlineViewContainer extends Component<Props, State> {
         const xc = this.xc;
         const [x, y] = this.xyOfMouseEvent(e)
 
-        if (this.isDragging && xc.mouseDownHitDrawingIdx === undefined) {
+        if (this.isDragging && this.drawingState.mouseDownHitDrawing === undefined) {
             // drag chart
             const dx = x - this.xDragStart
             const dy = y - this.yDragStart
@@ -660,8 +676,10 @@ class KlineViewContainer extends Component<Props, State> {
             return
         }
 
-        if (this.state.drawingIdsToCreate === 'all' || this.state.drawingIdsToCreate.size > 0 || xc.selectedDrawingIdx !== undefined || xc.mouseMoveHitDrawingIdx !== undefined) {
-            // is under drawing?
+        if (this.state.drawingIdsToCreate === 'all' ||
+            this.state.drawingIdsToCreate.size > 0 ||
+            this.drawingState.selectedDrawing !== undefined ||
+            this.drawingState.mouseMoveHitDrawing !== undefined) {  // is under drawing?
             xc.isMouseCrosshairEnabled = false;
             this.update({ crosshairTicker: nextTickerId() });
             return
@@ -795,7 +813,6 @@ class KlineViewContainer extends Component<Props, State> {
             this.setState({
                 updateDrawing: {
                     ...(this.state.updateDrawing),
-                    action: 'create',
                     createDrawingId: drawingId as string
                 },
                 drawingIdsToCreate: ids
@@ -957,7 +974,7 @@ class KlineViewContainer extends Component<Props, State> {
         })
     }
 
-    analyze(ticker: string, timeframe: string, scripts?: string[], tzone?: string) {
+    public analyze(ticker: string, timeframe: string, scripts?: string[], tzone?: string) {
         if (this.reloadDataTimeoutId) {
             clearTimeout(this.reloadDataTimeoutId);
         }
@@ -1096,6 +1113,7 @@ class KlineViewContainer extends Component<Props, State> {
                 />
 
                 <KlineView
+                    ref={this.klineViewRef}
                     id={"kline"}
                     x={0}
                     y={this.geom.yKlineView}
@@ -1160,6 +1178,7 @@ class KlineViewContainer extends Component<Props, State> {
     }
 
     render() {
+        // console.log('viewcontains render')
         return (
             <div style={{ display: "flex", width: '100%' }}>
 
@@ -1244,10 +1263,7 @@ class KlineViewContainer extends Component<Props, State> {
 
                             <TooltipTrigger placement="end">
                                 <ActionButton onPress={() => this.setState({
-                                    updateDrawing: {
-                                        action: 'hide',
-                                        isHidingDrawing: !this.state.updateDrawing.isHidingDrawing
-                                    }
+                                    updateDrawing: { isHidingDrawing: !this.state.updateDrawing.isHidingDrawing }
                                 })}
                                 >
                                     <SelectNo />
@@ -1258,13 +1274,7 @@ class KlineViewContainer extends Component<Props, State> {
                             </TooltipTrigger>
 
                             <TooltipTrigger placement="end">
-                                <ActionButton onPress={() => this.setState({
-                                    updateDrawing: {
-                                        ...(this.state.updateDrawing),
-                                        action: 'delete'
-                                    }
-                                })}
-                                >
+                                <ActionButton onPress={this.klineViewRef.current?.deleteSelectedDrawing}>
                                     <SelectNone />
                                 </ActionButton>
                                 <Tooltip>

@@ -126,7 +126,7 @@ export function Title({ xc, ticker, handleSymbolTimeframeChanged }: Props) {
     const dateStringWithTZ = new Date().toLocaleString('en-US', { timeZoneName: 'short' });
     const tzoneShort = dateStringWithTZ.split(' ').pop();
 
-    console.log("Title render");
+    // console.log("Title render");
 
     return (
         <div style={{ display: 'flex', justifyContent: 'flex-start', padding: '0px 1px', fontFamily: 'monospace', fontSize: '12px' }}>

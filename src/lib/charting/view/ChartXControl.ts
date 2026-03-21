@@ -171,11 +171,6 @@ export class ChartXControl {
     fixedNBars?: number;
     fixedLeftSideTime?: number;
 
-    // share across view and view container
-    selectedDrawingIdx: number;
-    mouseMoveHitDrawingIdx: number;
-    mouseDownHitDrawingIdx: number;
-
     #lastOccurredRowOfBaseSer = 0;
     #isAutoScrollToNewData = true;
     #isMouseEnteredAnyChartPane = false;

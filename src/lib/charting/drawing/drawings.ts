@@ -6,7 +6,7 @@ import { FibonacciTimeZoneDrawing } from "./FibonacciTimeZoneDrawing"
 import { GannAnglesDrawing } from "./GannAnglesDrawing"
 import { LineDrawing } from "./LineDrawing"
 import { ParallelDrawing } from "./ParallelDrawing"
-import { PolylineDrawing } from "./PloylineDrawing"
+import { PolylineDrawing } from "./PolylineDrawing"
 
 export function createDrawing(id: string, xc: ChartXControl, yc: ChartYControl) {
     switch (id) {
