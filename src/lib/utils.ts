@@ -92,4 +92,28 @@ const createAtomicCounter = (initialValue = 0) => {
     return () => ++count;
 };
 
+/**
+ * Converts an IANA timezone string (e.g., "America/Vancouver") to its short abbreviation (e.g., "PST" or "PDT").
+ * @param timeZone - The IANA timezone string.
+ * @param date - The date to check against (defaults to now, as DST changes the abbreviation).
+ * @returns The short timezone abbreviation, or undefined if not found.
+ */
+export function getTimezoneAbbr(timeZone: string, date: Date = new Date()): string | undefined {
+    try {
+        const formatter = new Intl.DateTimeFormat('en-US', {
+            timeZone,
+            timeZoneName: 'short',
+        });
+
+        const parts = formatter.formatToParts(date);
+        const tzPart = parts.find(part => part.type === 'timeZoneName');
+
+        return tzPart?.value;
+
+    } catch (error) {
+        console.error(`Invalid timezone string: ${timeZone}`, error);
+        return undefined;
+    }
+}
+
 export const nextTickerId = createAtomicCounter();

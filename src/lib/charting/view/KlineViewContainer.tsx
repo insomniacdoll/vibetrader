@@ -458,8 +458,8 @@ class KlineViewContainer extends Component<Props, State> {
             this.ticker = this.props.initialTicker || (source === Source.binance ? 'BTCUSDT' : 'NVDA');
             this.tframe = this.props.initialTimeframe ? TFrame.ofName(this.props.initialTimeframe) : TFrame.DAILY;
 
-            this.tzone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            //this. tzone = "America/Vancouver" 
+            //this.tzone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            this.tzone = "UTC"
 
             this.baseSer = new DefaultTSer(this.tframe, this.tzone, 1000);
             this.kvar = this.baseSer.varOf(KVAR_NAME) as TVar<Kline>;
