@@ -4,6 +4,9 @@ import { Kline } from "../../src/lib/domain/Kline";
 import type { TVar } from "../../src/lib/timeseris/TVar";
 import klinesJson from "./klines.json"
 
+import { describe, it, expect } from 'vitest';
+
+
 //const tzone = "America/Los_Angeles";
 const tzone = "America/Vancouver";
 const varName = "ETH";
@@ -26,27 +29,41 @@ export function testSer() {
 	const tser = loadSer(varName);
 
 	const kvar = tser.varOf(varName) as TVar<Kline>;
-	console.log(kvar.values());
+	// console.log(kvar.values());
 
 	const itrT = kvar.timesIterator()
 	while (itrT.hasNext()) {
 		const time = itrT.next();
-		const q = kvar.getByTime(time);
-		console.log(q.time);
+		// const q = kvar.getByTime(time);
+		// console.log(q.time);
 	}
 
 	const itrV = kvar.valuesIterator();
 	while (itrV.hasNext()) {
 		const q = itrV.next();
-		console.log(q);
+		// console.log(q);
 	}
 
 	for (const q of kvar) {
-		console.log(q);
+		// console.log(q);
 	}
 
 	console.log(kvar.size())
+	return kvar.size();
 }
+
+describe('KlineSer Test', () => {
+	const testCases = [
+		{ varName: 'test_only.pine', expected: 251 },
+	];
+
+	it.each(testCases)(`parses $fileName`, ({ varName, expected }) => {
+		const size = testSer();
+		expect(size).toBe(expected);
+	});
+});
+
+
 
 
 
