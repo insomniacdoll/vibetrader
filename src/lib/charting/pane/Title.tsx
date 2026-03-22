@@ -139,12 +139,12 @@ function Title({ xc, ticker, handleSymbolTimeframeChanged }: Props) {
                     <ChooseSymbol
                         ticker={ticker}
                         handleSymbolTimeframeChanged={handleSymbolTimeframeChanged} />
-                    &nbsp;&middot;&nbsp;
+                    &middot;
                     <ChooseTimeframe
                         ticker={ticker}
                         timeframe={xc.baseSer.timeframe}
                         handleSymbolTimeframeChanged={handleSymbolTimeframeChanged} />
-                    &nbsp;&middot;&nbsp;
+                    &middot;
                     <Button style={{ fontFamily: 'monospace', fontSize: 12, padding: 0, border: 'none', background: 'transparent' }}>
                         {tzoneShort}
                     </Button>
