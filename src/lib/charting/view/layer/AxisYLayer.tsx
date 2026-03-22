@@ -7,7 +7,7 @@ type AxisYLayerProps = AxisYProps & {
 }
 
 const AxisYLayer = ({
-    x, y, height, tvar, xc, yc, colorScheme, latestValue
+    x, y, height, tvar, xc, yc, colorScheme, font, latestValue
 }: AxisYLayerProps) => {
 
     return (
@@ -19,6 +19,7 @@ const AxisYLayer = ({
             xc={xc}
             yc={yc}
             colorScheme={colorScheme}
+            font={font}
             latestValue={latestValue}
         />
     );

@@ -1,9 +1,7 @@
 import { ChartXControl } from "../view/ChartXControl";
 import { Path } from "../../svg/Path";
 import { Texts } from "../../svg/Texts";
-import { Component, type JSX, type RefObject, } from "react";
-import type { UpdateEvent } from "../view/chartviews";
-import React from "react";
+import { Component, type JSX } from "react";
 import { stringMetrics } from "../../utils";
 import { H_HEADER, H_SPACING } from "../view/KlineViewContainer";
 
@@ -14,6 +12,7 @@ type Props = {
 	xc: ChartXControl,
 	width: number,
 	height: number,
+	font: string;
 	up?: boolean
 }
 
@@ -22,9 +21,6 @@ type State = {
 }
 
 class AxisX extends Component<Props, State> {
-	ref: RefObject<SVGAElement>;
-	font: string;
-
 	dfY: Intl.DateTimeFormat
 	dfYM: Intl.DateTimeFormat
 	dfM: Intl.DateTimeFormat
@@ -37,8 +33,6 @@ class AxisX extends Component<Props, State> {
 
 	constructor(props: Props) {
 		super(props);
-
-		this.ref = React.createRef();
 
 		const tzone = props.xc.baseSer.timezone
 		const tframe = props.xc.baseSer.timeframe
@@ -182,7 +176,7 @@ class AxisX extends Component<Props, State> {
 					tickStr = this.dfm.format(date);
 			}
 
-			const metrics = stringMetrics(tickStr, this.font)
+			const metrics = stringMetrics(tickStr, this.props.font)
 			const wTickStr = metrics.width;
 			const xText = x - Math.round(wTickStr / 2);
 
@@ -248,7 +242,7 @@ class AxisX extends Component<Props, State> {
 
 		const dtStr = this.dfCrosshair.format(new Date(time))
 
-		const metrics = stringMetrics(dtStr, this.font)
+		const metrics = stringMetrics(dtStr, this.props.font)
 		const w = metrics.width + 3
 		const x0 = x - w / 2;
 
@@ -282,7 +276,7 @@ class AxisX extends Component<Props, State> {
 
 		const transform = `translate(${this.props.x} ${this.props.y})`;
 		return (
-			<g transform={transform} ref={this.ref}>
+			<g transform={transform}>
 				{axis}
 				{referCrosshair}
 				{mouseCrosshair}
@@ -290,17 +284,6 @@ class AxisX extends Component<Props, State> {
 		)
 	}
 
-	// Code to run after initial render, equivalent to useEffect with an 
-	// empty dependency array ([])
-	override componentDidMount() {
-		if (this.ref.current) {
-			const computedStyle = window.getComputedStyle(this.ref.current);
-			const fontSize = computedStyle.getPropertyValue('font-size');
-			const fontFamily = computedStyle.getPropertyValue('font-family');
-
-			this.font = fontSize + ' ' + fontFamily;
-		}
-	}
 }
 
 export default AxisX;

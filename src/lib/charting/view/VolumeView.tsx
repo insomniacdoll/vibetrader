@@ -6,32 +6,18 @@ import { Kline } from "../../domain/Kline";
 import AxisYLayer from "./layer/AxisYLayer";
 import VolumeLayer from "./layer/VolumeLayer";
 import CrosshairLayer from "./layer/CrosshairLayer";
-import { Component, type RefObject } from "react";
+import { Component } from "react";
 import { ChartYControl } from "./ChartYControl";
-import React from "react";
 
 export class VolumeView extends Component<ViewProps, ViewState> {
 
     yc: ChartYControl;
-    ref: RefObject<SVGAElement>;
-    font: string;
 
     constructor(props: ViewProps) {
         super(props);
-        this.ref = React.createRef();
         this.yc = new ChartYControl(props.xc.baseSer, props.height);
 
         this.state = {}
-    }
-
-    override componentDidMount(): void {
-        if (this.ref.current) {
-            const computedStyle = window.getComputedStyle(this.ref.current);
-            const fontSize = computedStyle.getPropertyValue('font-size');
-            const fontFamily = computedStyle.getPropertyValue('font-family');
-
-            this.font = fontSize + ' ' + fontFamily;
-        }
     }
 
     private calcGeometry(atleastMinValue?: number) {
@@ -90,7 +76,7 @@ export class VolumeView extends Component<ViewProps, ViewState> {
 
         const transform = `translate(${this.props.x} ${this.props.y})`;
         return (
-            <g transform={transform} ref={this.ref}>
+            <g transform={transform}>
                 <VolumeLayer
                     kvar={this.props.tvar as TVar<Kline>}
                     xc={this.props.xc}
@@ -107,6 +93,7 @@ export class VolumeView extends Component<ViewProps, ViewState> {
                     yc={this.yc}
                     tvar={this.props.tvar}
                     colorScheme={this.props.colorScheme}
+                    font={this.props.axisFont}
                     chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
                 />
 
@@ -116,7 +103,7 @@ export class VolumeView extends Component<ViewProps, ViewState> {
                     yc={this.yc}
                     width={this.props.width}
                     colorScheme={this.props.colorScheme}
-                    font={this.font}
+                    font={this.props.axisFont}
                     valueAtTime={(time) => (this.props.tvar.getByTime(time) as Kline).volume}
                     mouseWho={this.props.updateEvent.xyMouse?.who}
                     mouseX={this.props.updateEvent.xyMouse?.x}

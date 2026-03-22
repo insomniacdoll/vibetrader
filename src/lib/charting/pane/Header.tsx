@@ -1,9 +1,8 @@
 import { ChartXControl } from "../view/ChartXControl";
-import { Component, type RefObject } from "react";
+import { Component } from "react";
 import type { UpdateEvent } from "../view/chartviews";
 import type { TVar } from "../../timeseris/TVar";
 import { Kline } from "../../domain/Kline";
-import React from "react";
 import { styleOfLabel } from "../../colors";
 import type { ColorScheme } from "../../../App";
 
@@ -40,15 +39,14 @@ type Snapshot = {
 
 const L_SNAPSHOTS = 6;
 
+const FONT_STYLE = { fontFamily: 'monospace', fontSize: '12px' }
+
 class Header extends Component<Props, State> {
     referKline: Kline
     pointKline: Kline
     delta: Delta
     snapshots: Snapshot[] = []
     newSnapshot: boolean
-
-    ref: RefObject<SVGAElement>;
-    font: string;
 
     tframeShowName: string;
     tzone: string;
@@ -60,8 +58,6 @@ class Header extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-
-        this.ref = React.createRef();
 
         this.state = {}
 
@@ -245,7 +241,7 @@ class Header extends Component<Props, State> {
         const transform = `translate(${this.props.x} ${this.props.y})`;
 
         return (
-            <g transform={transform} ref={this.ref} style={{ fontFamily: 'monospace', fontSize: '12px' }}>
+            <g transform={transform} style={{ ...FONT_STYLE }}>
 
                 {/* Refer Kline row */}
                 <text x={leftPadding} y={yReferLabel} fill="currentColor">
@@ -311,16 +307,6 @@ class Header extends Component<Props, State> {
                 />
             </g>
         );
-    }
-
-    override componentDidMount(): void {
-        if (this.ref.current) {
-            const computedStyle = window.getComputedStyle(this.ref.current);
-            const fontSize = computedStyle.getPropertyValue('font-size');
-            const fontFamily = computedStyle.getPropertyValue('font-family');
-
-            this.font = fontSize + ' ' + fontFamily;
-        }
     }
 
 }

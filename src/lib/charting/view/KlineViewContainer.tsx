@@ -146,6 +146,8 @@ const H_VOLUME_VIEW = 100;
 const H_INDICATOR_VIEW = 160;
 const H_AXIS_X = 40;
 
+const AXIS_FONT = '12px "Roboto", "Helvetica", "Arial", sans-serif';
+
 class KlineViewContainer extends Component<Props, State> {
     ticker: string;
     tframe: TFrame;
@@ -1130,6 +1132,7 @@ class KlineViewContainer extends Component<Props, State> {
                     xc={this.xc}
                     tvar={this.kvar}
                     colorScheme={this.props.colorScheme}
+                    axisFont={AXIS_FONT}
                     updateEvent={this.state.updateEvent}
                     updateDrawing={this.state.updateDrawing}
                     overlayIndicators={this.state.overlayIndicators}
@@ -1146,6 +1149,7 @@ class KlineViewContainer extends Component<Props, State> {
                     xc={this.xc}
                     tvar={this.kvar}
                     colorScheme={this.props.colorScheme}
+                    axisFont={AXIS_FONT}
                     updateEvent={this.state.updateEvent}
                 />
 
@@ -1163,6 +1167,7 @@ class KlineViewContainer extends Component<Props, State> {
                             xc={this.xc}
                             tvar={tvar}
                             colorScheme={this.props.colorScheme}
+                            axisFont={AXIS_FONT}
                             mainIndicatorOutputs={outputs}
                             updateEvent={this.state.updateEvent}
                             callbacksToContainer={this.callbacks}
@@ -1176,6 +1181,7 @@ class KlineViewContainer extends Component<Props, State> {
                     y={this.geom.yAxisx}
                     width={this.state.chartviewWidth}
                     height={H_AXIS_X}
+                    font={AXIS_FONT}
                     xc={this.xc}
                 />
 

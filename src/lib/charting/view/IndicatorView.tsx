@@ -7,31 +7,18 @@ import AxisYLayer from "./layer/AxisYLayer";
 import IndicatorLayer from "./layer/IndicatorLayer";
 import CrosshairLayer from "./layer/CrosshairLayer";
 import IndicatorLabelsLayer from "./layer/IndicatorLabelsLayer";
-import React, { Component, type RefObject } from "react";
+import { Component } from "react";
 import { ChartYControl } from "./ChartYControl";
 
 export class IndicatorView extends Component<ViewProps, ViewState> {
 
     yc: ChartYControl;
-    ref: RefObject<SVGAElement>;
-    font: string;
 
     constructor(props: ViewProps) {
         super(props);
-        this.ref = React.createRef();
         this.yc = new ChartYControl(props.xc.baseSer, props.height);
 
         this.state = {}
-    }
-
-    override componentDidMount(): void {
-        if (this.ref.current) {
-            const computedStyle = window.getComputedStyle(this.ref.current);
-            const fontSize = computedStyle.getPropertyValue('font-size');
-            const fontFamily = computedStyle.getPropertyValue('font-family');
-
-            this.font = fontSize + ' ' + fontFamily;
-        }
     }
 
     private calcGeometry(atleastMinValue?: number) {
@@ -84,11 +71,6 @@ export class IndicatorView extends Component<ViewProps, ViewState> {
         }
     }
 
-    // won't show cursor value of time.
-    valueAtTime(time: number) {
-        return undefined;
-    }
-
     render() {
         const latestTime = this.props.xc.lastOccurredTime();
         let latestIndicatorValues: string[]
@@ -113,7 +95,7 @@ export class IndicatorView extends Component<ViewProps, ViewState> {
 
         const transform = `translate(${this.props.x} ${this.props.y})`;
         return (
-            <g transform={transform} ref={this.ref}>
+            <g transform={transform}>
                 <IndicatorLayer
                     tvar={this.props.tvar as TVar<PineData[]>}
                     xc={this.props.xc}
@@ -130,6 +112,7 @@ export class IndicatorView extends Component<ViewProps, ViewState> {
                     yc={this.yc}
                     tvar={this.props.tvar}
                     colorScheme={this.props.colorScheme}
+                    font={this.props.axisFont}
                     chartUpdateTicker={this.props.updateEvent.chartUpdateTicker}
                 />
 
@@ -139,7 +122,7 @@ export class IndicatorView extends Component<ViewProps, ViewState> {
                     yc={this.yc}
                     width={this.props.width}
                     colorScheme={this.props.colorScheme}
-                    font={this.font}
+                    font={this.props.axisFont}
                     valueAtTime={() => undefined}
                     mouseWho={this.props.updateEvent.xyMouse?.who}
                     mouseX={this.props.updateEvent.xyMouse?.x}

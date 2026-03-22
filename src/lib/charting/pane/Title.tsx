@@ -2,7 +2,6 @@ import { ChartXControl } from "../view/ChartXControl";
 import { memo, useState } from "react";
 import { Button } from 'react-aria-components';
 import { ActionButtonGroup, useAsyncList, Popover, TooltipTrigger, Tooltip, ComboBox, ComboBoxItem, MenuTrigger } from "@react-spectrum/s2";
-import { style } from '@react-spectrum/s2/style' with {type: 'macro'};
 import { TFrame } from "../../timeseris/TFrame";
 import { fetchSymbolList } from "../../domain/DataFecther";
 import { source } from "../../../Env";
@@ -12,6 +11,8 @@ type Props = {
     ticker: string,
     handleSymbolTimeframeChanged: (ticker: string, timeframe?: string) => void
 }
+
+const FONT_STYLE = { fontFamily: 'monospace', fontSize: '12px' }
 
 export function ChooseSymbol(props: { ticker: string, handleSymbolTimeframeChanged: (ticker: string, timeframe?: string) => void }) {
     const list = useAsyncList<{ ticker: string }>({
@@ -24,7 +25,7 @@ export function ChooseSymbol(props: { ticker: string, handleSymbolTimeframeChang
     return (
         <MenuTrigger>
             <TooltipTrigger placement="top">
-                <Button style={{ fontFamily: 'monospace', fontSize: 12, padding: 0, border: 'none', background: 'transparent' }}>
+                <Button style={{ padding: 0, border: 'none', background: 'transparent', ...FONT_STYLE }}>
                     {props.ticker}
                 </Button>
                 <Tooltip>
@@ -81,7 +82,7 @@ export function ChooseTimeframe(props: { ticker: string, timeframe: TFrame, hand
     return (
         <MenuTrigger>
             <TooltipTrigger placement="top">
-                <Button style={{ fontFamily: 'monospace', fontSize: 12, padding: 0, border: 'none', background: 'transparent' }}>
+                <Button style={{ padding: 0, border: 'none', background: 'transparent', ...FONT_STYLE }}>
                     {props.timeframe.shortName}
                 </Button>
                 <Tooltip>
@@ -129,7 +130,7 @@ function Title({ xc, ticker, handleSymbolTimeframeChanged }: Props) {
     console.log("Title render");
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'flex-start', padding: '0px 1px', fontFamily: 'monospace', fontSize: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', padding: '0px 1px', ...FONT_STYLE }}>
             <div style={{ flex: 1, justifyContent: 'flex-start' }}>
                 <ActionButtonGroup>
                     <ChooseSymbol

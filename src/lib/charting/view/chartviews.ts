@@ -44,6 +44,7 @@ export interface ViewProps {
     xc: ChartXControl;
     tvar: TVar<unknown>;
     colorScheme: ColorScheme;
+    axisFont: string;
 
     updateEvent: UpdateEvent;
     updateDrawing?: UpdateDrawing;

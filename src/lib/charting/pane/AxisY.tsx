@@ -17,6 +17,7 @@ export type AxisYProps = {
     yc: ChartYControl,
     tvar: TVar<unknown>
     colorScheme: ColorScheme
+    font: string;
     latestValue?: { value: number, isPositive: boolean, axisyUpdated: number },
 }
 
@@ -25,13 +26,9 @@ type State = {
 }
 
 class AxisY extends Component<AxisYProps, State> {
-    ref: RefObject<SVGAElement>;
-    font: string;
 
     constructor(props: AxisYProps) {
         super(props);
-
-        this.ref = React.createRef();
     }
 
     plot() {
@@ -130,7 +127,7 @@ class AxisY extends Component<AxisYProps, State> {
 
         const valueStr = value.toFixed(3);
 
-        const metrics = stringMetrics(valueStr, this.font)
+        const metrics = stringMetrics(valueStr, this.props.font)
         const wLabel = metrics.width + 4
         const hLabel = 13;
 
@@ -167,20 +164,10 @@ class AxisY extends Component<AxisYProps, State> {
 
         const transform = `translate(${this.props.x} ${this.props.y})`;
         return (
-            <g transform={transform} ref={this.ref}>
+            <g transform={transform}>
                 {axis}
             </g >
         );
-    }
-
-    override componentDidMount() {
-        if (this.ref.current) {
-            const computedStyle = window.getComputedStyle(this.ref.current);
-            const fontSize = computedStyle.getPropertyValue('font-size');
-            const fontFamily = computedStyle.getPropertyValue('font-family');
-
-            this.font = fontSize + ' ' + fontFamily;
-        }
     }
 }
 
