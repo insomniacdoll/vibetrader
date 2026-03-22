@@ -77,7 +77,7 @@ class Header extends Component<Props, State> {
 
         this.dtFormatL = new Intl.DateTimeFormat("en-US", {
             timeZone: this.tzone,
-            year: "2-digit",
+            year: "numeric",
             month: "short",
             day: "2-digit",
             hour: "2-digit",
