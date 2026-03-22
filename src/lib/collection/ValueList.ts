@@ -260,7 +260,7 @@ export class ValueList<T> extends AbstractCollection<T> {
                     if (nVacancy > 0) {
                         // and cursor0 should be 0 too, since we'll always keep cursor0 is at 0 in this case
                         if (this.cursor0 === 0) {
-                            throw "When there are vacancy still available, cursor0 should keep to 0";
+                            throw new Error("When there are vacancy still available, cursor0 should keep to 0");
                         }
 
                         // backward shift all elems after n1 by nVacancy steps
@@ -506,7 +506,7 @@ export class ValueList<T> extends AbstractCollection<T> {
      */
     reduceToSize(sz: number) {
         if (sz <= this.size0) {
-            throw "sz ${sz} <= this.size0 ${this.size}";
+            throw new Error(`sz ${sz} <= this.size0 ${this.size0}`);
         }
 
         if (this.cursor0 === 0) {
@@ -549,8 +549,12 @@ export class ValueList<T> extends AbstractCollection<T> {
             }
 
             const newArray = Array(newSize);
-            this.arraycopy(this.array, 0, newArray, 0, this.size0);
+            // Unroll the circular buffer logically instead of a linear arraycopy
+            const elements = this.toArray();
+            this.arraycopy(elements, 0, newArray, 0, this.size0);
+
             this.array = newArray;
+            this.cursor0 = 0; // Reset cursor to 0 since the array is now flattened
         }
     }
 
@@ -575,7 +579,49 @@ export class ValueList<T> extends AbstractCollection<T> {
 
 
     iterator(): CIterator<T> {
-        return new ValueList.Itr(this);
+        let cursor = 0; // index of next element to return
+        let lastRet = -1; // index of last element returned; -1 if no such
+        let expectedModCount = this.modCount;
+
+        return {
+            hasNext: (): boolean => {
+                return cursor !== this.size();
+            },
+
+            next: (): T => {
+                if (this.modCount !== expectedModCount) {
+                    throw new Error("ConcurrentModificationException");
+                }
+                const i = cursor;
+                if (i >= this.size()) {
+                    throw new Error("NoSuchElementException: " + i + " >= " + this.size());
+                }
+                if (i >= this.array.length) {
+                    throw new Error("ConcurrentModificationException");
+                }
+                cursor = i + 1;
+                lastRet = i;
+                return this.array[this.trueIndex(i)];
+            },
+
+            remove: (): void => {
+                if (lastRet < 0) {
+                    throw new Error("IllegalStateException");
+                }
+                if (this.modCount !== expectedModCount) {
+                    throw new Error("ConcurrentModificationException");
+                }
+
+                try {
+                    this.removeByIndex(lastRet);
+                    cursor = lastRet;
+                    lastRet = -1;
+                    expectedModCount = this.modCount;
+                } catch (ex) {
+                    throw new Error("ConcurrentModificationException");
+                }
+            }
+        };
     }
 
 
@@ -619,7 +665,7 @@ export class ValueList<T> extends AbstractCollection<T> {
     }
 
     protected underlyingArrayString(): string {
-        return "underlying array(cursor0=${this.cursor0},size0=${this.size0})";
+        return `underlying array(cursor0=${this.cursor0},size0=${this.size0})`;
         // + ","
         // + "cursor0="
         // + cursor0
@@ -661,62 +707,6 @@ export class ValueList<T> extends AbstractCollection<T> {
     //     }
     //   }
     // }
-
-    private static Itr = class <T> implements CIterator<T> {
-        readonly outer: ValueList<T>;
-        private cursor = 0; // index of next element to return
-        private lastRet = -1; // index of last element returned; -1 if no such
-        private expectedModCount: number;
-
-        // prevent creating a synthetic constructor
-        constructor(outer: ValueList<T>) {
-            this.outer = outer;
-            this.expectedModCount = this.outer.modCount;
-        }
-
-
-        hasNext(): boolean {
-            return this.cursor !== this.outer.size();
-        }
-
-
-        next(): T {
-            this.checkForComodification();
-            const i = this.cursor;
-            if (i >= this.outer.size()) {
-                throw new Error("NoSuchElementException: " + i + " >= " + this.outer.size());
-            }
-            if (i >= this.outer.array.length) {
-                throw new Error("ConcurrentModificationException");
-            }
-            this.cursor = i + 1;
-            this.lastRet = i;
-            return this.outer.array[this.outer.trueIndex(i)];
-        }
-
-
-        remove() {
-            if (this.lastRet < 0) {
-                throw new Error("IllegalStateException");
-            }
-            this.checkForComodification();
-
-            try {
-                this.outer.remove(this.lastRet);
-                this.cursor = this.lastRet;
-                this.lastRet = -1;
-                this.expectedModCount = this.outer.modCount;
-            } catch (ex) {
-                throw new Error("ConcurrentModificationException");
-            }
-        }
-
-        checkForComodification() {
-            if (this.outer.modCount !== this.expectedModCount) {
-                throw new Error("ConcurrentModificationException");
-            }
-        }
-    }
 
 }
 

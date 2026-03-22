@@ -32,6 +32,6 @@
     },
     "include": [
         "src",
-        "tests/timeseries/KlineSer.ts"
+        "tests/timeseries/KlineSer.test.ts"
     ]
 }
