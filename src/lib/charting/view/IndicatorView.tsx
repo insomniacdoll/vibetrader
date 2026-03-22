@@ -22,11 +22,11 @@ export class IndicatorView extends Component<ViewProps, ViewState> {
     }
 
     private calcGeometry(atleastMinValue?: number) {
-        const [maxValue, minValue] = this.computeMaxValueMinValue();
+        const [maxValue, minValue] = this.computeMaxMinValue();
         this.yc.calcGeometry(maxValue, atleastMinValue !== undefined ? Math.min(minValue, atleastMinValue) : minValue);
     }
 
-    computeMaxValueMinValue() {
+    private computeMaxMinValue() {
         let max = Number.NEGATIVE_INFINITY;
         let min = Number.POSITIVE_INFINITY;
 

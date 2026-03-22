@@ -21,11 +21,11 @@ export class VolumeView extends Component<ViewProps, ViewState> {
     }
 
     private calcGeometry(atleastMinValue?: number) {
-        const [maxValue, minValue] = this.computeMaxValueMinValue();
+        const [maxValue, minValue] = this.computeMaxMinValue();
         this.yc.calcGeometry(maxValue, atleastMinValue !== undefined ? Math.min(minValue, atleastMinValue) : minValue);
     }
 
-    private computeMaxValueMinValue() {
+    private computeMaxMinValue() {
         let max = Number.NEGATIVE_INFINITY;
         const min = 0// Number.POSITIVE_INFINITY;
 

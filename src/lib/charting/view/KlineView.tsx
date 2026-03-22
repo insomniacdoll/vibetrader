@@ -40,11 +40,11 @@ export class KlineView extends Component<ViewProps, ViewState> {
     public cancelSketch = () => this.drawingLayerRef.current?.cancelSketch();
 
     private calcGeometry(atleastMinValue?: number) {
-        const [maxValue, minValue] = this.computeMaxValueMinValue();
+        const [maxValue, minValue] = this.computeMaxMinValue();
         this.yc.calcGeometry(maxValue, atleastMinValue !== undefined ? Math.min(minValue, atleastMinValue) : minValue);
     }
 
-    private computeMaxValueMinValue() {
+    private computeMaxMinValue() {
         let max = Number.NEGATIVE_INFINITY;
         let min = Number.POSITIVE_INFINITY;
 
@@ -173,9 +173,6 @@ export class KlineView extends Component<ViewProps, ViewState> {
                     createDrawingId={this.props.updateDrawing.createDrawingId}
                     callback={this.props.callbacksToContainer}
                 />
-
-                {/* Invisible background to capture clicks in empty space */}
-                {/* <rect width={this.props.width} height={this.props.height} fill="transparent" pointerEvents="all" /> */}
 
                 <KlinesLayer
                     kvar={this.props.tvar as TVar<Kline>}
