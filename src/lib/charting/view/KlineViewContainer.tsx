@@ -74,8 +74,7 @@ import DistributeSpaceVertically from '@react-spectrum/s2/icons/DistributeSpaceV
 import Resize from '@react-spectrum/s2/icons/Resize';
 import StrokeWidth from '@react-spectrum/s2/icons/StrokeWidth';
 import Percentage from '@react-spectrum/s2/icons/Percentage';
-import StarFilled from '@react-spectrum/s2/icons/StarFilled';
-import Star from '@react-spectrum/s2/icons/Star';
+import UnlinkHoriz from '@react-spectrum/s2/icons/UnlinkHoriz';
 import Exposure from '@react-spectrum/s2/icons/Exposure';
 import FullScreenExit from '@react-spectrum/s2/icons/FullScreenExit';
 import { fetchData, Source } from "../../domain/DataFecther";
@@ -1315,14 +1314,14 @@ class KlineViewContainer extends Component<Props, State> {
                                 </Tooltip>
                             </TooltipTrigger>
 
-                            {/* <TooltipTrigger placement="end">
-                            <ActionButton onPress={this.toggleOnCalendarMode} >
-                                {this.state.xc.isOnCalendarMode ? <StarFilled /> : <Star />}
-                            </ActionButton>
-                            <Tooltip >
-                                Toggle Calendar/Occurred mode
-                            </Tooltip>
-                        </TooltipTrigger> */}
+                            <TooltipTrigger placement="end">
+                                <ActionButton onPress={this.toggleOnCalendarMode} >
+                                    <UnlinkHoriz />
+                                </ActionButton>
+                                <Tooltip >
+                                    Toggle Calendar/Occurred mode
+                                </Tooltip>
+                            </TooltipTrigger>
 
                             <TooltipTrigger placement="end">
                                 <ActionButton onPress={this.backToOriginalChartScale} >
