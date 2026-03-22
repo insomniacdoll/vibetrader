@@ -1,8 +1,6 @@
 import { Temporal } from "temporal-polyfill"
 import type { TSer } from "../../timeseris/TSer"
 import type { KlineKind } from "../plot/PlotKline"
-import { LINEAR_SCALAR } from "../scalar/LinearScala"
-import type { Scalar } from "../scalar/Scalar"
 import { TUnit } from "../../timeseris/TUnit"
 import { dev } from "../../../Env"
 
@@ -16,90 +14,143 @@ type Tick = {
 
 const MIN_TICK_SPACING = 100 // in pixels
 
-const locatorDict = {
+const LOCATOR_DICT: Record<string, number[][]> = {
     year: [
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], // Used with modulo 10
         [0, 2, 4, 6, 8],
-        [0, 5, 10],
         [0, 5],
     ],
     month: [
-        [2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        [2, 4, 6, 8, 10],
-        [4, 7, 10],
-        [6],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], // Temporal months are 1-12
+        [1, 3, 5, 7, 9, 11],
+        [1, 4, 7, 10],
+        [1, 7],
     ],
     week: [
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], // Used with modulo 10
         [0, 2, 4, 6, 8],
-        [0, 5, 10],
         [0, 5],
     ],
     day: [
-        [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28],
-        [4, 8, 12, 16, 20, 24, 28],
-        [5, 10, 15, 20, 25],
-        [10, 20],
-        [15],
+        [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31], // 1st of month is critical
+        [1, 5, 10, 15, 20, 25],
+        [1, 10, 20],
+        [1, 15],
     ],
     hour: [
-        [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22],
-        [3, 6, 9, 12, 15, 18, 21],
-        [4, 8, 12, 16, 20],
-        [6, 12, 18],
-        [8, 16],
-        [12],
+        [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22],
+        [0, 3, 6, 9, 12, 15, 18, 21],
+        [0, 4, 8, 12, 16, 20],
+        [0, 6, 12, 18],
+        [0, 12],
     ],
     minute: [
-        [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
-        [10, 20, 30, 40, 50, 60],
-        [15, 30, 45, 60],
-        [30, 60],
+        [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], // 0 replaces 60
+        [0, 10, 20, 30, 40, 50],
+        [0, 15, 30, 45],
+        [0, 30],
     ],
 }
 
+function getFuzzyTicks(newTicks: Tick[], locator: number[], level: Tick['level']): Tick[] {
+    if (locator.length === 0) return [];
 
-function fillTicks(existedTicks: Tick[], newTicks: Tick[], level: string, nTicksAround: number): Tick[] {
+    const selectedTicks: Tick[] = [];
+    let targetIdx = 0;
+    let prevValue = -1;
 
-    // Find the lowest level ticks first 
-    if (existedTicks.length < 2) {
-        const locators = locatorDict[level]
-        let i = 0;
-        while (i < locators.length) {
-            const locator = locators[i]
-            let count = 0
-            for (const tick of newTicks) {
-                const value = level === "year" || level === "week"
-                    ? tick.dt[level] % 10
-                    : tick.dt[level]
+    for (let i = 0; i < newTicks.length; i++) {
+        const tick = newTicks[i];
 
-                if (locator.includes(value)) {
-                    count++
-                }
-            }
+        // Map "week" to "weekOfYear" and assert type for TypeScript
+        let value = level === "week"
+            ? tick.dt.weekOfYear
+            : tick.dt[level as keyof Temporal.ZonedDateTime] as number;
 
-            // console.log(level, locator, count)
-            if (count < nTicksAround) { // may add upper level ticks later, so nTicksAround, not nTicksMax
-                for (const tick of newTicks) {
-                    const value = level === "year" || level === "week"
-                        ? tick.dt[level] % 10
-                        : tick.dt[level]
-
-                    if (locator.includes(value)) {
-                        existedTicks.push(tick)
-                    }
-
-                }
-                break
-            }
-
-            i++
+        // Apply modulo 10 logic for years/weeks
+        if (level === "year" || level === "week") {
+            value = value % 10;
         }
 
+        // 1. Detect Period Rollover
+        // If the current value is less than the previous (e.g., Day 31 -> Day 1),
+        // we have entered a new month/period. Reset the locator target.
+        if (prevValue !== -1 && value < prevValue) {
+            targetIdx = 0;
+        }
+
+        // 2. Match Target
+        if (targetIdx < locator.length) {
+            const target = locator[targetIdx];
+
+            // If the current tick's value has reached or passed the target, select it!
+            if (value >= target) {
+                selectedTicks.push(tick);
+
+                // Fast-forward the target index. 
+                // This prevents a single large value (e.g., market opens on the 6th) 
+                // from consuming both the '1' and '5' targets at the same time.
+                while (targetIdx < locator.length && value >= locator[targetIdx]) {
+                    targetIdx++;
+                }
+            }
+        }
+
+        prevValue = value;
+    }
+
+    return selectedTicks;
+}
+
+function fillTicks(existedTicks: Tick[], newTicks: Tick[], level: Tick['level'], nTicksAround: number): Tick[] {
+
+    // Phase 1: Establish the baseline
+    if (existedTicks.length === 0) {
+        const locators = LOCATOR_DICT[level];
+
+        for (const locator of locators) {
+            const candidateTicks = getFuzzyTicks(newTicks, locator, level);
+
+            // We allow a 50% tolerance (1.5x) so we don't accidentally leave the chart empty
+            if (candidateTicks.length <= nTicksAround * 1.5) {
+                existedTicks.push(...candidateTicks);
+                return existedTicks.sort((a, b) => a.x - b.x);
+            }
+        }
+
+        // CRITICAL FIX: If we get here, ALL locators for this timeframe are too dense.
+        // We DO NOT force the fallback anymore. We SKIP this level entirely, returning 
+        // the empty array so the next timeframe up (e.g. Month) becomes the baseline.
+
+        // The only exception is "year" - if years are too dense, we have to plot them anyway.
+        if (level === "year") {
+            const sparsestLocator = locators[locators.length - 1];
+            existedTicks.push(...getFuzzyTicks(newTicks, sparsestLocator, level));
+        }
+
+        return existedTicks;
+
     } else {
-        // just dump upper level ticks after lowest found, 
-        // whose number is less than 1/12 (year to month) of lowest ticks 
-        existedTicks = existedTicks.concat(newTicks)
+        // Phase 2: Overlay upper-level ticks (Months over Days, Years over Months)
+        const collisionThreshold = MIN_TICK_SPACING * 0.7; // 70% of spacing requires clearing
+
+        for (const upperTick of newTicks) {
+
+            // Prevent two major ticks of the SAME level from overlapping if zoomed out insanely far
+            const collidesWithSameLevel = existedTicks.some(existing =>
+                existing.level === upperTick.level && Math.abs(existing.x - upperTick.x) < collisionThreshold
+            );
+
+            if (collidesWithSameLevel) continue;
+
+            // CRITICAL FIX 2: Remove ALL lower-level ticks that fall within the collision radius
+            existedTicks = existedTicks.filter(existing =>
+                Math.abs(existing.x - upperTick.x) >= collisionThreshold
+            );
+
+            // Add the major tick into the cleared-out space
+            existedTicks.push(upperTick);
+        }
     }
 
     return existedTicks.sort((a, b) => a.x - b.x);
@@ -222,151 +273,102 @@ export class ChartXControl {
         // })
     }
 
-    calcXTicks() {
-
+    calcXTicks(): Tick[] {
         const nTicksAround = Math.round(this.wChart / MIN_TICK_SPACING);
         const tzone = this.baseSer.timezone;
         const tframe = this.baseSer.timeframe;
-        let prevDt: Temporal.ZonedDateTime;
+        const shortName = tframe.unit.shortName;
 
-        const yearTicks: Tick[] = []
-        const monthTicks: Tick[] = []
-        const weekTicks: Tick[] = []
-        const dayTicks: Tick[] = []
-        const hourTicks: Tick[] = []
-        const minuteTicks: Tick[] = []
+        // We only need previous values, not full Temporal objects, to detect crossings
+        let prevYear: number | undefined;
+        let prevMonth: number | undefined;
+        let prevDay: number | undefined;
+        let prevHour: number | undefined;
+        let prevMinute: number | undefined;
+        let prevWeek: number | undefined;
 
-        const minute_locator = locatorDict['minute'][0]
+        const yearTicks: Tick[] = [];
+        const monthTicks: Tick[] = [];
+        const weekTicks: Tick[] = [];
+        const dayTicks: Tick[] = [];
+        const hourTicks: Tick[] = [];
+        const minuteTicks: Tick[] = [];
+
         for (let i = 1; i <= this.nBars; i++) {
-            const time = this.tb(i)
-            const dt = new Temporal.ZonedDateTime(BigInt(time) * TUnit.NANO_PER_MILLI, tzone);
+            const time = this.tb(i);
+            const dt = new Temporal.ZonedDateTime(BigInt(time) * BigInt(TUnit.NANO_PER_MILLI), tzone);
             const x = this.xb(i);
 
-            if (prevDt !== undefined) {
-                switch (tframe.unit.shortName) {
-                    case 'm':
-                        if (dt.year !== prevDt.year) {
-                            yearTicks.push({ dt, x, level: "year" })
-
-                        } else if (dt.month !== prevDt.month) {
-                            monthTicks.push({ dt, x, level: "month" })
-
-                        } else if (dt.day !== prevDt.day) {
-                            dayTicks.push({ dt, x, level: "day" })
-
-                        } else if (dt.hour !== prevDt.hour) {
-                            hourTicks.push({ dt, x, level: "hour" })
-
-                        } else if (dt.minute !== prevDt.minute && minute_locator.includes(dt.minute)) {
-                            minuteTicks.push({ dt, x, level: "minute" })
-                        }
-
-                        break;
-
-                    case "h":
-                        if (dt.year !== prevDt.year) {
-                            yearTicks.push({ dt, x, level: "year" })
-
-                        } else if (dt.month !== prevDt.month) {
-                            monthTicks.push({ dt, x, level: "month" })
-
-                        } else if (dt.day !== prevDt.day) {
-                            dayTicks.push({ dt, x, level: "day" })
-
-                        } else if (dt.hour !== prevDt.hour) {
-                            hourTicks.push({ dt, x, level: "hour" })
-                        }
-
-                        break
-
-                    case "D":
-                        if (dt.year !== prevDt.year) {
-                            yearTicks.push({ dt, x, level: "year" })
-
-                        } else if (dt.month !== prevDt.month) {
-                            monthTicks.push({ dt, x, level: "month" })
-
-                        } else if (dt.day !== prevDt.day) {
-                            dayTicks.push({ dt, x, level: "day" })
-                        }
-
-                        break;
-
-                    case "W":
-                        if (dt.year !== prevDt.year) {
-                            yearTicks.push({ dt, x, level: "year" })
-
-                        } else if (dt.month !== prevDt.month) {
-                            monthTicks.push({ dt, x, level: "month" })
-
-                        } else if (dt.weekOfYear !== prevDt.weekOfYear) {
-                            weekTicks.push({ dt, x, level: "week" })
-                        }
-
-                        break
-
-                    case "M":
-                        if (dt.year !== prevDt.year) {
-                            yearTicks.push({ dt, x, level: "year" })
-
-                        } else if (dt.month !== prevDt.month) {
-                            monthTicks.push({ dt, x, level: "month" })
-                        }
-
-                        break;
-
-                    case "Y":
-                        if (dt.year !== prevDt.year) {
-                            yearTicks.push({ dt, x, level: "year" })
-                        }
+            if (prevYear !== undefined) {
+                // Check Year
+                if (dt.year !== prevYear) {
+                    yearTicks.push({ dt, x, level: "year" });
                 }
-
+                // Check Month
+                else if (dt.month !== prevMonth) {
+                    monthTicks.push({ dt, x, level: "month" });
+                }
+                // Check Week (Only if timeframe is Weekly)
+                else if (shortName === 'W' && dt.weekOfYear !== prevWeek) {
+                    weekTicks.push({ dt, x, level: "week" });
+                }
+                // Check Day
+                else if (dt.day !== prevDay) {
+                    dayTicks.push({ dt, x, level: "day" });
+                }
+                // Check Hour
+                else if (dt.hour !== prevHour) {
+                    hourTicks.push({ dt, x, level: "hour" });
+                }
+                // Check Minute (Notice the hardcoded filter is gone)
+                else if (dt.minute !== prevMinute) {
+                    minuteTicks.push({ dt, x, level: "minute" });
+                }
             }
 
-            prevDt = dt;
+            // Cache primitives for the next iteration
+            prevYear = dt.year;
+            prevMonth = dt.month;
+            prevDay = dt.day;
+            prevHour = dt.hour;
+            prevMinute = dt.minute;
+            prevWeek = dt.weekOfYear;
         }
 
-        let ticks: Tick[] = []
-        switch (tframe.unit.shortName) {
+        let ticks: Tick[] = [];
+
+        // The cascading fills remain the same, but now benefit from full data and collision handling
+        switch (shortName) {
             case "m":
                 ticks = fillTicks(ticks, minuteTicks, "minute", nTicksAround);
                 ticks = fillTicks(ticks, hourTicks, "hour", nTicksAround);
                 ticks = fillTicks(ticks, dayTicks, "day", nTicksAround);
                 ticks = fillTicks(ticks, monthTicks, "month", nTicksAround);
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
-
                 break;
-
             case "h":
                 ticks = fillTicks(ticks, hourTicks, "hour", nTicksAround);
                 ticks = fillTicks(ticks, dayTicks, "day", nTicksAround);
                 ticks = fillTicks(ticks, monthTicks, "month", nTicksAround);
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
-
-                break
-
+                break;
             case "D":
                 ticks = fillTicks(ticks, dayTicks, "day", nTicksAround);
                 ticks = fillTicks(ticks, monthTicks, "month", nTicksAround);
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
-
                 break;
-
             case "W":
                 ticks = fillTicks(ticks, weekTicks, "week", nTicksAround);
                 ticks = fillTicks(ticks, monthTicks, "month", nTicksAround);
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
-
-                break
-
+                break;
             case "M":
                 ticks = fillTicks(ticks, monthTicks, "month", nTicksAround);
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
-
                 break;
-
             case "Y":
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
+                break;
         }
 
         return ticks;
