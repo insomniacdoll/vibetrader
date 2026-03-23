@@ -660,8 +660,11 @@ export class DefaultTSer implements TSer {
         if (idx >= 0 && idx <= lastIdx) {
             return this.#activeTimestamps().get(idx);
 
+        } else if (idx > lastIdx) {
+            return this.timeframe.timeAfterNTimeframes(this.lastOccurredTime(), idx - lastIdx, this.timezone);
+
         } else {
-            this.timeframe.timeAfterNTimeframes(this.lastOccurredTime(), idx - lastIdx, this.timezone);
+            return this.timeframe.timeBeforeNTimeframes(this.firstOccurredTime(), 0 - idx, this.timezone);
         }
     }
 

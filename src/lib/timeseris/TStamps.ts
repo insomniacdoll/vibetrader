@@ -112,8 +112,7 @@ export class TStampsOnOccurred extends TStamps {
     }
 
     /**
-     * Get nearest row that can also properly extends before firstOccurredTime or after
-     * lastOccurredTime
+     * Get nearest row that can also properly extends before firstOccurredTime or after lastOccurredTime
      */
     rowOfTime(time: number): number {
         const lastOccurredIdx = this.size() - 1;
