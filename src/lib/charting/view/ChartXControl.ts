@@ -199,11 +199,11 @@ export class ChartXControl {
         this.baseSer = baseSer;
         this.wChart = wChart;
 
-        this.#internal_initCrosshairRow()
+        this.internal_initCrosshairRow()
     }
 
     reinit() {
-        this.#internal_initCrosshairRow()
+        this.internal_initCrosshairRow()
     }
 
     rightSideRow = 0;
@@ -222,9 +222,7 @@ export class ChartXControl {
     fixedNBars?: number;
     fixedLeftSideTime?: number;
 
-    #lastOccurredRowOfBaseSer = 0;
     #isAutoScrollToNewData = true;
-    #isMouseEnteredAnyChartPane = false;
 
     isCrosshairVisible = true;
 
@@ -234,10 +232,10 @@ export class ChartXControl {
 
     setChartWidth(width: number) {
         this.wChart = width;
-        this.#updateGeometry();
+        this.updateGeometry();
     }
 
-    #updateGeometry() {
+    private updateGeometry() {
         /**
          * !NOTE
          * 1.Should get wBar firstly, then calculator nBars
@@ -463,7 +461,7 @@ export class ChartXControl {
         return this.br(this.baseSer.rowOfTime(time))
     }
 
-    #internal_initCrosshairRow() {
+    private internal_initCrosshairRow() {
         /**
          * baseSer may have finished computing at this time, to adjust
          * the cursor to proper row, update it here.
@@ -472,21 +470,6 @@ export class ChartXControl {
          */
         const row = this.baseSer.lastOccurredRow();
         this.setCrosshairByRow(row, row, true)
-    }
-
-    get isMouseEnteredAnyChartPane() {
-        return this.#isMouseEnteredAnyChartPane;
-    }
-    set isMouseEnteredAnyChartPane(b: boolean) {
-        const oldValue = this.#isMouseEnteredAnyChartPane
-        this.#isMouseEnteredAnyChartPane = b
-
-        if (!this.#isMouseEnteredAnyChartPane) {
-            /** this cleanups mouse crosshair */
-            if (this.#isMouseEnteredAnyChartPane != oldValue) {
-                this.#updateGeometry();
-            }
-        }
     }
 
     get isAutoScrollToNewData() {
@@ -518,9 +501,9 @@ export class ChartXControl {
         }
 
         // console.log(this.#wBarIdx)
-        this.#internal_setWBar(ChartXControl.PREDEFINED_BAR_WIDTHS[this.#wBarIdx]);
+        this.internal_setWBar(ChartXControl.PREDEFINED_BAR_WIDTHS[this.#wBarIdx]);
 
-        this.#updateGeometry()
+        this.updateGeometry()
     }
 
 
@@ -564,9 +547,9 @@ export class ChartXControl {
             }
         }
 
-        this.#internal_setWBar(newWBar)
+        this.internal_setWBar(newWBar)
 
-        this.#updateGeometry()
+        this.updateGeometry()
     }
 
     get isOnCalendarMode() {
@@ -583,16 +566,16 @@ export class ChartXControl {
                 this.baseSer.toOnOccurredMode()
             }
 
-            this.#internal_setReferCrosshairByTime(referCrosshairTime1);
-            this.#internal_setRightCrosshairByTime(rightCrosshairTime1);
+            this.internal_setReferCrosshairByTime(referCrosshairTime1);
+            this.internal_setRightCrosshairByTime(rightCrosshairTime1);
 
-            this.#updateGeometry();
+            this.updateGeometry();
         }
     }
 
     setCrosshairByRow(referRow: number, rightRow: number, willUpdateViews: boolean) {
         /** set right crosshair row first and directly */
-        this.#internal_setRightSideRow(rightRow, willUpdateViews)
+        this.internal_setRightSideRow(rightRow, willUpdateViews)
 
         const oldValue = this.referCrosshairRow
         this.scrollReferCrosshair(referRow - oldValue, willUpdateViews)
@@ -614,26 +597,26 @@ export class ChartXControl {
         // if refCrosshair is near left/right side, check if need to scroll chart except referCursur
         const rightPadding = rightRow - referRow
         if (rightPadding < ChartXControl.REF_PADDING_RIGHT) {
-            this.#internal_setRightSideRow(rightRow + ChartXControl.REF_PADDING_RIGHT - rightPadding, willUpdateViews)
+            this.internal_setRightSideRow(rightRow + ChartXControl.REF_PADDING_RIGHT - rightPadding, willUpdateViews)
 
         } else {
             /** right spacing is enough, check left spacing: */
             const leftRow = rightRow - this.nBars + 1
             const leftPadding = referRow - leftRow
             if (leftPadding < ChartXControl.REF_PADDING_LEFT) {
-                this.#internal_setRightSideRow(rightRow + leftPadding - ChartXControl.REF_PADDING_LEFT, willUpdateViews)
+                this.internal_setRightSideRow(rightRow + leftPadding - ChartXControl.REF_PADDING_LEFT, willUpdateViews)
             }
         }
 
-        this.#internal_setReferCrosshairRow(referRow, willUpdateViews)
+        this.internal_setReferCrosshairRow(referRow, willUpdateViews)
 
-        this.#updateGeometry();
+        this.updateGeometry();
     }
 
     /** keep refer crosshair stay on same x of screen, and scroll charts left or right by bar */
     scrollChartsHorizontallyByBar(increment: number) {
         const rightRow = this.rightSideRow;
-        this.#internal_setRightSideRow(rightRow + increment)
+        this.internal_setRightSideRow(rightRow + increment)
 
         this.scrollReferCrosshair(increment, true)
     }
@@ -675,7 +658,7 @@ export class ChartXControl {
      * as we don't like referCrosshair and rightCrosshair being set directly by others,
      * the following setter methods are named internal_setXXX, and are private.
      */
-    #internal_setWBar(wBar: number) {
+    private internal_setWBar(wBar: number) {
         const oldValue = this.wBar
         this.wBar = wBar
         if (this.wBar != oldValue) {
@@ -683,22 +666,20 @@ export class ChartXControl {
         }
     }
 
-    #internal_setReferCrosshairRow(row: number, boolean = true) {
+    private internal_setReferCrosshairRow(row: number, boolean = true) {
         this.referCrosshairRow = row
-        // remember the lastRow for decision if need update cursor, see changeCursorByRow() 
-        this.#lastOccurredRowOfBaseSer = this.baseSer.lastOccurredRow()
     }
 
-    #internal_setRightSideRow(row: number, notify: boolean = true) {
+    private internal_setRightSideRow(row: number, notify: boolean = true) {
         this.rightSideRow = row
     }
 
-    #internal_setReferCrosshairByTime(time: number, notify: boolean = true) {
-        this.#internal_setReferCrosshairRow(this.baseSer.rowOfTime(time), notify)
+    private internal_setReferCrosshairByTime(time: number, notify: boolean = true) {
+        this.internal_setReferCrosshairRow(this.baseSer.rowOfTime(time), notify)
     }
 
-    #internal_setRightCrosshairByTime(time: number) {
-        this.#internal_setRightSideRow(this.baseSer.rowOfTime(time))
+    private internal_setRightCrosshairByTime(time: number) {
+        this.internal_setRightSideRow(this.baseSer.rowOfTime(time))
     }
 
     // DIRECTION = -1: Left
@@ -717,62 +698,6 @@ export class ChartXControl {
             : this.isMovingAccelerated ? Math.floor(this.nBars * 0.168) : 1
 
         this.scrollChartsHorizontallyByBar(nBarsToMove * DIRECTION)
-    }
-
-
-    // popupViewToDesktop(view: ChartView, dim: DOMRect, alwaysOnTop: boolean, joint: boolean) {
-    //   const popupView = view;
-
-    //   this.popupViewRefs.set(popupView, undefined)
-    //   // addKeyMouseListenersTo(popupView)
-
-    //   const w = dim.width
-    //   const h = dim.height
-    //   const frame = new JFrame//new JDialog (), true);
-    //   frame.setAlwaysOnTop(alwaysOnTop)
-    //   frame.setTitle(popupView.mainSer.shortName)
-    //   frame.add(popupView, BorderLayout.CENTER)
-    //   const screenSize = Toolkit.getDefaultToolkit.getScreenSize
-    //   frame.setBounds((screenSize.width - w) / 2, (screenSize.height - h) / 2, w, h)
-    //   frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-    //   frame.addWindowListener(new WindowAdapter {
-    //     windowClosed(e: WindowEvent) {
-    //       removeKeyMouseListenersFrom(popupView)
-    //       popupViewRefs.remove(popupView)
-    //     }
-    //   })
-
-    //   frame.setVisible(true)
-    // }
-
-    protected finalize() {
-        //deafTo(baseSer)
-
-        //super.finalize
-    }
-
-    private updateView(toTime: number) {
-        // switch (this.viewContainer.masterView) {
-        //   case view: WithDrawingPane:
-        //     const drawing = view.selectedDrawing
-        //     if (drawing != null && drawing.isInDrawing) {
-        //       return
-        //     }
-        //     break;
-        //   default:
-        // }
-
-        const oldReferRow = this.referCrosshairRow;
-        if (oldReferRow === this.#lastOccurredRowOfBaseSer || this.#lastOccurredRowOfBaseSer <= 0) {
-            /** update only when the old lastRow is extratly oldReferRow, or prev lastRow <= 0 */
-            const lastTime = Math.max(toTime, this.baseSer.lastOccurredTime());
-            const referRow = this.baseSer.rowOfTime(lastTime);
-            const rightRow = this.isFixedLeftSideTime() ? this.rightSideRow : referRow;
-
-            this.setCrosshairByRow(referRow, rightRow, true)
-        }
-
-        //this.notifyChanged(classOf<ChartValidityObserver>)
     }
 
 }
