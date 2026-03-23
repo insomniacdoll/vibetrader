@@ -95,8 +95,8 @@ type Props = {
 
 type State = {
     chartviewWidth: number
-    updateEvent?: UpdateEvent;
-    updateDrawing?: UpdateDrawing;
+    updateEvent: UpdateEvent;
+    updateDrawing: UpdateDrawing;
 
     overlayIndicators?: Indicator[];
     stackedIndicators?: Indicator[];
@@ -1274,7 +1274,7 @@ class KlineViewContainer extends Component<Props, State> {
                             <Divider staticColor='auto' />
 
                             <TooltipTrigger placement="end">
-                                <ToggleButton isSelected={this.state.updateDrawing?.isHidingDrawing} onPress={() => this.setState({
+                                <ToggleButton isSelected={this.state.updateDrawing.isHidingDrawing} onPress={() => this.setState({
                                     updateDrawing: { isHidingDrawing: !this.state.updateDrawing.isHidingDrawing }
                                 })}
                                 >
@@ -1315,7 +1315,7 @@ class KlineViewContainer extends Component<Props, State> {
                             </TooltipTrigger>
 
                             <TooltipTrigger placement="end">
-                                <ToggleButton isSelected={this.xc?.isOnCalendarMode} onPress={this.toggleOnCalendarMode} >
+                                <ToggleButton isSelected={this.xc?.isOnCalendarMode ?? false} onPress={this.toggleOnCalendarMode} >
                                     <UnlinkHoriz />
                                 </ToggleButton>
                                 <Tooltip >
