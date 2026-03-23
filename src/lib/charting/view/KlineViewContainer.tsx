@@ -1274,12 +1274,12 @@ class KlineViewContainer extends Component<Props, State> {
                             <Divider staticColor='auto' />
 
                             <TooltipTrigger placement="end">
-                                <ActionButton onPress={() => this.setState({
+                                <ToggleButton isSelected={this.state.updateDrawing?.isHidingDrawing} onPress={() => this.setState({
                                     updateDrawing: { isHidingDrawing: !this.state.updateDrawing.isHidingDrawing }
                                 })}
                                 >
                                     <SelectNo />
-                                </ActionButton>
+                                </ToggleButton>
                                 <Tooltip >
                                     Hide drawings
                                 </Tooltip>
@@ -1315,9 +1315,9 @@ class KlineViewContainer extends Component<Props, State> {
                             </TooltipTrigger>
 
                             <TooltipTrigger placement="end">
-                                <ActionButton onPress={this.toggleOnCalendarMode} >
+                                <ToggleButton isSelected={this.xc?.isOnCalendarMode} onPress={this.toggleOnCalendarMode} >
                                     <UnlinkHoriz />
-                                </ActionButton>
+                                </ToggleButton>
                                 <Tooltip >
                                     Toggle Calendar/Occurred mode
                                 </Tooltip>
