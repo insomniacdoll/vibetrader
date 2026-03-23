@@ -46,8 +46,8 @@ const PlotHline = (props: PlotProps) => {
         }
 
         const y = yc.yv(value)
-        path.moveto(0, y);
-        path.lineto(xc.wChart, y)
+        path.moveto(0, y)
+            .lineto(xc.wChart, y);
 
         return segs
     }

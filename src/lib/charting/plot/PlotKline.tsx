@@ -118,16 +118,16 @@ const PlotKline = (props: KlineProps) => {
 
         } else {
             path.moveto(x - r, yUpper)
-            path.lineto(x + r, yUpper)
-            path.lineto(x + r, yLower)
-            path.lineto(x - r, yLower)
-            path.closepath()
+                .lineto(x + r, yUpper)
+                .lineto(x + r, yLower)
+                .lineto(x - r, yLower)
+                .closepath();
 
             path.moveto(x, yUpper)
-            path.lineto(x, yHigh)
+                .lineto(x, yHigh);
 
             path.moveto(x, yLower)
-            path.lineto(x, yLow)
+                .lineto(x, yLow);
         }
     }
 
@@ -150,17 +150,17 @@ const PlotKline = (props: KlineProps) => {
 
         if (width <= 2) {
             path.moveto(x, yHigh)
-            path.lineto(x, yLow)
+                .lineto(x, yLow);
 
         } else {
             path.moveto(x, yHigh)
-            path.lineto(x, yLow)
+                .lineto(x, yLow);
 
             path.moveto(x - r, yOpen)
-            path.lineto(x, yOpen)
+                .lineto(x, yOpen);
 
             path.moveto(x, yClose)
-            path.lineto(x + r, yClose)
+                .lineto(x + r, yClose);
         }
 
     }
@@ -201,8 +201,8 @@ const PlotKline = (props: KlineProps) => {
                 if (xc.nBarsCompressed > 1) {
                     // draw a vertical line to cover the min to max
                     const x = xc.xb(bar)
-                    path.moveto(x, yc.yv(min));
-                    path.lineto(x, yc.yv(max));
+                    path.moveto(x, yc.yv(min))
+                        .lineto(x, yc.yv(max));
 
                 } else {
                     if (y1 !== undefined) {
@@ -210,8 +210,8 @@ const PlotKline = (props: KlineProps) => {
                         // think about the case of on calendar day mode
                         const x1 = xc.xb(bar - xc.nBarsCompressed)
                         const x2 = xc.xb(bar)
-                        path.moveto(x1, y1);
-                        path.lineto(x2, y2);
+                        path.moveto(x1, y1)
+                            .lineto(x2, y2);
                     }
                 }
                 y1 = y2;

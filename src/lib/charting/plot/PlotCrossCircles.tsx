@@ -51,14 +51,16 @@ const PlotCrossCircles = (props: PlotProps) => {
 
                     switch (options.style) {
                         case 'style_circles':
-                            segs.push(new Circle(x2, y2, r))
+                            segs.push(new Circle(x2, y2, r));
+
                             break
 
                         case 'style_cross':
                             path.moveto(x2, y2 - d)
-                            path.lineto(x2, y2)
-                            path.moveto(x2 - r, y2 - r)
-                            path.lineto(x2 + r, y2 - r)
+                                .lineto(x2, y2)
+                                .moveto(x2 - r, y2 - r)
+                                .lineto(x2 + r, y2 - r);
+
                             break
                     }
 

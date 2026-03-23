@@ -18,10 +18,10 @@ const PlotLine = (props: PlotProps) => {
             if (y !== undefined) {
                 if (prevY === undefined) {
                     // new segment
-                    path.moveto(x, y)
+                    path.moveto(x, y);
 
                 } else {
-                    path.lineto(x, y)
+                    path.lineto(x, y);
                 }
             }
 

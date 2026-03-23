@@ -41,14 +41,14 @@ const PlotHistogram = (props: PlotProps) => {
                 const x = xc.xb(bar)
 
                 if (thin || xc.wBar <= 2) {
-                    path.moveto(x, y0);
-                    path.lineto(x, yValue);
+                    path.moveto(x, y0)
+                        .lineto(x, yValue);
 
                 } else {
                     path.moveto(x - r, y0)
-                    path.lineto(x - r, yValue)
-                    path.lineto(x + r, yValue)
-                    path.lineto(x + r, y0)
+                        .lineto(x - r, yValue)
+                        .lineto(x + r, yValue)
+                        .lineto(x + r, y0);
                 }
             }
         }

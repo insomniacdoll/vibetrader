@@ -89,8 +89,8 @@ const PlotDrawingLine = ({ xc, yc, tvar, atIndex, options }: PlotProps) => {
                     startY = Math.max(0, Math.min(chartHeight, startY));
                     endY = Math.max(0, Math.min(chartHeight, endY));
 
-                    path.moveto(xPos1, startY);
-                    path.lineto(xPos2, endY);
+                    path.moveto(xPos1, startY)
+                        .lineto(xPos2, endY);
 
                 } else {
                     const k = dy / dx;
@@ -146,8 +146,8 @@ const PlotDrawingLine = ({ xc, yc, tvar, atIndex, options }: PlotProps) => {
                             break;
                     }
 
-                    path.moveto(startX, startY);
-                    path.lineto(endX, endY);
+                    path.moveto(startX, startY)
+                        .lineto(endX, endY);
                 }
 
                 path.stroke = color || "#2962FF"; // #2962FF is the default drawing color

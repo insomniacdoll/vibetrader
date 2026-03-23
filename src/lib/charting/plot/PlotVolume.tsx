@@ -55,14 +55,14 @@ const PlotVolmue = (props: VolumeProps) => {
 
                 const y2 = yc.yv(volume)
                 if (thin || xc.wBar <= 2) {
-                    path.moveto(x, y1);
-                    path.lineto(x, y2);
+                    path.moveto(x, y1)
+                        .lineto(x, y2);
 
                 } else {
                     path.moveto(x - r, y1)
-                    path.lineto(x - r, y2)
-                    path.lineto(x + r, y2)
-                    path.lineto(x + r, y1)
+                        .lineto(x - r, y2)
+                        .lineto(x + r, y2)
+                        .lineto(x + r, y1);
                 }
             }
         }

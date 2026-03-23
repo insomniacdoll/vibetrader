@@ -28,11 +28,11 @@ const PlotStepLine = (props: PlotProps) => {
 
                 } else {
                     if (prevY === y) {
-                        path.lineto(x, y)
+                        path.lineto(x, y);
 
                     } else {
                         path.lineto(x + r, prevY)
-                        path.lineto(x + r, y)
+                            .lineto(x + r, y);
                     }
                 }
             }

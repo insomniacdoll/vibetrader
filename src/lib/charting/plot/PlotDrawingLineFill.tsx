@@ -118,10 +118,10 @@ const PlotDrawingLineFill = ({ xc, yc, tvar, atIndex }: PlotProps) => {
                 }
 
                 // Draw the polygon: Start1 -> End1 -> End2 -> Start2 -> Close
-                path.moveto(coords1.startX, coords1.startY);
-                path.lineto(coords1.endX, coords1.endY);
-                path.lineto(coords2.endX, coords2.endY);
-                path.lineto(coords2.startX, coords2.startY);
+                path.moveto(coords1.startX, coords1.startY)
+                    .lineto(coords1.endX, coords1.endY)
+                    .lineto(coords2.endX, coords2.endY)
+                    .lineto(coords2.startX, coords2.startY);
                 // In a standard SVG Path class, there might be a close() or Z() method. 
                 // If not, just lineTo back to the start:
                 path.lineto(coords1.startX, coords1.startY);
