@@ -1,5 +1,11 @@
 # VibeTrader 
-Toward an Open Source AI-Friendly Trading Platform
+Toward an Open Source AI-Friendly Trading Platform. 
+- APIs for specifying ticker, timeframe, and indicators etc.
+- Supports Pine Script indicators.
+- Take screenshot of chart.
+
+> **About Pine Script™?**  
+> [Pine Script™](https://www.tradingview.com/pine-script-docs/welcome/) is a domain-specific programming language created by TradingView for writing custom technical analysis indicators and strategies.
 
 ## For Developers
 https://deepwiki.com/dcaoyuan/vibetrader
