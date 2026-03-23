@@ -8,6 +8,9 @@ Toward an Open Source AI-Friendly Trading Platform.
 > [Pine Script™](https://www.tradingview.com/pine-script-docs/welcome/) is a domain-specific programming language created by TradingView for writing custom technical analysis indicators and strategies.
 
 ## For Developers
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dcaoyuan/vibetrader)
+
 https://deepwiki.com/dcaoyuan/vibetrader
 
 ## For Users
