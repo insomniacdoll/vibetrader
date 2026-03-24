@@ -135,7 +135,7 @@ const allIndTags = dev
 // used for space between indicator panes and place for indicator value labels.    
 export const H_SPACING = 25;
 
-const H_TITLE = 26;
+const H_TITLE = 20;
 const H_INDICATOR_TAGS = 28;
 
 export const H_HEADER = 40;
@@ -1423,8 +1423,8 @@ class KlineViewContainer extends Component<Props, State> {
 
                     </div>}
 
-                {/* View Container, width should be set at '.viewcontainer' in vibetrader.css */}
-                <div className="viewcontainer" style={{ paddingLeft: '6px', width: this.props.width || '100%', height: this.geom.containerHeight + 'px' }}
+                {/* View Container, width should be set at '.viewcontainer' in vibetrader.css.  "positioned" it for tags position */}
+                <div className="viewcontainer" style={{ position: 'relative', paddingLeft: '6px', width: this.props.width || '100%', height: this.geom.containerHeight + 'px' }}
                     key="klineviewcontainer"
                     ref={this.chartviewRef}
                     tabIndex={-1} // required for programmatically focusing non-inputs
@@ -1438,41 +1438,44 @@ class KlineViewContainer extends Component<Props, State> {
                             />
                         </div>
 
-                        {/* Indicator tags */}
-                        {this.props.chartOnly === false &&
-                            <div style={{
-                                position: 'absolute',
-                                top: this.geom.yKlineView - 20,
-                                zIndex: 2, // ensure it's above the SVG
-                                backgroundColor: 'transparent',
-                                display: 'flex',
-                                justifyContent: 'flex-start',
-                                height: H_INDICATOR_TAGS,
-                                paddingTop: "0px"
-                            }}>
-                                <TagGroup
-                                    aria-label="Or need 'label' that will show" // An aria-label or aria-labelledby prop is required for accessibility.
-                                    size="S"
-                                    selectionMode="multiple"
-                                    selectedKeys={this.state.selectedIndicatorTags}
-                                    onSelectionChange={this.setSelectedIndicatorTags}
-                                >
-                                    {allIndTags.map((tag, n) =>
-                                        <Tag key={"ind-tag-" + n} id={tag}>{tag.toUpperCase()}</Tag>
-                                    )}
-                                </TagGroup>
-                            </div>}
+                        <div style={{ position: 'relative' }}>
+                            {/* Indicator tags */}
+                            {this.props.chartOnly === false &&
+                                <div style={{
+                                    position: 'absolute', // relative to the closest positioned ancestor,
+                                    top: 39,
+                                    left: 0,
+                                    zIndex: 2, // ensure it's above the SVG
+                                    backgroundColor: 'transparent',
+                                    display: 'flex',
+                                    justifyContent: 'flex-start',
+                                    height: H_INDICATOR_TAGS,
+                                    paddingTop: "0px"
+                                }}>
+                                    <TagGroup
+                                        aria-label="Or need 'label' that will show" // An aria-label or aria-labelledby prop is required for accessibility.
+                                        size="S"
+                                        selectionMode="multiple"
+                                        selectedKeys={this.state.selectedIndicatorTags}
+                                        onSelectionChange={this.setSelectedIndicatorTags}
+                                    >
+                                        {allIndTags.map((tag, n) =>
+                                            <Tag key={"ind-tag-" + n} id={tag}>{tag.toUpperCase()}</Tag>
+                                        )}
+                                    </TagGroup>
+                                </div>}
 
-                        {/* Main svg chart part */}
-                        <div style={{ position: 'relative', width: '100%', height: this.geom.svgHeight }}
-                            onDoubleClick={this.onDoubleClick}
-                            onMouseLeave={this.onMouseLeave}
-                            onMouseMove={this.onMouseMove}
-                            onMouseDown={this.onMouseDown}
-                            onMouseUp={this.onMouseUp}
-                        // onWheel={this.onWheel}
-                        >
-                            {this.renderSvgChart()}
+                            {/* Main svg chart part */}
+                            <div style={{ position: 'relative', width: '100%', height: this.geom.svgHeight }}
+                                onDoubleClick={this.onDoubleClick}
+                                onMouseLeave={this.onMouseLeave}
+                                onMouseMove={this.onMouseMove}
+                                onMouseDown={this.onMouseDown}
+                                onMouseUp={this.onMouseUp}
+                            // onWheel={this.onWheel}
+                            >
+                                {this.renderSvgChart()}
+                            </div>
                         </div>
                     </>)}
 
