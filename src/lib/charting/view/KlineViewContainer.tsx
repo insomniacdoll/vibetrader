@@ -45,39 +45,22 @@ import {
 } from "@react-spectrum/s2";
 
 import Line from '@react-spectrum/s2/icons/Line';
-import Edit from '@react-spectrum/s2/icons/Edit';
-import Copy from '@react-spectrum/s2/icons/Copy';
-import Delete from '@react-spectrum/s2/icons/Delete';
 import Properties from '@react-spectrum/s2/icons/Properties';
 import AudioWave from '@react-spectrum/s2/icons/AudioWave';
-import GridTypeLines from '@react-spectrum/s2/icons/GridTypeLines';
-import LineHeight from '@react-spectrum/s2/icons/LineHeight';
-import ChartTrend from '@react-spectrum/s2/icons/ChartTrend';
 import Collection from '@react-spectrum/s2/icons/Collection';
 import DistributeSpaceHorizontally from '@react-spectrum/s2/icons/DistributeSpaceHorizontally';
-import EditNo from '@react-spectrum/s2/icons/EditNo';
-import Erase from '@react-spectrum/s2/icons/Erase';
 import SelectNo from '@react-spectrum/s2/icons/SelectNo';
 import SelectNone from '@react-spectrum/s2/icons/SelectNone';
-import New from '@react-spectrum/s2/icons/New';
 import Maximize from '@react-spectrum/s2/icons/Maximize';
 import BrightnessContrast from '@react-spectrum/s2/icons/BrightnessContrast';
-import Background from '@react-spectrum/s2/icons/Background';
 import HelpCircle from '@react-spectrum/s2/icons/HelpCircle';
-import AlignTop from '@react-spectrum/s2/icons/AlignTop';
 import DistributeHorizontalCenter from '@react-spectrum/s2/icons/DistributeHorizontalCenter';
-import MenuHamburger from '@react-spectrum/s2/icons/MenuHamburger';
-import Prototyping from '@react-spectrum/s2/icons/Prototyping';
-import Add from '@react-spectrum/s2/icons/Add';
 import RectangleHoriz from '@react-spectrum/s2/icons/RectangleHoriz';
 import DirectSelect from '@react-spectrum/s2/icons/DirectSelect';
 import DistributeSpaceVertically from '@react-spectrum/s2/icons/DistributeSpaceVertically';
-import Resize from '@react-spectrum/s2/icons/Resize';
-import StrokeWidth from '@react-spectrum/s2/icons/StrokeWidth';
 import Percentage from '@react-spectrum/s2/icons/Percentage';
 import UnlinkHoriz from '@react-spectrum/s2/icons/UnlinkHoriz';
 import Exposure from '@react-spectrum/s2/icons/Exposure';
-import FullScreenExit from '@react-spectrum/s2/icons/FullScreenExit';
 import { fetchData, Source } from "../../domain/DataFecther";
 import { styleOfAnnot } from "../../colors";
 import Header from "../pane/Header";
@@ -1423,7 +1406,7 @@ class KlineViewContainer extends Component<Props, State> {
 
                     </div>}
 
-                {/* View Container, width should be set at '.viewcontainer' in vibetrader.css.  "positioned" it for tags position */}
+                {/* View Container */}
                 <div className="viewcontainer" style={{ position: 'relative', paddingLeft: '6px', width: this.props.width || '100%', height: this.geom.containerHeight + 'px' }}
                     key="klineviewcontainer"
                     ref={this.chartviewRef}
