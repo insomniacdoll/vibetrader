@@ -1,7 +1,7 @@
 # VibeTrader 
 Toward an Open Source AI-Friendly Trading Platform. 
 - APIs for specifying ticker, timeframe, and indicators etc.
-- Supports Pine Script indicators.
+- Supports Pine Script indicators via [PineTS](https://github.com/QuantForgeOrg/PineTS).
 - Take screenshot of chart.
 
 > [Pine Script™](https://www.tradingview.com/pine-script-docs/welcome/) is a trademark of TradingView, Inc., and serves as their programming language for creating custom trading tools. VibeTrader is an independent platform and is not affiliated with, endorsed by, or sponsored by TradingView.
