@@ -275,7 +275,7 @@ export class ChartXControl {
         const nTicksAround = Math.round(this.wChart / MIN_TICK_SPACING);
         const tzone = this.baseSer.timezone;
         const tframe = this.baseSer.timeframe;
-        const shortName = tframe.unit.shortName;
+        const tunit = tframe.unit;
 
         // We only need previous values, not full Temporal objects, to detect crossings
         let prevYear: number | undefined;
@@ -307,7 +307,7 @@ export class ChartXControl {
                     monthTicks.push({ dt, x, level: "month" });
                 }
                 // Check Week (Only if timeframe is Weekly)
-                else if (shortName === 'W' && dt.weekOfYear !== prevWeek) {
+                else if (tunit === TUnit.Week && dt.weekOfYear !== prevWeek) {
                     weekTicks.push({ dt, x, level: "week" });
                 }
                 // Check Day
@@ -336,35 +336,35 @@ export class ChartXControl {
         let ticks: Tick[] = [];
 
         // The cascading fills remain the same, but now benefit from full data and collision handling
-        switch (shortName) {
-            case "m":
+        switch (tunit) {
+            case TUnit.Minute:
                 ticks = fillTicks(ticks, minuteTicks, "minute", nTicksAround);
                 ticks = fillTicks(ticks, hourTicks, "hour", nTicksAround);
                 ticks = fillTicks(ticks, dayTicks, "day", nTicksAround);
                 ticks = fillTicks(ticks, monthTicks, "month", nTicksAround);
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
                 break;
-            case "h":
+            case TUnit.Hour:
                 ticks = fillTicks(ticks, hourTicks, "hour", nTicksAround);
                 ticks = fillTicks(ticks, dayTicks, "day", nTicksAround);
                 ticks = fillTicks(ticks, monthTicks, "month", nTicksAround);
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
                 break;
-            case "D":
+            case TUnit.Day:
                 ticks = fillTicks(ticks, dayTicks, "day", nTicksAround);
                 ticks = fillTicks(ticks, monthTicks, "month", nTicksAround);
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
                 break;
-            case "W":
+            case TUnit.Week:
                 ticks = fillTicks(ticks, weekTicks, "week", nTicksAround);
                 ticks = fillTicks(ticks, monthTicks, "month", nTicksAround);
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
                 break;
-            case "M":
+            case TUnit.Month:
                 ticks = fillTicks(ticks, monthTicks, "month", nTicksAround);
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
                 break;
-            case "Y":
+            case TUnit.Year:
                 ticks = fillTicks(ticks, yearTicks, "year", nTicksAround);
                 break;
         }
