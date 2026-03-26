@@ -12,7 +12,7 @@ type Tick = {
 }
 
 const MIN_TICK_SPACING = 100 // in pixels
-const COLLISION_THRESHOLD = 10 // in pixels
+const COLLISION_THRESHOLD = 50 // in pixels
 
 const LOCATOR_DICT: Record<string, number[][]> = {
     year: [
