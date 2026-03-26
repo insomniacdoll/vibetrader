@@ -1316,7 +1316,7 @@ class KlineViewContainer extends Component<Props, State> {
                             </TooltipTrigger>
 
                             <TooltipTrigger placement="end">
-                                <ToggleButton isSelected={this.xc?.isCrosshairEnabled} onPress={this.toggleCrosshairVisiable} >
+                                <ToggleButton isSelected={this.xc?.isCrosshairEnabled ?? false} onPress={this.toggleCrosshairVisiable} >
                                     <RectangleHoriz />
                                 </ToggleButton>
                                 <Tooltip >
