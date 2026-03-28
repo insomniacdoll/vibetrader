@@ -319,14 +319,19 @@ class KlineViewContainer extends Component<Props, State> {
                                 }
 
                                 // console.log(result)
-                                console.log(scriptName + ' data:\n', data)
+                                console.log(scriptName + ' plots:\n', plots)
                                 console.log(scriptName + ' options:\n', plots.map(x => JSON.stringify(x.options)))
 
                                 const plotKeys = plots.map((p) => p._plotKey)
 
                                 const isOverlayIndicator = indicator !== undefined && indicator.overlay
 
-                                const [overlayOutputs, stackedOutputs] = plots.reduce(([overlayOutputs, stackedOutputs], { title, options }, atIndex) => {
+                                const [overlayOutputs, stackedOutputs] = plots.reduce(([overlayOutputs, stackedOutputs], { title, options, data }, atIndex) => {
+                                    // Filter out empty plots that are brought by PineTS v0.9.8 [TODO]
+                                    if (data.length === 1 && Array.isArray(data[0].value) && data[0].value.length === 0) {
+                                        return [overlayOutputs, stackedOutputs]
+                                    }
+
                                     const style = options.style
                                     const location = options.location
                                     const isForceOverlay = options.force_overlay === true
