@@ -865,7 +865,7 @@ class KlineViewContainer extends Component<Props, State> {
         // Clear out any old screenshot and start the loading state
         this.screenshotCanvas = undefined;
         this.setState({ isGeneratingScreenshot: true }, () => {
-            this.takeScreenshot().then(screenshot => {
+            this.takeScreenshot(true).then(screenshot => {
                 this.screenshotCanvas = screenshot;
 
                 this.setState({ isGeneratingScreenshot: false });
@@ -873,14 +873,22 @@ class KlineViewContainer extends Component<Props, State> {
         });
     }
 
-    async takeScreenshot(): Promise<HTMLCanvasElement> {
+    async takeScreenshot(includeIndicatorTags?: boolean): Promise<HTMLCanvasElement> {
         console.log(renderToStaticMarkup(this.renderSvgChart()))
 
         if (!this.chartviewRef.current) {
             return document.createElement('canvas');
         }
 
+        const filter = includeIndicatorTags
+            ? undefined
+            : (node: HTMLElement) => {
+                const exclusionClasses = ['indicator-tags'];
+                return !exclusionClasses.some((classname) => node.classList?.contains(classname));
+            }
+
         return toCanvas(this.chartviewRef.current, {
+            filter,
             backgroundColor: 'rgba(0,0,0,0)', // Transparent
             skipFonts: true, // Bypass the Firefox font bug
         }).catch((e: Error) => {
@@ -1431,7 +1439,7 @@ class KlineViewContainer extends Component<Props, State> {
 
                         <div style={{ position: 'relative' }}>
                             {/* Indicator tags */}
-                            {<div style={{
+                            {<div className="indicator-tags" style={{
                                 display: (this.state.isSvgOnly || this.props.chartOnly) ? 'none' : 'flex', // display: 'flex',
                                 position: 'absolute', // relative to the closest positioned ancestor,
                                 top: 39,
