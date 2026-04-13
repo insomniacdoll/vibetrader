@@ -1,32 +1,26 @@
 //@version=6
-indicator("Reading line values demo", overlay = true)
+indicator("Cloning lines demo", overlay = true, max_lines_count = 500)
 
-//@variable The number of bars for rising and falling calculations.
-int length = input.int(2, "Length", 2)
+//@variable The number of bars between each new mainLine assignment.
+int length = input.int(20, "Length", 2, 500)
 
-//@variable A line that's drawn whenever `hlc3` starts rising or falling over `length` bars.
-var line directionLine = na
+//@variable The first `chart.point` used by the `mainLine`. Contains `index` and `time` information.
+firstPoint = chart.point.now(open)
+//@variable The second `chart.point` used by the `mainLine`. Does not contain `time` information.
+secondPoint = chart.point.from_index(bar_index + length, open)
 
-//@variable Is `true` when `hlc3` is rising over `length` bars, `false` otherwise.
-bool rising = ta.rising(hlc3, length)
-//@variable Is `true` when `hlc3` is falling over `length` bars, `false` otherwise.
-bool falling = ta.falling(hlc3, length)
-//@variable Is `true` when a rising or falling pattern begins, `false` otherwise.
-bool newDirection = (rising and not rising[1]) or (falling and not falling[1])
+//@variable A horizontal line drawn at the `open` price once every `length` bars.
+var line mainLine = na
 
-// Update the `directionLine` when `newDirection` is `true`. The line uses the default `xloc.bar_index`.
-if newDirection
-    directionLine := line.new(bar_index - length, hlc3[length], bar_index, hlc3, width = 3)
+if bar_index % length == 0
+    // Assign a new line to the `mainLine` that connects the `firstPoint` to the `secondPoint`.
+    // This line uses the `index` fields from both points as x-coordinates.
+    mainLine := line.new(firstPoint, secondPoint, color = color.purple, width = 2)
 
-//@variable The slope of the `directionLine`.
-float slope = (directionLine.get_y2() - directionLine.get_y1()) / (directionLine.get_x2() - directionLine.get_x1())
-//@variable The value extrapolated from the `directionLine` at the `bar_index`.
-float lineValue = line.get_price(directionLine, bar_index)
+//@variable A copy of the `mainLine`. Changes to this line do not affect the original.
+line copiedLine = line.copy(mainLine)
 
-//@variable Is `color.green` when the `slope` is positive, `color.red` otherwise.
-color slopeColor = slope > 0 ? color.green : color.red
-
-// Update the color of the `directionLine`.
-directionLine.set_color(slopeColor)
-// Plot the `lineValue`.
-plot(lineValue, "Extrapolated value", slopeColor, 3, plot.style_circles)
+// Update the color, style, and second point of the `copiedLine`.
+line.set_color(copiedLine, color.orange)
+line.set_style(copiedLine, line.style_dotted)
+line.set_second_point(copiedLine, chart.point.now(close))

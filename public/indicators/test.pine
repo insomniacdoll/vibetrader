@@ -1,22 +1,31 @@
 //@version=6
-indicator("Technical Analysis Setup", overlay=true)
+indicator("Support & Resistance Levels", overlay=true)
 
-// Moving Averages
-ema20 = ta.ema(close, 20)
-ema50 = ta.ema(close, 50)
-plot(ema20, color=color.blue, title="EMA 20", linewidth=2)
-plot(ema50, color=color.orange, title="EMA 50", linewidth=2)
+// Pivot Points High/Low
+leftBars = 15
+rightBars = 15
+ph = ta.pivothigh(leftBars, rightBars)
+pl = ta.pivotlow(leftBars, rightBars)
 
-// Bollinger Bands
-[middle, upper, lower] = ta.bb(close, 20, 2)
-plot(upper, color=color.new(color.green, 50), title="BB Upper")
-plot(lower, color=color.new(color.green, 50), title="BB Lower")
-fill(plot(upper), plot(lower), color=color.new(color.green, 95))
+// Plotting
+plot(ph, style=plot.style_circles, linewidth=3, color=color.red, offset=-rightBars, title="Resistance")
+plot(pl, style=plot.style_cross, linewidth=3, color=color.green, offset=-rightBars, title="Support")
 
-// Pattern Detection: Bearish Engulfing
-bearishEngulfing = open[1] < close[1] and open > close and open >= close[1] and close <= open[1]
-plotshape(bearishEngulfing, title="Bearish Engulfing", location=location.abovebar, color=color.red, style=shape.triangledown, text="Bear")
+// Extend lines for better visualization (optional simple approach using plotchar for recent levels)
+// We will just stick to pivot points for clarity on the screenshot.
 
-// Pattern Detection: Bullish Engulfing
-bullishEngulfing = open[1] > close[1] and close > open and close >= open[1] and open <= close[1]
-plotshape(bullishEngulfing, title="Bullish Engulfing", location=location.belowbar, color=color.green, style=shape.triangleup, text="Bull")
+// Calculate and display recent significant levels
+var float recent_res = na
+var float recent_sup = na
+
+if not na(ph)
+    recent_res := ph
+if not na(pl)
+    recent_sup := pl
+
+// Plotting horizontal lines for the most recent levels
+// Note: line.new is not supported, so we rely on the visual crosses and manual interpretation of the values.
+// We can use plot to show the 'current' active levels as a stepped line
+plot(recent_res, "Active Resistance", color=color.new(color.red, 50), style=plot.style_stepline)
+plot(recent_sup, "Active Support", color=color.new(color.green, 50), style=plot.style_stepline)
+

@@ -1,0 +1,28 @@
+//@version=5
+indicator("Dynamic Pivot S/R Lines", overlay=true)
+
+leftBars = 20
+rightBars = 20
+ph = ta.pivothigh(high, leftBars, rightBars)
+pl = ta.pivotlow(low, leftBars, rightBars)
+
+
+var line resLine = na
+var line supLine = na
+
+if not na(ph)
+    resLine := line.new(bar_index[rightBars], high[rightBars], bar_index, high[rightBars], color=color.red, width=2, style=line.style_solid, extend=extend.right)
+
+if not na(pl)
+    supLine := line.new(bar_index[rightBars], low[rightBars], bar_index, low[rightBars], color=color.green, width=2, style=line.style_dashed, extend=extend.right)
+
+// 填充支撑阻力区间
+var linefill srZone = na
+if not na(resLine) and not na(supLine)
+    srZone := linefill.new(supLine, resLine, color=color.blue)
+
+
+
+
+    
+

@@ -1,0 +1,31 @@
+
+//@version=5
+indicator("Channel", overlay = true)
+
+LEN_LEFT = 15
+LEN_RIGHT = 5
+pH = ta.pivothigh(LEN_LEFT, LEN_RIGHT)
+pL = ta.pivotlow(LEN_LEFT, LEN_RIGHT)
+
+// Bar indices of pivot points
+pH_x1 = ta.valuewhen(pH, bar_index, 1) - LEN_RIGHT
+pH_x2 = ta.valuewhen(pH, bar_index, 0) - LEN_RIGHT
+pL_x1 = ta.valuewhen(pL, bar_index, 1) - LEN_RIGHT
+pL_x2 = ta.valuewhen(pL, bar_index, 0) - LEN_RIGHT
+// Price values of pivot points
+pH_y1 = ta.valuewhen(pH, pH, 1)
+pH_y2 = ta.valuewhen(pH, pH, 0)
+pL_y1 = ta.valuewhen(pL, pL, 1)
+pL_y2 = ta.valuewhen(pL, pL, 0)
+
+if barstate.islastconfirmedhistory
+    // Lines
+    lH = line.new(pH_x1, pH_y1, pH_x2, pH_y2, extend = extend.right)
+    lL = line.new(pL_x1, pL_y1, pL_x2, pL_y2, extend = extend.right)
+    // Fill
+    fillColor = switch
+        pH_y2 > pH_y1 and pL_y2 > pL_y1 => color.green
+        pH_y2 < pH_y1 and pL_y2 < pL_y1 => color.red
+        => color.silver
+    linefill.new(lH, lL, color.new(fillColor, 90))
+    

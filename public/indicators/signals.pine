@@ -37,7 +37,7 @@ reversalSell = close > upper and rsiVal > 70
 plotshape(trendBuy, title="Trend Buy", style=shape.labelup, location=location.belowbar, color=color.green, text="BUY", textcolor=color.white, size=size.small)
 plotshape(trendSell, title="Trend Sell", style=shape.labeldown, location=location.abovebar, color=color.red, text="SELL", textcolor=color.white, size=size.small)
 
-// Plotting Reversal dots (secondary signals)
-plotshape(reversalBuy, title="Oversold Buy", style=shape.circle, location=location.belowbar, color=color.lime, size=size.tiny)
-plotshape(reversalSell, title="Overbought Sell", style=shape.circle, location=location.abovebar, color=color.maroon, size=size.tiny)
+// // Plotting Reversal dots (secondary signals)
+// plotshape(reversalBuy, title="Oversold Buy", style=shape.circle, location=location.belowbar, color=color.lime, size=size.tiny)
+// plotshape(reversalSell, title="Overbought Sell", style=shape.circle, location=location.abovebar, color=color.maroon, size=size.tiny)
 

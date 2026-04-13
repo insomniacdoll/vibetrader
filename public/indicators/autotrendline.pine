@@ -1,0 +1,42 @@
+//@version=6
+indicator("Auto Trendlines using line.*", overlay=true)
+
+// ph_time = time[15]
+// log.info("{0}", ph_time)
+
+// var pl_times = array.new_int(0)
+// array.unshift(pl_times, time[15])
+
+
+// Find pivots
+leftBars = 15
+rightBars = 15
+ph = ta.pivothigh(high, leftBars, rightBars)
+pl = ta.pivotlow(low, leftBars, rightBars)
+
+// Arrays to store past pivots
+var ph_prices = array.new_float(0)
+var ph_times = array.new_int(0)
+var pl_prices = array.new_float(0)
+var pl_times = array.new_int(0)
+
+if not na(ph)
+    array.unshift(ph_prices, ph)
+    array.unshift(ph_times, time[rightBars])
+    if array.size(ph_prices) > 2
+        array.pop(ph_prices)
+        array.pop(ph_times)
+        
+if not na(pl)
+    array.unshift(pl_prices, pl)
+    array.unshift(pl_times, time[rightBars])
+    if array.size(pl_prices) > 2
+        array.pop(pl_prices)
+        array.pop(pl_times)
+        
+// Draw lines only on the last bar
+if barstate.islast
+    if array.size(ph_prices) >= 2
+        line.new(x1=array.get(ph_times, 1), y1=array.get(ph_prices, 1), x2=array.get(ph_times, 0), y2=array.get(ph_prices, 0), xloc=xloc.bar_time, color=color.red, width=3, extend=extend.right, style=line.style_solid)
+    if array.size(pl_prices) >= 2
+        line.new(x1=array.get(pl_times, 1), y1=array.get(pl_prices, 1), x2=array.get(pl_times, 0), y2=array.get(pl_prices, 0), xloc=xloc.bar_time, color=color.green, width=3, extend=extend.right, style=line.style_solid)

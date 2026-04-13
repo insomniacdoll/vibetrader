@@ -1,0 +1,31 @@
+//@version=6
+indicator("AAPL Institutional Liquidity Grid", overlay=true)
+
+// Function: Draw persistence lines for levels
+draw_level(price, color_in, width_in) =>
+    line.new(bar_index - 30, price, bar_index, price, color=color_in, width=width_in)
+
+// 1. Identify Institutional "Order Block" levels using Pivots
+ph = ta.pivothigh(high, 10, 10)
+pl = ta.pivotlow(low, 10, 10)
+
+if not na(ph)
+    draw_level(ph, color.new(color.red, 40), 2)
+if not na(pl)
+    draw_level(pl, color.new(color.green, 40), 2)
+
+// 2. Mean Reversion Lines (The "Fair Value" Channels)
+sma20 = ta.sma(close, 20)
+sma50 = ta.sma(close, 50)
+line.new(bar_index - 10, sma20[10], bar_index, sma20, color=color.blue, width=3)
+line.new(bar_index - 10, sma50[10], bar_index, sma50, color=color.orange, width=3)
+
+// 3. Volatility/Range Midpoint Projection
+range_high = ta.highest(high, 60)
+range_low = ta.lowest(low, 60)
+mid_point = (range_high + range_low) / 2
+line.new(bar_index - 20, mid_point, bar_index, mid_point, color=color.white, width=1, style=line.style_dashed)
+
+// 4. Trend Velocity Indicator
+// Draws a line showing the steepness of the current price relative to 5 days ago
+line.new(bar_index - 5, close[5], bar_index, close, color=color.purple, width=2)

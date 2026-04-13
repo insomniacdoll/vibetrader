@@ -6,12 +6,135 @@ length = input.int(20, minval=1)
 mult = input.float(2.0, minval=0.001, maxval=50)
 
 // 2. Calculate the Bollinger Bands using ta.bb()
+// The function returns: middle, upper, lower
 [middleBand, upperBand, lowerBand] = ta.bb(close, length, mult)
 
 // 3. Plot the bands on the chart
-plot(middleBand, color=color.blue, title="Middle Band")
+plot(middleBand, color=color.aqua, title="Middle Band")
 p1 = plot(upperBand, color=color.red, title="Upper Band")
 p2 = plot(lowerBand, color=color.red, title="Lower Band")
 
 // 4. Fill the area between bands
 fill(p1, p2, color=color.rgb(33, 150, 243, 90), title="Background")
+
+// //@version=6
+// indicator("Bollinger Bands Overlay", overlay=true)
+// [middle, upper, lower] = ta.bb(close, 20, 2)
+// plot(upper, color=color.new(color.red, 0), title="Upper Band")
+// plot(middle, color=color.new(color.orange, 0), title="Middle Band")
+// plot(lower, color=color.new(color.blue, 0), title="Lower Band")
+// fill(plot(upper), plot(lower), color=color.new(color.blue, 90), title="Background")
+
+
+// //@version=6
+// indicator("RSI Analysis", overlay=false)
+// rsiLength = 14
+// rsiValue = ta.rsi(close, rsiLength)
+// plot(rsiValue, title="RSI", color=color.purple, linewidth=2)
+// h1 = hline(70, "Overbought", color=color.red, linestyle=hline.style_dashed)
+// h2 = hline(30, "Oversold", color=color.green, linestyle=hline.style_dashed)
+// fill(h1, h2, color=color.new(color.purple, 90))
+// hline(50, "Midline", color=color.gray)
+
+// //@version=6
+// indicator("RSI", overlay=false)
+// rsi = ta.rsi(close, 14)
+// plot(rsi, title="RSI", color=#7E57C2, linewidth=2)
+// hline(70, "Overbought", color=color.red, linestyle=hline.style_dashed)
+// hline(30, "Oversold", color=color.green, linestyle=hline.style_dashed)
+// hline(50, "Midline", color=color.gray)
+// fill(hline(70), hline(30), color=color.new(#7E57C2, 90))
+
+// //@version=6
+// indicator("Supertrend Strategy", overlay=true)
+
+// // Supertrend settings
+// atrPeriod = 10
+// factor = 3.0
+// [supertrend, direction] = ta.supertrend(factor, atrPeriod)
+
+// // EMA 200 for trend filter
+// ema200 = ta.ema(close, 200)
+// plot(ema200, color=color.blue, title="EMA 200", linewidth=2)
+
+// // Plot Supertrend
+// bodyMiddle = plot((open + close) / 2,  display=display.none)
+// upTrend = plot(direction < 0 ? supertrend : na, "Up Trend", color = color.green, style=plot.style_linebr)
+// downTrend = plot(direction < 0? na : supertrend, "Down Trend", color = color.red, style=plot.style_linebr)
+
+// // Fill background
+// fill(bodyMiddle, upTrend, color.new(color.green, 90), fillgaps=false)
+// fill(bodyMiddle, downTrend, color.new(color.red, 90), fillgaps=false)
+
+// // Buy/Sell Signals
+// plotshape(direction < 0 and direction[1] > 0, title="Buy", style=shape.labelup, location=location.belowbar, color=color.green, text="BUY", textcolor=color.white, size=size.small)
+// plotshape(direction > 0 and direction[1] < 0, title="Sell", style=shape.labeldown, location=location.abovebar, color=color.red, text="SELL", textcolor=color.white, size=size.small)
+
+
+// //@version=6
+// indicator("Ichimoku Cloud", overlay=true)
+
+// conversionPeriods = 9
+// basePeriods = 26
+// laggingSpan2Periods = 52
+// displacement = 26
+
+// donchian(len) => math.avg(ta.lowest(len), ta.highest(len))
+
+// conversionLine = donchian(conversionPeriods)
+// baseLine = donchian(basePeriods)
+// leadLine1 = math.avg(conversionLine, baseLine)
+// leadLine2 = donchian(laggingSpan2Periods)
+
+// plot(conversionLine, color=#2962FF, title="Conversion Line")
+// plot(baseLine, color=#B71C1C, title="Base Line")
+
+// p1 = plot(leadLine1, offset = displacement - 1, color=#A5D6A7,
+// 	 title="Leading Span A")
+// p2 = plot(leadLine2, offset = displacement - 1, color=#EF9A9A,
+// 	 title="Leading Span B")
+// fill(p1, p2, color = leadLine1 > leadLine2 ? color.rgb(67, 160, 71, 90) : color.rgb(244, 67, 54, 90))
+
+// //@version=5
+// indicator("My Indicator", overlay=true)
+
+// // Simple moving average crossover
+// fastMA = ta.sma(close, 9)
+// slowMA = ta.sma(close, 21)
+
+// // Plot the moving averages
+// plot(fastMA, "Fast MA", color.blue, linewidth=2)
+// plot(slowMA, "Slow MA", color.red, linewidth=2)
+
+// // Generate signals
+// bullCross = ta.crossover(fastMA, slowMA)
+// bearCross = ta.crossunder(fastMA, slowMA)
+
+// // Plot signals
+// plotshape(bullCross, "Buy", shape.triangleup, location.belowbar, color.green, size=size.small)
+// plotshape(bearCross, "Sell", shape.triangledown, location.abovebar, color.red, size=size.small)
+
+// //@version=6
+// indicator("RSI Divergence Detector", overlay=false)
+
+// // RSI Calculation
+// len = 14
+// src = close
+// up = ta.rma(math.max(ta.change(src), 0), len)
+// down = ta.rma(-math.min(ta.change(src), 0), len)
+// rsi = down == 0 ? 100 : up == 0 ? 0 : 100 - (100 / (1 + up / down))
+// plot(rsi, "RSI", color=#7E57C2)
+// hline(70, "Overbought", color=#787B86, linestyle=hline.style_dotted)
+// hline(30, "Oversold", color=#787B86, linestyle=hline.style_dashed)
+
+// // Divergence Logic
+// // We use a simple pivot detection to find local lows
+// lookback = 5
+// pl = ta.pivotlow(src, lookback, lookback)
+// rsi_pl = ta.pivotlow(rsi, lookback, lookback)
+
+// // Detect Bullish Divergence: Price Lower Low, RSI Higher Low
+// // Note: This is a simplified detection for visual aid
+// bullish_div = not na(pl) and (src[lookback] < src[lookback + 20]) and (rsi[lookback] > rsi[lookback + 20])
+
+// plotshape(bullish_div, title="Bullish Divergence", style=shape.labelup, location=location.bottom, color=color.green, text="BULL", textcolor=color.white, offset=-lookback)
