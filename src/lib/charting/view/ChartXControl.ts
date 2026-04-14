@@ -175,20 +175,7 @@ function fillTicks(levelToTicks: { level: Tick['level'], ticks: Tick[] }[], widt
                 return locator.includes(value);
             })
 
-            // FIX 3: Enforce strict physical collision filter to prevent overlaps.
-            // This acts as a bulletproof final pass, replacing the need for getFuzzyTicks.
-            const collisionThreshold = MIN_TICK_SPACING * 0.6;
-            const finalTicks: Tick[] = [];
-            let lastX = -99999;
-
-            for (const tick of ticksInLocator) {
-                if (tick.x - lastX >= collisionThreshold) {
-                    finalTicks.push(tick);
-                    lastX = tick.x;
-                }
-            }
-
-            existedTicks.push(...finalTicks);
+            existedTicks.push(...ticksInLocator);
             return existedTicks.sort((a, b) => a.x - b.x);
         }
     }
